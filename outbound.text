@@ -1,0 +1,143 @@
+  <?xml version="1.0" encoding="UTF-8" ?>
+- <qdoc:dsRqm_mstr xmlns:qdoc="urn:schemas-qad-com:xml-services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+- <qdoc:rqm_mstr>
+  <qdoc:operation>M</qdoc:operation>
+  <qdoc:oidRqmMstr>202406050066842537.697866161</qdoc:oidRqmMstr>
+  <qdoc:rqmAcct />
+  <qdoc:rqmAprCmtindx>0</qdoc:rqmAprCmtindx>
+  <qdoc:rqmAprvStat>2</qdoc:rqmAprvStat>
+  <qdoc:rqmBill />
+  <qdoc:rqmBuyer>mfg</qdoc:rqmBuyer>
+  <qdoc:rqmCategory />
+  <qdoc:rqmCc>312</qdoc:rqmCc>
+  <qdoc:rqmChr01 />
+  <qdoc:rqmChr02 />
+  <qdoc:rqmChr03 />
+  <qdoc:rqmChr04 />
+  <qdoc:rqmClsDate xsi:nil="true" />
+  <qdoc:rqmCmtindx>0</qdoc:rqmCmtindx>
+  <qdoc:rqmContact />
+  <qdoc:rqmCurr>IDR</qdoc:rqmCurr>
+  <qdoc:rqmDaybookset>AP-SMII</qdoc:rqmDaybookset>
+  <qdoc:rqmDec01>0.0</qdoc:rqmDec01>
+  <qdoc:rqmDirect>true</qdoc:rqmDirect>
+  <qdoc:rqmDiscPct>0.0</qdoc:rqmDiscPct>
+  <qdoc:rqmDomain>SMII</qdoc:rqmDomain>
+  <qdoc:rqmDueDate>2024-06-05</qdoc:rqmDueDate>
+  <qdoc:rqmEbyUserid>mfg</qdoc:rqmEbyUserid>
+  <qdoc:rqmEmailOpt>2</qdoc:rqmEmailOpt>
+  <qdoc:rqmEndUserid>edie</qdoc:rqmEndUserid>
+  <qdoc:rqmEntDate>2024-06-05</qdoc:rqmEntDate>
+  <qdoc:rqmEntEx>1.0</qdoc:rqmEntEx>
+  <qdoc:rqmEntity>SMII</qdoc:rqmEntity>
+  <qdoc:rqmExRate>1.0</qdoc:rqmExRate>
+  <qdoc:rqmExRate2>1.0</qdoc:rqmExRate2>
+  <qdoc:rqmExRatetype />
+  <qdoc:rqmExruSeq>0</qdoc:rqmExruSeq>
+  <qdoc:rqmFixPr>true</qdoc:rqmFixPr>
+  <qdoc:rqmFixRate>false</qdoc:rqmFixRate>
+  <qdoc:rqmFob />
+  <qdoc:rqmJob />
+  <qdoc:rqmLang>us</qdoc:rqmLang>
+  <qdoc:rqmLnFmt>false</qdoc:rqmLnFmt>
+  <qdoc:rqmLog01>false</qdoc:rqmLog01>
+  <qdoc:rqmMaxTotal>2000.0</qdoc:rqmMaxTotal>
+  <qdoc:rqmNbr>PR7602</qdoc:rqmNbr>
+  <qdoc:rqmNeedDate>2024-06-05</qdoc:rqmNeedDate>
+  <qdoc:rqmOpen>true</qdoc:rqmOpen>
+  <qdoc:rqmPartial>true</qdoc:rqmPartial>
+  <qdoc:rqmPentUserid>mfg</qdoc:rqmPentUserid>
+  <qdoc:rqmPrevRtp>false</qdoc:rqmPrevRtp>
+  <qdoc:rqmPrevUserid>mfg</qdoc:rqmPrevUserid>
+  <qdoc:rqmPrint>true</qdoc:rqmPrint>
+  <qdoc:rqmPrList />
+  <qdoc:rqmPrList2 />
+  <qdoc:rqmProject />
+  <qdoc:rqmQadc01 />
+  <qdoc:rqmQadc02 />
+  <qdoc:rqmQadc03 />
+  <qdoc:rqmQadc04 />
+  <qdoc:rqmReason>Beli</qdoc:rqmReason>
+  <qdoc:rqmReqDate>2024-06-05</qdoc:rqmReqDate>
+  <qdoc:rqmRmks>EX PR/PURPLAN-DD/SMII/06</qdoc:rqmRmks>
+  <qdoc:rqmRqbyUserid>mfg</qdoc:rqmRqbyUserid>
+  <qdoc:rqmRtdtoPurch>true</qdoc:rqmRtdtoPurch>
+  <qdoc:rqmRttoDate xsi:nil="true" />
+  <qdoc:rqmRttoTime>0</qdoc:rqmRttoTime>
+  <qdoc:rqmRttoUserid>mfg</qdoc:rqmRttoUserid>
+  <qdoc:rqmShip>1000</qdoc:rqmShip>
+  <qdoc:rqmShipvia />
+  <qdoc:rqmSite>1000</qdoc:rqmSite>
+  <qdoc:rqmStatus />
+  <qdoc:rqmSub />
+  <qdoc:rqmType />
+  <qdoc:rqmVend>10005</qdoc:rqmVend>
+- <qdoc:rqd_det>
+  <qdoc:operation>M</qdoc:operation>
+  <qdoc:oidRqdDet>202406050066842543.697866161</qdoc:oidRqdDet>
+  <qdoc:rqdAcct>5516</qdoc:rqdAcct>
+  <qdoc:rqdAprvStat>2</qdoc:rqdAprvStat>
+  <qdoc:rqdAssay>0.0</qdoc:rqdAssay>
+  <qdoc:rqdCategory />
+  <qdoc:rqdCc />
+  <qdoc:rqdChr01 />
+  <qdoc:rqdChr02 />
+  <qdoc:rqdChr03 />
+  <qdoc:rqdChr04 />
+  <qdoc:rqdCmtindx>0</qdoc:rqdCmtindx>
+  <qdoc:rqdDesc>Item Not In Inventory</qdoc:rqdDesc>
+  <qdoc:rqdDiscPct>0.0</qdoc:rqdDiscPct>
+  <qdoc:rqdDomain>SMII</qdoc:rqdDomain>
+  <qdoc:rqdDueDate>2024-06-05</qdoc:rqdDueDate>
+  <qdoc:rqdExpire xsi:nil="true" />
+  <qdoc:rqdGrade />
+  <qdoc:rqdInspRqd>false</qdoc:rqdInspRqd>
+  <qdoc:rqdItemRevDate xsi:nil="true" />
+  <qdoc:rqdLine>1</qdoc:rqdLine>
+  <qdoc:rqdLoc />
+  <qdoc:rqdLotRcpt>false</qdoc:rqdLotRcpt>
+  <qdoc:rqdMaxCost>1000.0</qdoc:rqdMaxCost>
+  <qdoc:rqdNbr>PR7602</qdoc:rqdNbr>
+  <qdoc:rqdNeedDate>2024-06-05</qdoc:rqdNeedDate>
+  <qdoc:rqdOotExtra />
+  <qdoc:rqdOotExtra />
+  <qdoc:rqdOotExtra />
+  <qdoc:rqdOotExtra />
+  <qdoc:rqdOotExtra />
+  <qdoc:rqdOotExtra />
+  <qdoc:rqdOotExtra />
+  <qdoc:rqdOotExtra />
+  <qdoc:rqdOotPonetcst>0.0</qdoc:rqdOotPonetcst>
+  <qdoc:rqdOotPoum />
+  <qdoc:rqdOotRqnetcst>0.0</qdoc:rqdOotRqnetcst>
+  <qdoc:rqdOotRqum />
+  <qdoc:rqdOp>0</qdoc:rqdOp>
+  <qdoc:rqdOpen>true</qdoc:rqdOpen>
+  <qdoc:rqdPart>baso</qdoc:rqdPart>
+  <qdoc:rqdPrList />
+  <qdoc:rqdPrList2 />
+  <qdoc:rqdProject />
+  <qdoc:rqdPurCost>1000.0</qdoc:rqdPurCost>
+  <qdoc:rqdQadc01>1000</qdoc:rqdQadc01>
+  <qdoc:rqdQadc02 />
+  <qdoc:rqdQadc03 />
+  <qdoc:rqdQadc04 />
+  <qdoc:rqdRctstat />
+  <qdoc:rqdRelDate xsi:nil="true" />
+  <qdoc:rqdReqQty>2.0</qdoc:rqdReqQty>
+  <qdoc:rqdRev />
+  <qdoc:rqdShip />
+  <qdoc:rqdSite>1000</qdoc:rqdSite>
+  <qdoc:rqdStatus />
+  <qdoc:rqdSubType />
+  <qdoc:rqdTaxable>false</qdoc:rqdTaxable>
+  <qdoc:rqdType>M</qdoc:rqdType>
+  <qdoc:rqdUm />
+  <qdoc:rqdUmConv>1.0</qdoc:rqdUmConv>
+  <qdoc:rqdVend>10005</qdoc:rqdVend>
+  <qdoc:rqdVpart />
+  <qdoc:rqdWipLotser />
+  <qdoc:rqdWoLot />
+  </qdoc:rqd_det>
+  </qdoc:rqm_mstr>
+  </qdoc:dsRqm_mstr>

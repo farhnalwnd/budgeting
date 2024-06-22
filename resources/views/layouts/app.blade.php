@@ -6,275 +6,140 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <!-- PWA  -->
+    <meta name="theme-color" content="#6777ef" />
+    <link rel="apple-touch-icon" href="{{ asset('assets/images/sinarmeadow.png') }}">
+    <link rel="manifest" href="{{ asset('/manifest.json') }}">
+
+    <title>{{ config('app.name', 'INTRA SMII') }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-    {{-- style --}}
-    <link rel="stylesheet" type="text/css" media="screen" href="{{ asset('assets') }}/css/perfect-scrollbar.min.css">
-    <link rel="stylesheet" type="text/css" media="screen" href="{{ asset('assets') }}/css/style.css">
-    <link defer="" rel="stylesheet" type="text/css" media="screen" href="{{ asset('assets') }}/css/animate.css">
-    <script src="{{ asset('assets') }}/js/perfect-scrollbar.min.js"></script>
-    <script defer="" src="{{ asset('assets') }}/js/popper.min.js"></script>
-    <script defer="" src="{{ asset('assets') }}/js/tippy-bundle.umd.min.js"></script>
-    <script defer="" src="{{ asset('assets') }}/js/sweetalert.min.js"></script>
+    <!-- Vendors Style-->
+    <link rel="stylesheet" href="{{ asset('assets') }}/src/css/vendors_css.css">
+
+
+    {{-- <script src="{{ asset('assets') }}/3.4.3"></script> --}}
+
+    <link rel="stylesheet" href="{{ asset('assets') }}/src/css/tailwind.min.css">
+
+    <!-- Style-->
+    <link rel="stylesheet" href="{{ asset('assets') }}/src/css/horizontal-menu.css">
+    <link rel="stylesheet" href="{{ asset('assets') }}/src/css/style.css">
+    <link rel="stylesheet" href="{{ asset('assets') }}/src/css/skin_color.css">
+    <link rel="stylesheet" href="{{ asset('assets') }}/src/css/custom.css">
+
+<style>
+ body {
+    zoom: 0.8;  /* Mengatur skala zoom ke 80% */
+}
+</style>
 
     <!-- Scripts -->
-    @vite(['resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body x-data="main" class="relative overflow-x-hidden font-nunito text-sm font-normal antialiased"
-    :class="[$store.app.sidebar ? 'toggle-sidebar' : '', $store.app.theme === 'dark' || $store.app.isDarkMode ? 'dark' : '',
-        $store.app.menu, $store.app.layout, $store.app.rtlClass
-    ]">
-    <!-- sidebar menu overlay -->
-    <div x-cloak="" class="fixed inset-0 z-50 bg-[black]/60 lg:hidden" :class="{ 'hidden': !$store.app.sidebar }"
-        @click="$store.app.toggleSidebar()"></div>
+<body class="layout-top-nav light-skin theme-primary fixed-manu">
 
-    @include('layouts.partials.loader_scroll')
-    @include('layouts.partials.theme')
-    <div class="main-container min-h-screen text-black dark:text-white-dark" :class="[$store.app.navbar]">
+    <div class="wrapper">
+        <div id="loader"></div>
+        @include('layouts.partials.header')
 
         @include('layouts.partials.sidebar')
-        <div class="main-content flex min-h-screen flex-col">
+        <!-- Content Wrapper. Contains page content -->
 
-            @include('layouts.partials.header')
-
-            <div class="animate__animated p-6" :class="[$store.app.animation]">
-
-                {{ $slot }}
-
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <div class="px-4 md:px-0">
+                {{ $slot   }}
             </div>
-
-            @include('layouts.partials.footer')
         </div>
+        <!-- /.content-wrapper -->
+
+
+        @include('layouts.partials.footer')
+        <!-- Side panel -->
+
+
+        <!-- Control Sidebar -->
+        @include('layouts.partials.theme')
+        <!-- /.control-sidebar -->
+
+        <!-- Add the sidebar's background. This div must be placed immediately after the control sidebar -->
+        <div class="control-sidebar-bg"></div>
 
     </div>
-    </div>
-    <script src="{{ asset('assets') }}/js/alpine-collaspe.min.js"></script>
-    <script src="{{ asset('assets') }}/js/alpine-persist.min.js"></script>
-    <script defer="" src="{{ asset('assets') }}/js/alpine-ui.min.js"></script>
-    <script defer="" src="{{ asset('assets') }}/js/alpine-focus.min.js"></script>
-    <script defer="" src="{{ asset('assets') }}/js/alpine.min.js"></script>
-    <script src="{{ asset('assets') }}/js/custom.js"></script>
-    <script defer="" src="{{ asset('assets') }}/js/apexcharts.js"></script>
+    <!-- ./wrapper -->
 
-    <script>
-        document.addEventListener('alpine:init', () => {
-            // main section
-            Alpine.data('scrollToTop', () => ({
-                showTopButton: false,
-                init() {
-                    window.onscroll = () => {
-                        this.scrollFunction();
-                    };
-                },
+    <!-- Page Content overlay -->
 
-                scrollFunction() {
-                    if (document.body.scrollTop > 50 || document.documentElement.scrollTop > 50) {
-                        this.showTopButton = true;
-                    } else {
-                        this.showTopButton = false;
-                    }
-                },
 
-                goToTop() {
-                    document.body.scrollTop = 0;
-                    document.documentElement.scrollTop = 0;
-                },
-            }));
 
-            // theme customization
-            Alpine.data('customizer', () => ({
-                showCustomizer: false,
-            }));
-
-            // sidebar section
-            Alpine.data('sidebar', () => ({
-                init() {
-                    const selector = document.querySelector('.sidebar ul a[href="' + window.location
-                        .pathname + '"]');
-                    if (selector) {
-                        selector.classList.add('active');
-                        const ul = selector.closest('ul.sub-menu');
-                        if (ul) {
-                            let ele = ul.closest('li.menu').querySelectorAll('.nav-link');
-                            if (ele) {
-                                ele = ele[0];
-                                setTimeout(() => {
-                                    ele.click();
-                                });
-                            }
-                        }
-                    }
-                },
-            }));
-
-            // header section
-            Alpine.data('header', () => ({
-                init() {
-                    const selector = document.querySelector('ul.horizontal-menu a[href="' + window
-                        .location.pathname + '"]');
-                    if (selector) {
-                        selector.classList.add('active');
-                        const ul = selector.closest('ul.sub-menu');
-                        if (ul) {
-                            let ele = ul.closest('li.menu').querySelectorAll('.nav-link');
-                            if (ele) {
-                                ele = ele[0];
-                                setTimeout(() => {
-                                    ele.classList.add('active');
-                                });
-                            }
-                        }
-                    }
-                },
-
-                notifications: [{
-                        id: 1,
-                        profile: 'user-profile.jpeg',
-                        message: '<strong class="text-sm mr-1">StarCode Kh</strong>invite you to <strong>Prototyping</strong>',
-                        time: '45 min ago',
-                    },
-                    {
-                        id: 2,
-                        profile: 'profile-34.jpeg',
-                        message: '<strong class="text-sm mr-1">Adam Nolan</strong>mentioned you to <strong>UX Basics</strong>',
-                        time: '9h Ago',
-                    },
-                    {
-                        id: 3,
-                        profile: 'profile-16.jpeg',
-                        message: '<strong class="text-sm mr-1">Anna Morgan</strong>Upload a file',
-                        time: '9h Ago',
-                    },
-                ],
-
-                messages: [{
-                        id: 1,
-                        image: '<span class="grid place-content-center w-9 h-9 rounded-full bg-success-light dark:bg-success text-success dark:text-success-light"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></span>',
-                        title: 'Congratulations!',
-                        message: 'Your OS has been updated.',
-                        time: '1hr',
-                    },
-                    {
-                        id: 2,
-                        image: '<span class="grid place-content-center w-9 h-9 rounded-full bg-info-light dark:bg-info text-info dark:text-info-light"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></span>',
-                        title: 'Did you know?',
-                        message: 'You can switch between artboards.',
-                        time: '2hr',
-                    },
-                    {
-                        id: 3,
-                        image: '<span class="grid place-content-center w-9 h-9 rounded-full bg-danger-light dark:bg-danger text-danger dark:text-danger-light"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span>',
-                        title: 'Something went wrong!',
-                        message: 'Send Reposrt',
-                        time: '2days',
-                    },
-                    {
-                        id: 4,
-                        image: '<span class="grid place-content-center w-9 h-9 rounded-full bg-warning-light dark:bg-warning text-warning dark:text-warning-light"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">    <circle cx="12" cy="12" r="10"></circle>    <line x1="12" y1="8" x2="12" y2="12"></line>    <line x1="12" y1="16" x2="12.01" y2="16"></line></svg></span>',
-                        title: 'Warning',
-                        message: 'Your password strength is low.',
-                        time: '5days',
-                    },
-                ],
-
-                languages: [{
-                        id: 1,
-                        key: 'Khmer',
-                        value: 'kh',
-                    },
-                    {
-                        id: 2,
-                        key: 'Danish',
-                        value: 'da',
-                    },
-                    {
-                        id: 3,
-                        key: 'English',
-                        value: 'en',
-                    },
-                    {
-                        id: 4,
-                        key: 'French',
-                        value: 'fr',
-                    },
-                    {
-                        id: 5,
-                        key: 'German',
-                        value: 'de',
-                    },
-                    {
-                        id: 6,
-                        key: 'Greek',
-                        value: 'el',
-                    },
-                    {
-                        id: 7,
-                        key: 'Hungarian',
-                        value: 'hu',
-                    },
-                    {
-                        id: 8,
-                        key: 'Italian',
-                        value: 'it',
-                    },
-                    {
-                        id: 9,
-                        key: 'Japanese',
-                        value: 'ja',
-                    },
-                    {
-                        id: 10,
-                        key: 'Polish',
-                        value: 'pl',
-                    },
-                    {
-                        id: 11,
-                        key: 'Portuguese',
-                        value: 'pt',
-                    },
-                    {
-                        id: 12,
-                        key: 'Russian',
-                        value: 'ru',
-                    },
-                    {
-                        id: 13,
-                        key: 'Spanish',
-                        value: 'es',
-                    },
-                    {
-                        id: 14,
-                        key: 'Swedish',
-                        value: 'sv',
-                    },
-                    {
-                        id: 15,
-                        key: 'Turkish',
-                        value: 'tr',
-                    },
-                    {
-                        id: 16,
-                        key: 'Arabic',
-                        value: 'ae',
-                    },
-                ],
-
-                removeNotification(value) {
-                    this.notifications = this.notifications.filter((d) => d.id !== value);
-                },
-
-                removeMessage(value) {
-                    this.messages = this.messages.filter((d) => d.id !== value);
-                },
-            }));
-
-        });
+    <script type="text/javascript" src="{{ asset('assets') }}/ajax/libs/jQuery-slimScroll/1.3.8/jquery-3.7.1.min.js">
     </script>
+    <script type="text/javascript" src="{{ asset('assets') }}/ajax/libs/jQuery-slimScroll/1.3.8/jquery.slimscroll.min.js">
+    </script>
+    <!-- Vendor JS -->
+    <script src="{{ asset('assets') }}/src/js/vendors.min.js"></script>
+    <script src="{{ asset('assets') }}/src/js/pages/chat-popup.js"></script>
+    <script src="{{ asset('assets') }}/icons/feather-icons/feather.min.js"></script>
+
+    <script src="{{ asset('assets') }}/vendor_components/Flot/jquery.flot.js"></script>
+    <script src="{{ asset('assets') }}/vendor_components/Flot/jquery.flot.resize.js"></script>
+    <script src="{{ asset('assets') }}/vendor_components/Flot/jquery.flot.pie.js"></script>
+    <script src="{{ asset('assets') }}/vendor_components/Flot/jquery.flot.categories.js"></script>
+    <script src="{{ asset('assets') }}/vendor_components/datatable/datatables.min.js"></script>
+    <script src="{{ asset('assets') }}/vendor_components/echarts/dist/echarts-en.min.js"></script>
+    <script src="{{ asset('assets') }}/vendor_components/apexcharts-bundle/dist/apexcharts.js"></script>
+    <script src="{{ asset('assets') }}/vendor_components/jquery-toast-plugin-master/src/jquery.toast.js"></script>
+    <script src="{{ asset('assets') }}/vendor_components/sweetalert/sweetalert.min.js"></script>
+    <script src="{{ asset('assets') }}/vendor_components/sweetalert/jquery.sweet-alert.custom.js"></script>
+
+    <script src="{{ asset('assets') }}/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js"></script>
+    <script src="{{ asset('assets') }}/vendor_components/c3/d3.min.js"></script>
+    <script src="{{ asset('assets') }}/vendor_components/c3/c3.min.js"></script>
+    <script src="{{ asset('assets') }}/vendor_components/raphael/raphael.min.js"></script>
+    <script src="{{ asset('assets') }}/vendor_components/morris.js/morris.min.js"></script>
+    <script src="{{ asset('assets') }}/src/js/tailwind.min.js"></script>
+    <!-- Warehouse App -->
+    <script src="{{ asset('assets') }}/src/js/demo.js"></script>
+    <script src="{{ asset('assets') }}/src/js/jquery.smartmenus.js"></script>
+    <script src="{{ asset('assets') }}/src/js/menus.js"></script>
+    <script src="{{ asset('assets') }}/src/js/template.js"></script>
+    <script src="{{ asset('assets') }}/src/js/pages/dashboard2.js"></script>
+    <script src="{{ asset('assets') }}/src/js/pages/calendar.js"></script>
+    <script src="{{ asset('assets') }}/vendor_components/jquery-steps-master/build/jquery.steps.js"></script>
+    <script src="{{ asset('assets') }}/vendor_components/jquery-validation-1.17.0/dist/jquery.validate.min.js"></script>
+    <script src="{{ asset('assets') }}/src/js/pages/steps.js"></script>
+    <script src="{{ asset('assets') }}/vendor_components/sweetalert/sweetalert.min.js"></script>
+    <script src="{{ asset('assets') }}/src/js/pages/data-table.js"></script>
+
+    <script src="{{ asset('assets') }}/src/js/pages/toastr.js"></script>
+    <script src="{{ asset('assets') }}/src/js/pages/notification.js"></script>
+
+    <script src="{{ asset('/sw.js') }}"></script>
+    {{-- <script>
+        if ("serviceWorker" in navigator) {
+            // Register a service worker hosted at the root of the
+            // site using the default scope.
+            navigator.serviceWorker.register("/sw.js").then(
+                (registration) => {
+                    console.log("Service worker registration succeeded:", registration);
+                },
+                (error) => {
+                    console.error(`Service worker registration failed: ${error}`);
+                },
+            );
+        } else {
+            console.error("Service workers are not supported.");
+        }
+    </script> --}}
+
+@stack('scripts')
+
+
 </body>
 
 </html>

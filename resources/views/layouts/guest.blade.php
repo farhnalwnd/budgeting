@@ -8,68 +8,42 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" type="text/css" media="screen" href="{{ asset('assets') }}/css/style.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+<!-- Vendors Style-->
+<link rel="stylesheet" href="{{ asset('assets') }}/src/css/vendors_css.css">
+<link rel="stylesheet" type="text/css" href="{{ asset('assets') }}/src/css/font-awesome-6.4.css">
 
+
+<script src="{{ asset('assets') }}/3.4.3"></script>
+
+<link rel="stylesheet" href="{{ asset('assets') }}/src/css/tailwind.min.css">
+
+<!-- Style-->
+<link rel="stylesheet" href="{{ asset('assets') }}/src/css/horizontal-menu.css">
+<link rel="stylesheet" href="{{ asset('assets') }}/src/css/style.css">
+<link rel="stylesheet" href="{{ asset('assets') }}/src/css/skin_color.css">
 
     <!-- Scripts -->
-    @vite(['resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body x-data="main" class="relative overflow-x-hidden font-nunito text-sm font-normal antialiased"
-    :class="[$store.app.sidebar ? 'toggle-sidebar' : '', $store.app.theme === 'dark' || $store.app.isDarkMode ? 'dark' : '',
-        $store.app.menu, $store.app.layout, $store.app.rtlClass
-    ]">
-    @include('layouts.partials.loader_scroll')
+<body class="hold-transition theme-primary bg-img bg-center" style="background-image: url({{ asset('assets/images/bg.png') }})">
 
-    <div class="main-container min-h-screen text-black dark:text-white-dark">
-        {{ $slot }}
-    </div>
-    @include('layouts.partials.footer')
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous">
-    </script>
-    <script src="{{ asset('assets') }}/js/alpine-collaspe.min.js"></script>
-    <script src="{{ asset('assets') }}/js/alpine-persist.min.js"></script>
-    <script defer="" src="{{ asset('assets') }}/js/alpine-ui.min.js"></script>
-    <script defer="" src="{{ asset('assets') }}/js/alpine-focus.min.js"></script>
-    <script defer="" src="{{ asset('assets') }}/js/alpine.min.js"></script>
+	<div class="px-4 md:px-0">
+			<div class="grid grid-cols-1 m-0">
+				{{ $slot }}
+			</div>
 
-    <script src="{{ asset('assets') }}/js/custom.js"></script>
+			<script type="text/javascript">
 
-    <script>
-        // main section
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('scrollToTop', () => ({
-                showTopButton: false,
-                init() {
-                    window.onscroll = () => {
-                        this.scrollFunction();
-                    };
-                },
-
-                scrollFunction() {
-                    if (document.body.scrollTop > 50 || document.documentElement.scrollTop > 50) {
-                        this.showTopButton = true;
-                    } else {
-                        this.showTopButton = false;
-                    }
-                },
-
-                goToTop() {
-                    document.body.scrollTop = 0;
-                    document.documentElement.scrollTop = 0;
-                },
-            }));
+			</script>
+			<!-- latest jquery-->
+			<script type="text/javascript" src="{{ asset('assets') }}/ajax/libs/jQuery-slimScroll/1.3.8/jquery-3.7.1.min.js">
+		</div>
 
 
-        });
-    </script>
+	<!-- Vendor JS -->
+	<script src="{{ asset('assets') }}/src/js/vendors.min.js"></script>
+
 </body>
 
 </html>

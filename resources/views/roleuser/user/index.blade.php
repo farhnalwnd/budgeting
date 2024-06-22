@@ -1,66 +1,67 @@
 <x-app-layout>
+    <div class="content-header">
+        <div class="flex items-center justify-between">
+            <h4 class="page-title text-2xl font-medium">List Users</h4>
+            <div class="inline-flex items-center">
+                <nav>
+                    <ol class="breadcrumb flex items-center">
+                        <li class="breadcrumb-item pr-1"><a href="{{ route('dashboard') }}"><i class="mdi mdi-home-outline"></i></a></li>
+                        <li class="breadcrumb-item pr-1" aria-current="page">Users</li>
+                        <li class="breadcrumb-item active" aria-current="page">List Users</li>
+                    </ol>
+                </nav>
 
-    <div class="container mt-2">
-        <div class="row">
-            <div class="col-md-12">
-
-                @if (session('status'))
-                    <div class="alert alert-success">{{ session('status') }}</div>
-                @endif
-
-                <div class="card mt-3">
-                    <div class="card-header">
-                        <h4>Users
-                            @can('create user')
-                                <a href="{{ url('users/create') }}" class="btn btn-primary float-end">Add User</a>
-                            @endcan
-                        </h4>
-                    </div>
-                    <div class="card-body">
-
-                        <table class="table table-bordered table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Id</th>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Roles</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($users as $user)
-                                    <tr>
-                                        <td>{{ $user->id }}</td>
-                                        <td>{{ $user->name }}</td>
-                                        <td>{{ $user->email }}</td>
-                                        <td>
-                                            @if (!empty($user->getRoleNames()))
-                                                @foreach ($user->getRoleNames() as $rolename)
-                                                    <label class="badge bg-primary mx-1">{{ $rolename }}</label>
-                                                @endforeach
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @can('update user')
-                                                <a href="{{ url('users/' . $user->id . '/edit') }}"
-                                                    class="btn btn-success">Edit</a>
-                                            @endcan
-
-                                            @can('delete user')
-                                                <a href="{{ url('users/' . $user->id . '/delete') }}"
-                                                    class="btn btn-danger mx-2">Delete</a>
-                                            @endcan
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-
-                    </div>
-                </div>
             </div>
         </div>
     </div>
 
+    <section class="content">
+        <a href="{{ route('users.create') }}" class="btn btn-success ml-4">Tambah User</a>
+        <div class="table-responsive">
+            <table class="text-fade table b-1 border-warning w-full" id="usersTable">
+                <thead class="bg-warning text-left">
+                    <tr>
+                        <th>#</th>
+                        <th>Nama Pengguna</th>
+                        <th>Email</th>
+                        <th>Posisi</th>
+                        <th>Departemen</th>
+                        <th>Edit</th>
+                        <th>Hapus</th>
+                    </tr>
+                </thead>
+                <tbody class="text-black">
+                    @foreach ($users as $user)
+                    <tr>
+                        <td>{{ $loop->iteration }}</td>
+                        <td>{{ $user->name }}</td>
+                        <td>{{ $user->email }}</td>
+                        <td>{{ $user->position->position_name }}</td>
+                        <td>{{ $user->position->department->department_name }}</td>
+                        <td><a href="/users/{{ $user->id }}/edit"><i class="mdi mdi-pencil"></i></a></td>
+                        <td>
+                            <form action="/users/{{ $user->id }}/delete" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus pengguna ini?')"><i class="mdi mdi-delete"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    @push('scripts')
+    <script>
+        $(document).ready(function() {
+            $('#usersTable').DataTable({
+                "pageLength": 5,
+                "lengthChange": false,
+                "pagingType": "simple_numbers"
+            });
+        });
+    </script>
+    @endpush
 </x-app-layout>

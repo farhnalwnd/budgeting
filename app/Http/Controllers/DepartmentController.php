@@ -12,7 +12,8 @@ class DepartmentController extends Controller
      */
     public function index()
     {
-        //
+        $departments = Department::all();
+        return view('roleuser.department.user.index', compact('departments'));
     }
 
     /**

@@ -1,65 +1,60 @@
-
 <x-app-layout>
-
-
-    <div class="container mt-2">
-        <div class="row">
-            <div class="col-md-12">
-
-                @if (session('status'))
-                    <div class="alert alert-success">{{ session('status') }}</div>
-                @endif
-
-                <div class="card mt-3">
-                    <div class="card-header">
-                        <h4>
-                            Roles
-                            @can('create role')
-                            <a href="{{ url('roles/create') }}" class="btn btn-primary float-end">Add Role</a>
-                            @endcan
-                        </h4>
-                    </div>
-                    <div class="card-body">
-
-                        <table class="table table-bordered table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Id</th>
-                                    <th>Name</th>
-                                    <th width="40%">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($roles as $role)
-                                <tr>
-                                    <td>{{ $role->id }}</td>
-                                    <td>{{ $role->name }}</td>
-                                    <td>
-                                        <a href="{{ url('roles/'.$role->id.'/give-permissions') }}" class="btn btn-warning">
-                                            Add / Edit Role Permission
-                                        </a>
-
-                                        @can('update role')
-                                        <a href="{{ url('roles/'.$role->id.'/edit') }}" class="btn btn-success">
-                                            Edit
-                                        </a>
-                                        @endcan
-
-                                        @can('delete role')
-                                        <a href="{{ url('roles/'.$role->id.'/delete') }}" class="btn btn-danger mx-2">
-                                            Delete
-                                        </a>
-                                        @endcan
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-
-                    </div>
-                </div>
+    <div class="content-header">
+        <div class="flex items-center justify-between">
+            <h4 class="page-title text-2xl font-medium">Daftar Role</h4>
+            <div class="inline-flex items-center">
+                <nav>
+                    <ol class="breadcrumb flex items-center">
+                        <li class="breadcrumb-item pr-1"><a href="{{ route('dashboard') }}"><i class="mdi mdi-home-outline"></i></a></li>
+                        <li class="breadcrumb-item pr-1" aria-current="page">Role</li>
+                        <li class="breadcrumb-item active" aria-current="page">Daftar Role</li>
+                    </ol>
+                </nav>
             </div>
         </div>
     </div>
 
+    <section class="content">
+        <a href="{{ route('roles.create') }}" class="btn btn-success ml-4">Tambah Role</a>
+        <div class="table-responsive">
+            <table class="text-fade table b-1 border-warning w-full" id="rolesTable">
+                <thead class="bg-warning text-left">
+                    <tr>
+                        <th>#</th>
+                        <th>Nama Role</th>
+                        <th>Edit</th>
+                        <th>Hapus</th>
+                    </tr>
+                </thead>
+                <tbody class="text-black">
+                    @foreach ($roles as $role)
+                    <tr>
+                        <td>{{ $loop->iteration }}</td>
+                        <td>{{ $role->name }}</td>
+                        <td><a href="{{ route('roles.edit', $role->id) }}"><i class="mdi mdi-pencil"></i></a></td>
+                        <td>
+                            <form action="{{ route('roles.destroy', $role->id) }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus role ini?')"><i class="mdi mdi-delete"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    @push('scripts')
+    <script>
+        $(document).ready(function() {
+            $('#rolesTable').DataTable({
+                "pageLength": 5,
+                "lengthChange": false,
+                "pagingType": "simple_numbers"
+            });
+        });
+    </script>
+    @endpush
 </x-app-layout>

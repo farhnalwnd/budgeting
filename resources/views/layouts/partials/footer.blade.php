@@ -1,5 +1,15 @@
- <!-- start footer section -->
- <div class="mt-auto p-6 pt-0 text-center dark:text-white-dark ltr:sm:text-left rtl:sm:text-right">
-    © <span id="footer-year">2024</span>. MIS - SINAR MEADOW. All rights reserved.
-</div>
-<!-- end footer section -->
+<footer class="main-footer bt-1">
+    <div class="pull-right max-[575px]:hidden min-[576px]:inline-flex">
+        <ul class="nav nav-primary nav-dotted nav-dot-separated justify-center justify-content-md-end">
+            <li class="nav-item">
+                <a class="nav-link text-bold text-amber-500 hover:text-amber-900" href="https://sinarmeadow.com"
+                    target="_blank">PT . SINAR MEADOW OFFICIAL</a>
+            </li>
+        </ul>
+    </div>
+    &copy;
+    <script>
+        document.write(new Date().getFullYear())
+    </script> INTRA SMII | SINARMEADOW | MIS.  All Rights Reserved.
+
+</footer>

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('levels', function (Blueprint $table) {
             $table->id();
             $table->string('level_name');
+            $table->string('level_slug');
             $table->timestamps();
         });
     }

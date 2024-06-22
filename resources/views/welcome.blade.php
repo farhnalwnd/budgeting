@@ -1,133 +1,850 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Laravel</title>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
+    <title>Laravel</title>
 
-        <!-- Styles -->
-        <style>
-            /* ! tailwindcss v3.2.4 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:Figtree, sans-serif;font-feature-settings:normal}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-size:100%;font-weight:inherit;line-height:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}[type=button],[type=reset],[type=submit],button{-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]{display:none}*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: }::-webkit-backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: }.relative{position:relative}.mx-auto{margin-left:auto;margin-right:auto}.mx-6{margin-left:1.5rem;margin-right:1.5rem}.ml-4{margin-left:1rem}.mt-16{margin-top:4rem}.mt-6{margin-top:1.5rem}.mt-4{margin-top:1rem}.-mt-px{margin-top:-1px}.mr-1{margin-right:0.25rem}.flex{display:flex}.inline-flex{display:inline-flex}.grid{display:grid}.h-16{height:4rem}.h-7{height:1.75rem}.h-6{height:1.5rem}.h-5{height:1.25rem}.min-h-screen{min-height:100vh}.w-auto{width:auto}.w-16{width:4rem}.w-7{width:1.75rem}.w-6{width:1.5rem}.w-5{width:1.25rem}.max-w-7xl{max-width:80rem}.shrink-0{flex-shrink:0}.scale-100{--tw-scale-x:1;--tw-scale-y:1;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.items-center{align-items:center}.justify-center{justify-content:center}.gap-6{gap:1.5rem}.gap-4{gap:1rem}.self-center{align-self:center}.rounded-lg{border-radius:0.5rem}.rounded-full{border-radius:9999px}.bg-gray-100{--tw-bg-opacity:1;background-color:rgb(243 244 246 / var(--tw-bg-opacity))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity))}.bg-red-50{--tw-bg-opacity:1;background-color:rgb(254 242 242 / var(--tw-bg-opacity))}.bg-dots-darker{background-image:url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.22676 0C1.91374 0 2.45351 0.539773 2.45351 1.22676C2.45351 1.91374 1.91374 2.45351 1.22676 2.45351C0.539773 2.45351 0 1.91374 0 1.22676C0 0.539773 0.539773 0 1.22676 0Z' fill='rgba(0,0,0,0.07)'/%3E%3C/svg%3E")}.from-gray-700\/50{--tw-gradient-from:rgb(55 65 81 / 0.5);--tw-gradient-to:rgb(55 65 81 / 0);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.via-transparent{--tw-gradient-to:rgb(0 0 0 / 0);--tw-gradient-stops:var(--tw-gradient-from), transparent, var(--tw-gradient-to)}.bg-center{background-position:center}.stroke-red-500{stroke:#ef4444}.stroke-gray-400{stroke:#9ca3af}.p-6{padding:1.5rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.text-center{text-align:center}.text-right{text-align:right}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.font-semibold{font-weight:600}.leading-relaxed{line-height:1.625}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity))}.text-gray-900{--tw-text-opacity:1;color:rgb(17 24 39 / var(--tw-text-opacity))}.text-gray-500{--tw-text-opacity:1;color:rgb(107 114 128 / var(--tw-text-opacity))}.underline{-webkit-text-decoration-line:underline;text-decoration-line:underline}.antialiased{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-gray-500\/20{--tw-shadow-color:rgb(107 114 128 / 0.2);--tw-shadow:var(--tw-shadow-colored)}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.selection\:bg-red-500 *::selection{--tw-bg-opacity:1;background-color:rgb(239 68 68 / var(--tw-bg-opacity))}.selection\:text-white *::selection{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity))}.selection\:bg-red-500::selection{--tw-bg-opacity:1;background-color:rgb(239 68 68 / var(--tw-bg-opacity))}.selection\:text-white::selection{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity))}.hover\:text-gray-900:hover{--tw-text-opacity:1;color:rgb(17 24 39 / var(--tw-text-opacity))}.hover\:text-gray-700:hover{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity))}.focus\:rounded-sm:focus{border-radius:0.125rem}.focus\:outline:focus{outline-style:solid}.focus\:outline-2:focus{outline-width:2px}.focus\:outline-red-500:focus{outline-color:#ef4444}.group:hover .group-hover\:stroke-gray-600{stroke:#4b5563}.z-10{z-index: 10}@media (prefers-reduced-motion: no-preference){.motion-safe\:hover\:scale-\[1\.01\]:hover{--tw-scale-x:1.01;--tw-scale-y:1.01;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}}@media (prefers-color-scheme: dark){.dark\:bg-gray-900{--tw-bg-opacity:1;background-color:rgb(17 24 39 / var(--tw-bg-opacity))}.dark\:bg-gray-800\/50{background-color:rgb(31 41 55 / 0.5)}.dark\:bg-red-800\/20{background-color:rgb(153 27 27 / 0.2)}.dark\:bg-dots-lighter{background-image:url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.22676 0C1.91374 0 2.45351 0.539773 2.45351 1.22676C2.45351 1.91374 1.91374 2.45351 1.22676 2.45351C0.539773 2.45351 0 1.91374 0 1.22676C0 0.539773 0.539773 0 1.22676 0Z' fill='rgba(255,255,255,0.07)'/%3E%3C/svg%3E")}.dark\:bg-gradient-to-bl{background-image:linear-gradient(to bottom left, var(--tw-gradient-stops))}.dark\:stroke-gray-600{stroke:#4b5563}.dark\:text-gray-400{--tw-text-opacity:1;color:rgb(156 163 175 / var(--tw-text-opacity))}.dark\:text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity))}.dark\:shadow-none{--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.dark\:ring-1{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.dark\:ring-inset{--tw-ring-inset:inset}.dark\:ring-white\/5{--tw-ring-color:rgb(255 255 255 / 0.05)}.dark\:hover\:text-white:hover{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity))}.group:hover .dark\:group-hover\:stroke-gray-400{stroke:#9ca3af}}@media (min-width: 640px){.sm\:fixed{position:fixed}.sm\:top-0{top:0px}.sm\:right-0{right:0px}.sm\:ml-0{margin-left:0px}.sm\:flex{display:flex}.sm\:items-center{align-items:center}.sm\:justify-center{justify-content:center}.sm\:justify-between{justify-content:space-between}.sm\:text-left{text-align:left}.sm\:text-right{text-align:right}}@media (min-width: 768px){.md\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}}@media (min-width: 1024px){.lg\:gap-8{gap:2rem}.lg\:p-8{padding:2rem}}
-        </style>
-    </head>
-    <body class="antialiased">
-        <div class="relative sm:flex sm:justify-center sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white">
-            @if (Route::has('login'))
-                <div class="sm:fixed sm:top-0 sm:right-0 p-6 text-right z-10">
-                    @auth
-                        <a href="{{ url('/dashboard') }}" class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Dashboard</a>
-                    @else
-                        <a href="{{ route('login') }}" class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Log in</a>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-                        @if (Route::has('register'))
-                            <a href="{{ route('register') }}" class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Register</a>
-                        @endif
-                    @endauth
+    {{-- template --}}
+
+    <link rel="stylesheet" id="stylesheet" href="{{ asset('assets-dashboard/assets') }}/src/css/style.css">
+    <!-- Production css (used in all pages) -->
+    {{-- <link rel="stylesheet" href="dist/css/style.css"> --> --}}
+    <link rel="stylesheet" href="{{ asset('assets-dashboard/assets') }}/src/css/customizer.css">
+    <!-- google font -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" />
+    <link rel="stylesheet" type="text/css"
+        href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css" />
+    <style>
+        /* Add custom styles for the slider */
+        .slider-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .slick-slide {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .hover-gradient:hover {
+    background-image: linear-gradient(to right, gold, white);
+}
+
+        /* Gaya hover untuk tombol */
+        .btn-hover:hover {
+            background-color: gold;
+            /* Warna latar belakang saat hover */
+            color: black;
+            /* Warna teks saat hover */
+            border-color: gold;
+            /* Warna border saat hover */
+        }
+    </style>
+    <style>
+        .nav-link {
+            transition: color 0.3s ease-in-out;
+        }
+
+        .nav-link:hover,
+        .nav-link:focus {
+            color: #fff;
+        }
+
+        section {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.3s ease-in-out;
+        }
+
+        section.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .bg-gold {
+            background-color: #c0a01f;
+        }
+    </style>
+
+    <!-- Scripts -->
+    @vite(['resources/js/app.js'])
+</head>
+
+<body class="font-sans text-base font-normal text-gray-600 dark:text-gray-400 dark:bg-gray-900 pt-16 lg:pt-20">
+    <!-- ========== { HEADER }==========  -->
+    <header>
+        <!-- Navbar -->
+        <nav x-data="{ open: false }"
+            class=" nav-top flex flex-nowrap lg:flex-start items-center z-20 fixed top-0 left-0 right-0 overflow-y-auto max-h-screen lg:overflow-visible lg:max-h-full bg-gold dark:bg-indigo-900">
+            <div class="container mx-auto px-4 xl:max-w-6xl ">
+                <!-- mobile navigation -->
+                <div class="flex flex-row justify-between py-3 lg:hidden">
+                    <!-- logo -->
+                    <a class="flex items-center py-2 mr-4 text-xl" href="/">
+                        <h2 class="text-2xl font-semibold text-gray-200 px-4 max-h-9 overflow-hidden">
+                            <img class="inline-block w-10 h-auto me-2 -mt-1"
+                                src="{{ asset('assets-dashboard/assets') }}/src/img/logosmii.png">
+                            </svg><span class="text-gray-200">Intra SMII</span>
+                        </h2>
+                    </a>
+
+                    <!-- navbar toggler -->
+                    <div class="right-0 flex items-center">
+                        <!-- Mobile menu button-->
+                        <button id="navbartoggle" type="button"
+                            class="inline-flex items-center justify-center text-gray-200 focus:outline-none focus:ring-0"
+                            aria-controls="mobile-menu" @click="open = !open" aria-expanded="false"
+                            x-bind:aria-expanded="open.toString()">
+                            <span class="sr-only">Mobile menu</span>
+                            <svg x-description="Icon closed" x-state:on="Menu open" x-state:off="Menu closed"
+                                class="block h-8 w-8" :class="{ 'hidden': open, 'block': !(open) }"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24"
+                                stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 6h16M4 12h16M4 18h16"></path>
+                            </svg>
+
+                            <svg x-description="Icon open" x-state:on="Menu open" x-state:off="Menu closed"
+                                class="hidden h-8 w-8" :class="{ 'block': open, 'hidden': !(open) }"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24"
+                                stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
-            @endif
 
-            <div class="max-w-7xl mx-auto p-6 lg:p-8">
-                <div class="flex justify-center">
-                    <svg viewBox="0 0 62 65" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-16 w-auto bg-gray-100 dark:bg-gray-900">
-                        <path d="M61.8548 14.6253C61.8778 14.7102 61.8895 14.7978 61.8897 14.8858V28.5615C61.8898 28.737 61.8434 28.9095 61.7554 29.0614C61.6675 29.2132 61.5409 29.3392 61.3887 29.4265L49.9104 36.0351V49.1337C49.9104 49.4902 49.7209 49.8192 49.4118 49.9987L25.4519 63.7916C25.3971 63.8227 25.3372 63.8427 25.2774 63.8639C25.255 63.8714 25.2338 63.8851 25.2101 63.8913C25.0426 63.9354 24.8666 63.9354 24.6991 63.8913C24.6716 63.8838 24.6467 63.8689 24.6205 63.8589C24.5657 63.8389 24.5084 63.8215 24.456 63.7916L0.501061 49.9987C0.348882 49.9113 0.222437 49.7853 0.134469 49.6334C0.0465019 49.4816 0.000120578 49.3092 0 49.1337L0 8.10652C0 8.01678 0.0124642 7.92953 0.0348998 7.84477C0.0423783 7.8161 0.0598282 7.78993 0.0697995 7.76126C0.0884958 7.70891 0.105946 7.65531 0.133367 7.6067C0.152063 7.5743 0.179485 7.54812 0.20192 7.51821C0.230588 7.47832 0.256763 7.43719 0.290416 7.40229C0.319084 7.37362 0.356476 7.35243 0.388883 7.32751C0.425029 7.29759 0.457436 7.26518 0.498568 7.2415L12.4779 0.345059C12.6296 0.257786 12.8015 0.211853 12.9765 0.211853C13.1515 0.211853 13.3234 0.257786 13.475 0.345059L25.4531 7.2415H25.4556C25.4955 7.26643 25.5292 7.29759 25.5653 7.32626C25.5977 7.35119 25.6339 7.37362 25.6625 7.40104C25.6974 7.43719 25.7224 7.47832 25.7523 7.51821C25.7735 7.54812 25.8021 7.5743 25.8196 7.6067C25.8483 7.65656 25.8645 7.70891 25.8844 7.76126C25.8944 7.78993 25.9118 7.8161 25.9193 7.84602C25.9423 7.93096 25.954 8.01853 25.9542 8.10652V33.7317L35.9355 27.9844V14.8846C35.9355 14.7973 35.948 14.7088 35.9704 14.6253C35.9792 14.5954 35.9954 14.5692 36.0053 14.5405C36.0253 14.4882 36.0427 14.4346 36.0702 14.386C36.0888 14.3536 36.1163 14.3274 36.1375 14.2975C36.1674 14.2576 36.1923 14.2165 36.2272 14.1816C36.2559 14.1529 36.292 14.1317 36.3244 14.1068C36.3618 14.0769 36.3942 14.0445 36.4341 14.0208L48.4147 7.12434C48.5663 7.03694 48.7383 6.99094 48.9133 6.99094C49.0883 6.99094 49.2602 7.03694 49.4118 7.12434L61.3899 14.0208C61.4323 14.0457 61.4647 14.0769 61.5021 14.1055C61.5333 14.1305 61.5694 14.1529 61.5981 14.1803C61.633 14.2165 61.6579 14.2576 61.6878 14.2975C61.7103 14.3274 61.7377 14.3536 61.7551 14.386C61.7838 14.4346 61.8 14.4882 61.8199 14.5405C61.8312 14.5692 61.8474 14.5954 61.8548 14.6253ZM59.893 27.9844V16.6121L55.7013 19.0252L49.9104 22.3593V33.7317L59.8942 27.9844H59.893ZM47.9149 48.5566V37.1768L42.2187 40.4299L25.953 49.7133V61.2003L47.9149 48.5566ZM1.99677 9.83281V48.5566L23.9562 61.199V49.7145L12.4841 43.2219L12.4804 43.2194L12.4754 43.2169C12.4368 43.1945 12.4044 43.1621 12.3682 43.1347C12.3371 43.1097 12.3009 43.0898 12.2735 43.0624L12.271 43.0586C12.2386 43.0275 12.2162 42.9888 12.1887 42.9539C12.1638 42.9203 12.1339 42.8916 12.114 42.8567L12.1127 42.853C12.0903 42.8156 12.0766 42.7707 12.0604 42.7283C12.0442 42.6909 12.023 42.656 12.013 42.6161C12.0005 42.5688 11.998 42.5177 11.9931 42.4691C11.9881 42.4317 11.9781 42.3943 11.9781 42.3569V15.5801L6.18848 12.2446L1.99677 9.83281ZM12.9777 2.36177L2.99764 8.10652L12.9752 13.8513L22.9541 8.10527L12.9752 2.36177H12.9777ZM18.1678 38.2138L23.9574 34.8809V9.83281L19.7657 12.2459L13.9749 15.5801V40.6281L18.1678 38.2138ZM48.9133 9.14105L38.9344 14.8858L48.9133 20.6305L58.8909 14.8846L48.9133 9.14105ZM47.9149 22.3593L42.124 19.0252L37.9323 16.6121V27.9844L43.7219 31.3174L47.9149 33.7317V22.3593ZM24.9533 47.987L39.59 39.631L46.9065 35.4555L36.9352 29.7145L25.4544 36.3242L14.9907 42.3482L24.9533 47.987Z" fill="#FF2D20"/>
-                    </svg>
+                <!-- Mobile menu -->
+                <div class="lg:hidden fixed w-full h-full inset-0 z-40" id="mobile-menu" x-description="Mobile menu"
+                    x-show="open" style="display: none;">
+                    <!-- bg open -->
+                    <span class="fixed bg-gray-900 bg-opacity-70 w-full h-full inset-x-0 top-0"></span>
+
+                    <!-- Mobile navbar -->
+                    <nav id="mobile-nav"
+                        class="flex flex-col end-0 w-64 fixed top-0 py-4 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-400 h-full overflow-auto z-40"
+                        x-show="open" @click.away="open=false" x-description="Mobile menu" role="menu"
+                        aria-orientation="vertical" aria-labelledby="navbartoggle"
+                        x-transition:enter="transform transition-transform duration-300"
+                        x-transition:enter-start="ltr:translate-x-full rtl:-translate-x-full"
+                        x-transition:enter-end="translate-x-0"
+                        x-transition:leave="transform transition-transform duration-300"
+                        x-transition:leave-start="translate-x-0"
+                        x-transition:leave-end="ltr:translate-x-full rtl:-translate-x-full">
+                        <div class="mb-auto">
+                            <!--logo-->
+                            <div class="mh-18 text-center px-12 mb-8">
+                                <a href="/" class="flex relative">
+                                    <h2 class="text-2xl font-semibold text-gray-200 max-h-9">
+                                        <img class="inline-block w-10 h-auto me-2 -mt-1"
+                                            src="{{ asset('assets-dashboard/assets') }}/src/img/logosmii.png">
+
+                                        </svg><span class="text-gray-700 dark:text-gray-200">Intra SMII</span>
+                                    </h2>
+                                </a>
+                            </div>
+
+                            <!--navigation-->
+                            <div class="mb-4">
+                                <nav class="relative flex flex-wrap items-center justify-between">
+                                    @if (Route::has('login'))
+                                        <div class="grid text-center lg:block my-4 px-4 lg:my-auto">
+                                            @auth
+                                                <a href="{{ url('/dashboard') }}" wire:navigation
+                                                    class="py-2 px-4 text-sm inline-block text-center rounded leading-5 text-gray-100 bg-indigo-500 border border-indigo-500 hover:text-gray-300 hover:bg-indigo-600 hover:ring-0 hover:border-indigo-600 focus:bg-indigo-600 focus:border-indigo-600 focus:outline-none focus:ring-0">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="inline me-1"
+                                                        width="1.2rem" height="1.2rem" fill="currentColor"
+                                                        viewBox="0 0 576 512">
+                                                        <circle cx="176" cy="416" r="16"
+                                                            style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px">
+                                                        </circle>
+                                                        <circle cx="400" cy="416" r="16"
+                                                            style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px">
+                                                        </circle>
+                                                        <path
+                                                            d="M280.4 148.3L96 300.1V464a16 16 0 0 0 16 16l112.1-.3a16 16 0 0 0 15.9-16V368a16 16 0 0 1 16-16h64a16 16 0 0 1 16 16v95.6a16 16 0 0 0 16 16.1L464 480a16 16 0 0 0 16-16V300L295.7 148.3a12.2 12.2 0 0 0 -15.3 0zM571.6 251.5L488 182.6V44.1a12 12 0 0 0 -12-12h-56a12 12 0 0 0 -12 12v72.6L318.5 43a48 48 0 0 0 -61 0L4.3 251.5a12 12 0 0 0 -1.6 16.9l25.5 31A12 12 0 0 0 45.2 301l235.2-193.7a12.2 12.2 0 0 1 15.3 0L530.9 301a12 12 0 0 0 16.9-1.6l25.5-31a12 12 0 0 0 -1.7-16.9z" />
+
+                                                    </svg>Dashboard
+                                                </a>
+                                            @else
+                                                <a href="{{ route('login') }}"
+                                                    class=" btn-inside py-2 px-4 text-sm inline-block text-center rounded leading-5 text-gray-100 bg-indigo-500 border border-indigo-500 hover:text-gray-300 hover:bg-indigo-600 hover:ring-0 hover:border-indigo-600 focus:bg-indigo-600 focus:border-indigo-600 focus:outline-none focus:ring-0">
+                                                    <svg xmlns="http://www.w3.org/2000/svg"class="inline me-1"
+                                                        width="1.2rem" height="1.2rem" fill="currentColor"
+                                                        viewBox="0 0 448 512">
+                                                        <circle cx="176" cy="416" r="16"
+                                                            style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px">
+                                                        </circle>
+                                                        <circle cx="400" cy="416" r="16"
+                                                            style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px">
+                                                        </circle>
+                                                        <path
+                                                            d="M304 128a80 80 0 1 0 -160 0 80 80 0 1 0 160 0zM96 128a128 128 0 1 1 256 0A128 128 0 1 1 96 128zM49.3 464H398.7c-8.9-63.3-63.3-112-129-112H178.3c-65.7 0-120.1 48.7-129 112zM0 482.3C0 383.8 79.8 304 178.3 304h91.4C368.2 304 448 383.8 448 482.3c0 16.4-13.3 29.7-29.7 29.7H29.7C13.3 512 0 498.7 0 482.3z" />
+                                                    </svg> Login
+                                                </a>
+
+                                                {{-- @if (Route::has('register'))
+                                                    <a href="{{ route('register') }}"
+                                                        class="ms-4 btn-inside font-semibold text-gray-600 hover:text-gray-900 focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
+                                                        wire:navigate>Register</a>
+                                                @endif --}}
+                                            @endauth
+                                        </div>
+                                    @endif
+                                    <ul id="side-menu" class="w-full float-none flex flex-col">
+                                        <li class="relative">
+                                            <a href="#home"
+                                                class=" nav-link block py-3 px-4 hover:text-indigo-500 focus:text-indigo-500">Home</a>
+                                        </li>
+                                        <li class="relative">
+                                            <a href="#product"
+                                                class="nav-link block py-3 px-4 hover:text-indigo-500 focus:text-indigo-500">Our
+                                                Product</a>
+                                        </li>
+                                        <li class="relative">
+                                            <a href="#site"
+                                                class="nav-link block py-3 px-4 hover:text-indigo-500 focus:text-indigo-500">Our
+                                                Sites</a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                        <!-- copyright -->
+                        <div class="mt-5 text-center">
+                            <p>Copyright <a href="#">MIS Intra SMII</a> - All right reserved</p>
+                        </div>
+                    </nav>
+                </div><!-- End Mobile menu -->
+
+                <!-- desktop menu -->
+                <div class="hidden lg:flex lg:flex-row lg:flex-nowrap lg:items-center lg:justify-between lg:mt-0"
+                    id="desktp-menu">
+                    <!-- logo -->
+                    <a class="hidden lg:flex items-center py-2 mr-4 text-xl" href="index.html">
+                        <h2 class="text-2xl font-semibold px-4 max-h-9 overflow-hidden">
+                            <img class="inline-block w-10 h-auto me-2 -mt-1"
+                                src="{{ asset('assets-dashboard/assets') }}/src/img/logosmii.png">
+
+                            </svg><span class="text-gray-200">Intra SMII</span>
+                        </h2>
+                    </a>
+
+                    <!-- menu -->
+                    <ul class="flex flex-col lg:mx-auto mt-2 lg:flex-row lg:mt-0 text-gray-200">
+                        <li class="relative">
+                            <a class="nav-link block py-3 lg:py-7 px-6 hover:text-white focus:text-white"
+                                href="#home">
+                                Home
+                            </a>
+                        </li>
+                        <li class="relative">
+                            <a class="nav-link block py-3 lg:py-7 px-6 hover:text-white focus:text-white"
+                                href="#product">
+                                Our Product
+                            </a>
+                        </li>
+                        <li class="relative">
+                            <a class="nav-link block py-3 lg:py-7 px-6 hover:text-white focus:text-white"
+                                href="#site">
+                                Our Site
+                            </a>
+                        </li>
+                    </ul>
+
+                    <!-- button login -->
+                    @if (Route::has('login'))
+                        <div class="flex justify-between items-center my-4 lg:my-auto">
+                            <div class="grid text-center lg:block">
+                                @auth
+                                    <a href="{{ url('/dashboard') }}" wire:navigation
+                                        class="btn-inside py-2 px-4 text-sm inline-block text-center rounded leading-5 text-gray-100 bg-indigo-500 border border-indigo-500 hover:text-gray-300 hover:bg-indigo-600 hover:ring-0 hover:border-indigo-600 focus:bg-indigo-600 focus:border-indigo-600 focus:outline-none focus:ring-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="inline me-1" width="1.2rem"
+                                            height="1.2rem" fill="currentColor" viewBox="0 0 576 512">
+                                            <circle cx="176" cy="416" r="16"
+                                                style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px">
+                                            </circle>
+                                            <circle cx="400" cy="416" r="16"
+                                                style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px">
+                                            </circle>
+                                            <path
+                                                d="M280.4 148.3L96 300.1V464a16 16 0 0 0 16 16l112.1-.3a16 16 0 0 0 15.9-16V368a16 16 0 0 1 16-16h64a16 16 0 0 1 16 16v95.6a16 16 0 0 0 16 16.1L464 480a16 16 0 0 0 16-16V300L295.7 148.3a12.2 12.2 0 0 0 -15.3 0zM571.6 251.5L488 182.6V44.1a12 12 0 0 0 -12-12h-56a12 12 0 0 0 -12 12v72.6L318.5 43a48 48 0 0 0 -61 0L4.3 251.5a12 12 0 0 0 -1.6 16.9l25.5 31A12 12 0 0 0 45.2 301l235.2-193.7a12.2 12.2 0 0 1 15.3 0L530.9 301a12 12 0 0 0 16.9-1.6l25.5-31a12 12 0 0 0 -1.7-16.9z" />
+                                        </svg>Dashboard
+                                    </a>
+                                @else
+                                    <a href="{{ route('login') }}"
+                                        class="btn-inside py-2 px-4  text-sm inline-block text-center rounded leading-5 text-gray-100 bg-indigo-500 border border-indigo-500 hover:text-gray-300 hover:bg-indigo-600 hover:ring-0 hover:border-indigo-600 focus:bg-indigo-600 focus:border-indigo-600 focus:outline-none focus:ring-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg"class="inline me-1" width="1.2rem"
+                                            height="1.2rem" fill="currentColor" viewBox="0 0 448 512">
+                                            <circle cx="176" cy="416" r="16"
+                                                style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px">
+                                            </circle>
+                                            <circle cx="400" cy="416" r="16"
+                                                style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px">
+                                            </circle>
+                                            <path
+                                                d="M304 128a80 80 0 1 0 -160 0 80 80 0 1 0 160 0zM96 128a128 128 0 1 1 256 0A128 128 0 1 1 96 128zM49.3 464H398.7c-8.9-63.3-63.3-112-129-112H178.3c-65.7 0-120.1 48.7-129 112zM0 482.3C0 383.8 79.8 304 178.3 304h91.4C368.2 304 448 383.8 448 482.3c0 16.4-13.3 29.7-29.7 29.7H29.7C13.3 512 0 498.7 0 482.3z" />
+                                        </svg> Login
+                                    </a>
+                                @endauth
+                            </div>
+                            <div class="relative inline-block w-8 py-3 mt-0.5 me-3 align-middle select-none transition duration-200 ease-in mx-4" style="margin-left: 10px">
+                                <input type="checkbox" name="lightdark" id="lightdark"
+                                    class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white dark:bg-gray-900 border-2 dark:border-gray-700 appearance-none cursor-pointer">
+                                <label for="lightdark"
+                                    class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 dark:bg-gray-700 cursor-pointer">
+                                    <svg class="sun-icon" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 14.5a4.5 4.5 0 100-9 4.5 4.5 0 000 9zM10 1a1 1 0 011 1v1a1 1 0 11-2 0V2a1 1 0 011-1zm0 16a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zm9-8a1 1 0 010 2h-1a1 1 0 110-2h1zM3 10a1 1 0 100 2H2a1 1 0 100-2h1zm13.95-4.536a1 1 0 010 1.414l-.707.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM6.464 17.95a1 1 0 01-1.414 0l-.707-.707a1 1 0 011.414-1.414l.707.707a1 1 0 010 1.414zm11.778-11.778a1 1 0 010 1.414l-.707.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM4.95 6.464a1 1 0 010 1.414L4.243 8.586a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0z"></path></svg>
+                                    <svg class="moon-icon" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 14.707a1 1 0 010-1.414 8 8 0 10-11.313 0 1 1 0 01-1.414-1.414 10 10 0 1113.13 0 1 1 0 01-1.414 1.414h.01z"></path></svg>
+                                </label>
+                            </div>
+                        </div>
+                    @endif
+                </div><!-- end desktop menu -->
+            </div>
+        </nav><!-- End Navbar -->
+    </header><!-- end header -->
+
+    <!-- =========={ MAIN }==========  -->
+    <main id="content">
+        <!-- Hero -->
+        <div id="home"
+            class="relative overflow-hidden bg-gradient-to-b from-indigo-100 to-gray-100 dark:from-indigo-900 dark:to-gray-900">
+            <div class="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8 py-20">
+
+
+                <!-- Title -->
+                <div class="mb-5 max-w-2xl text-center mx-auto">
+                    <h1 class="block font-bold text-gray-800 text-5xl lg:text-6xl dark:text-gray-200">
+                        Welcome to <br>
+                        <span
+                            class="bg-clip-text bg-gradient-to-r from-indigo-700 to-indigo-600 text-transparent">Website
+                            Intra SMII</span>
+                    </h1>
                 </div>
 
-                <div class="mt-16">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-                        <a href="https://laravel.com/docs" class="scale-100 p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
-                            <div>
-                                <div class="h-16 w-16 bg-red-50 dark:bg-red-800/20 flex items-center justify-center rounded-full">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="w-7 h-7 stroke-red-500">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
-                                    </svg>
-                                </div>
+                <div class="mb-8 max-w-3xl text-center mx-auto">
+                    <p class="text-lg leading-normal">Website Internal Pt.Sinar Meadow International Indonesia.</p>
+                </div>
 
-                                <h2 class="mt-6 text-xl font-semibold text-gray-900 dark:text-white">Documentation</h2>
+                <img src="{{ asset('assets-dashboard/assets') }}/src/img/hero2.png" alt="tailwind dashboard"
+                    class="max-w-full mx-auto mb-10 ">
+            </div>
+        </div>
+        <!-- End Hero -->
 
-                                <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
-                                    Laravel has wonderful documentation covering every aspect of the framework. Whether you are a newcomer or have prior experience with Laravel, we recommend reading our documentation from beginning to end.
-                                </p>
+        <!-- =========={ Products }==========  -->
+        <div id="product"
+            class="relative pt-8 sm:pt-14 pb-2 md:pb-4 bg-gray-100 dark:bg-gray-900 dark:bg-opacity-40">
+            <div class="container xl:max-w-6xl mx-auto px-4">
+                <!-- section header -->
+                <header class="text-center mx-auto mb-12">
+                    <h2 class="text-2xl leading-normal mb-2 font-bold text-gray-800 dark:text-gray-300"><span
+                            class="font-light">Our</span> Products</h2>
+                    <hr class="block w-12 h-0.5 mx-auto my-5 bg-indigo-500 border-indigo-500">
+                    <p class="text-gray-500 leading-relaxed font-light text-xl mx-auto pb-2">Our various brands allow
+                        us to be the total solution for every customer’s needs while still delivering the highest value.
+                    </p>
+                </header><!-- end section header -->
+
+                <!-- row -->
+                <div class="slider-container flex flex-wrap flex-row -mx-4 text-center">
+                    <div class=" flex-shrink px-4 max-w-full w-full sm:w-1/2 lg:w-1/3 lg:px-6">
+                        <!-- service block -->
+                        <div
+                            class="p-6 mb-12 shadow-lg rounded-lg bg-white dark:bg-gray-200 transform transition duration-300 ease-in-out hover:-translate-y-2 hover:shadow-xl">
+                            <div class="inline-block text-indigo-500 mb-4">
+                                <!-- icon -->
+                                <img src="{{ asset('assets-dashboard/assets') }}/src/img/products/gb.jpeg" alt="Image 1">
                             </div>
-
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="self-center shrink-0 stroke-red-500 w-6 h-6 mx-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
-                            </svg>
-                        </a>
-
-                        <a href="https://laracasts.com" class="scale-100 p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
-                            <div>
-                                <div class="h-16 w-16 bg-red-50 dark:bg-red-800/20 flex items-center justify-center rounded-full">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="w-7 h-7 stroke-red-500">
-                                        <path stroke-linecap="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
-                                    </svg>
-                                </div>
-
-                                <h2 class="mt-6 text-xl font-semibold text-gray-900 dark:text-white">Laracasts</h2>
-
-                                <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
-                                    Laracasts offers thousands of video tutorials on Laravel, PHP, and JavaScript development. Check them out, see for yourself, and massively level up your development skills in the process.
-                                </p>
+                        </div> <!-- end service block -->
+                    </div>
+                    <div class=" flex-shrink px-4 max-w-full w-full sm:w-1/2 lg:w-1/3 lg:px-6">
+                        <!-- service block -->
+                        <div
+                            class="p-6 mb-12 shadow-lg rounded-lg bg-white dark:bg-gray-200 transform transition duration-300 ease-in-out hover:-translate-y-2 hover:shadow-xl">
+                            <div class="inline-block text-indigo-500 mb-4">
+                                <!-- icon -->
+                                <img src="{{ asset('assets-dashboard/assets') }}/src/img/products/gb2.jpeg" alt="Image 1">
                             </div>
-
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="self-center shrink-0 stroke-red-500 w-6 h-6 mx-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
-                            </svg>
-                        </a>
-
-                        <a href="https://laravel-news.com" class="scale-100 p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
-                            <div>
-                                <div class="h-16 w-16 bg-red-50 dark:bg-red-800/20 flex items-center justify-center rounded-full">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="w-7 h-7 stroke-red-500">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 01-2.25 2.25M16.5 7.5V18a2.25 2.25 0 002.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 002.25 2.25h13.5M6 7.5h3v3H6v-3z" />
-                                    </svg>
-                                </div>
-
-                                <h2 class="mt-6 text-xl font-semibold text-gray-900 dark:text-white">Laravel News</h2>
-
-                                <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
-                                    Laravel News is a community driven portal and newsletter aggregating all of the latest and most important news in the Laravel ecosystem, including new package releases and tutorials.
-                                </p>
+                        </div> <!-- end service block -->
+                    </div>
+                    <div class=" flex-shrink px-4 max-w-full w-full sm:w-1/2 lg:w-1/3 lg:px-6">
+                        <!-- service block -->
+                        <div
+                            class="p-6 mb-12 shadow-lg rounded-lg bg-white dark:bg-gray-200 transform transition duration-300 ease-in-out hover:-translate-y-2 hover:shadow-xl">
+                            <div class="inline-block text-indigo-500 mb-4">
+                                <!-- icon -->
+                                <img src="{{ asset('assets-dashboard/assets') }}/src/img/products/gb3.jpeg" alt="Image 1">
                             </div>
+                        </div> <!-- end service block -->
+                    </div>
+                    <div class=" flex-shrink px-4 max-w-full w-full sm:w-1/2 lg:w-1/3 lg:px-6">
+                        <!-- service block -->
+                        <div
+                            class="p-6 mb-12 shadow-lg rounded-lg bg-white dark:bg-gray-200 transform transition duration-300 ease-in-out hover:-translate-y-2 hover:shadow-xl">
+                            <div class="inline-block text-indigo-500 mb-4">
+                                <!-- icon -->
+                                <img src="{{ asset('assets-dashboard/assets') }}/src/img/products/gb4.jpeg" alt="Image 1">
+                            </div>
+                        </div> <!-- end service block -->
+                    </div>
+                    <div class=" flex-shrink px-4 max-w-full w-full sm:w-1/2 lg:w-1/3 lg:px-6">
+                        <!-- service block -->
+                        <div
+                            class="p-6 mb-12 shadow-lg rounded-lg bg-white dark:bg-gray-200 transform transition duration-300 ease-in-out hover:-translate-y-2 hover:shadow-xl">
+                            <div class="inline-block text-indigo-500 mb-4">
+                                <!-- icon -->
+                                <img src="{{ asset('assets-dashboard/assets') }}/src/img/products/gb5.jpeg" alt="Image 1">
+                            </div>
+                        </div> <!-- end service block -->
+                    </div>
+                    <div class=" flex-shrink px-4 max-w-full w-full sm:w-1/2 lg:w-1/3 lg:px-6">
+                        <!-- service block -->
+                        <div
+                            class="p-6 mb-12 shadow-lg rounded-lg bg-white dark:bg-gray-200 transform transition duration-300 ease-in-out hover:-translate-y-2 hover:shadow-xl">
+                            <div class="inline-block text-indigo-500 mb-4">
+                                <!-- icon -->
+                                <img src="{{ asset('assets-dashboard/assets') }}/src/img/products/gb6.jpeg" alt="Image 1">
+                            </div>
+                        </div> <!-- end service block -->
+                    </div>
+                    <div class=" flex-shrink px-4 max-w-full w-full sm:w-1/2 lg:w-1/3 lg:px-6">
+                        <!-- service block -->
+                        <div
+                            class="p-6 mb-12 shadow-lg rounded-lg bg-white dark:bg-gray-200 transform transition duration-300 ease-in-out hover:-translate-y-2 hover:shadow-xl">
+                            <div class="inline-block text-indigo-500 mb-4">
+                                <!-- icon -->
+                                <img src="{{ asset('assets-dashboard/assets') }}/src/img/products/gb7.jpeg" alt="Image 1">
+                            </div>
+                        </div> <!-- end service block -->
+                    </div>
+                    <div class=" flex-shrink px-4 max-w-full w-full sm:w-1/2 lg:w-1/3 lg:px-6">
+                        <!-- service block -->
+                        <div
+                            class="p-6 mb-12 shadow-lg rounded-lg bg-white dark:bg-gray-200 transform transition duration-300 ease-in-out hover:-translate-y-2 hover:shadow-xl">
+                            <div class="inline-block text-indigo-500 mb-4">
+                                <!-- icon -->
+                                <img src="{{ asset('assets-dashboard/assets') }}/src/img/products/gb8.jpeg" alt="Image 1">
+                            </div>
+                        </div> <!-- end service block -->
+                    </div>
+                    <div class=" flex-shrink px-4 max-w-full w-full sm:w-1/2 lg:w-1/3 lg:px-6">
+                        <!-- service block -->
+                        <div
+                            class="p-6 mb-12 shadow-lg rounded-lg bg-white dark:bg-gray-200 transform transition duration-300 ease-in-out hover:-translate-y-2 hover:shadow-xl">
+                            <div class="inline-block text-indigo-500 mb-4">
+                                <!-- icon -->
+                                <img src="{{ asset('assets-dashboard/assets') }}/src/img/products/gb9.jpeg" alt="Image 1">
+                            </div>
+                        </div> <!-- end service block -->
+                    </div>
+                </div>
+            </div><!-- End features -->
 
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="self-center shrink-0 stroke-red-500 w-6 h-6 mx-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
-                            </svg>
-                        </a>
+            <!-- =========={ site }==========  -->
+            <div id="site"
+                class="relative pt-8 sm:pt-14 pb-2 md:pb-4 bg-gray-100 dark:bg-gray-900 dark:bg-opacity-40">
+                <div class="container xl:max-w-6xl mx-auto px-4">
+                    <!-- section header -->
+                    <header class="text-center mx-auto mb-12">
+                        <h2 class="text-2xl leading-normal mb-2 font-bold text-gray-800 dark:text-gray-300">
+                        </h2>
+                        <h2 class="text-2xl leading-normal mb-2 font-bold text-gray-800 dark:text-gray-300"><span
+                                class="font-light">Our</span> Websites</h2>
+                    </header><!-- end section header -->
 
-                        <div class="scale-100 p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
-                            <div>
-                                <div class="h-16 w-16 bg-red-50 dark:bg-red-800/20 flex items-center justify-center rounded-full">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="w-7 h-7 stroke-red-500">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.115 5.19l.319 1.913A6 6 0 008.11 10.36L9.75 12l-.387.775c-.217.433-.132.956.21 1.298l1.348 1.348c.21.21.329.497.329.795v1.089c0 .426.24.815.622 1.006l.153.076c.433.217.956.132 1.298-.21l.723-.723a8.7 8.7 0 002.288-4.042 1.087 1.087 0 00-.358-1.099l-1.33-1.108c-.251-.21-.582-.299-.905-.245l-1.17.195a1.125 1.125 0 01-.98-.314l-.295-.295a1.125 1.125 0 010-1.591l.13-.132a1.125 1.125 0 011.3-.21l.603.302a.809.809 0 001.086-1.086L14.25 7.5l1.256-.837a4.5 4.5 0 001.528-1.732l.146-.292M6.115 5.19A9 9 0 1017.18 4.64M6.115 5.19A8.965 8.965 0 0112 3c1.929 0 3.716.607 5.18 1.64" />
-                                    </svg>
+                    <div class="flex flex-row flex-wrap justify-center -mx-4 mt-10">
+                        <div class="flex-shrink max-w-full w-full md:w-1/2 lg:w-1/3 px-4 md:px-6 mb-8">
+                            <div class="transform transition duration-300 ease-in-out hover:-translate-y-2 bg-white dark:bg-gray-700 shadow-lg hover-box-up rounded-lg mb-6 hover-gradient ">
+                                <div class="relative overflow-hidden h-60 sm:h-80">
+                                    <img src="{{ asset('assets-dashboard/assets') }}/src/img/demo/sinarmeadow.png" class="w-full h-full" title="Tailwind dashboard ecommerce" alt="Tailwind dashboard ecommerce">
                                 </div>
-
-                                <h2 class="mt-6 text-xl font-semibold text-gray-900 dark:text-white">Vibrant Ecosystem</h2>
-
-                                <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
-                                    Laravel's robust library of first-party tools and libraries, such as <a href="https://forge.laravel.com" class="underline hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Forge</a>, <a href="https://vapor.laravel.com" class="underline hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Vapor</a>, <a href="https://nova.laravel.com" class="underline hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Nova</a>, and <a href="https://envoyer.io" class="underline hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Envoyer</a> help you take your projects to the next level. Pair them with powerful open source libraries like <a href="https://laravel.com/docs/billing" class="underline hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Cashier</a>, <a href="https://laravel.com/docs/dusk" class="underline hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Dusk</a>, <a href="https://laravel.com/docs/broadcasting" class="underline hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Echo</a>, <a href="https://laravel.com/docs/horizon" class="underline hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Horizon</a>, <a href="https://laravel.com/docs/sanctum" class="underline hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Sanctum</a>, <a href="https://laravel.com/docs/telescope" class="underline hover:text-gray-700 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Telescope</a>, and more.
-                                </p>
+                                <div class="mt-4 px-6 py-3">
+                                    <div class="flex flex-row w-full items-center justify-between">
+                                        <h4 class="text-lg">Sinar Meadow Official</h4>
+                                        <a href="https://sinarmeadow.com/" class="py-2 px-4 rounded bg-indigo-500 text-indigo-100 dark:text-indigo-100 dark:bg-indigo-700 ms-2 btn-hover" target="_blank">
+                                            <span class="btn-inside">Visit</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-shrink max-w-full w-full md:w-1/2 lg:w-1/3 px-4 md:px-6 mb-8">
+                            <div
+                                class="transform transition duration-300 ease-in-out hover:-translate-y-2 bg-white dark:bg-gray-700 shadow-lg hover-box-up rounded-lg mb-6 hover-gradient ">
+                                <div class="relative overflow-hidden h-60 sm:h-80">
+                                    <img src="{{ asset('assets-dashboard/assets') }}/src/img/demo/hris.png" class="w-full h-full"
+                                        title="Tailwind dashboard CRM" alt="Tailwind dashboard CRM">
+                                </div>
+                                <div class="mt-4 px-6 py-3">
+                                    <div class="flex flex-row w-full items-center justify-between">
+                                        <h4 class="text-lg">Website Andal</h4>
+                                        <a href="http://hris.sinarmeadow.com:8081/"
+                                            class="py-2 px-4 rounded bg-indigo-500 text-indigo-100 dark:text-indigo-100 dark:bg-indigo-700 ms-2"
+                                            target="_blank">
+                                            <span class="btn-inside">Visit</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-shrink max-w-full w-full md:w-1/2 lg:w-1/3 px-4 md:px-6 mb-8">
+                            <div
+                                class="transform transition duration-300 ease-in-out hover:-translate-y-2 bg-white dark:bg-gray-700 shadow-lg hover-box-up rounded-lg mb-6 hover-gradient ">
+                                <div class="relative overflow-hidden h-60 sm:h-80">
+                                    <img src="{{ asset('assets-dashboard/assets') }}/src/img/demo/emgmt.png" class="max-w-full h-full"
+                                        title="Tailwind dashboard cms" alt="Tailwind dashboard cms">
+                                </div>
+                                <div class="mt-4 px-6 py-3">
+                                    <div class="flex flex-row w-full items-center justify-between">
+                                        <h4 class="text-lg">Website EMGMT</h4>
+                                        <a href="https://emgmt.sinarmeadow.com/loginPage?next=/"
+                                            class="py-2 px-4 rounded bg-indigo-500 text-indigo-100 dark:text-indigo-100 dark:bg-indigo-700 ms-2"
+                                            target="_blank">
+                                            <span class="btn-inside">Visit</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-shrink max-w-full w-full md:w-1/2 lg:w-1/3 px-4 md:px-6 mb-8">
+                            <div
+                                class="transform transition duration-300 ease-in-out hover:-translate-y-2 bg-white dark:bg-gray-700 shadow-lg hover-box-up rounded-lg mb-6 hover-gradient ">
+                                <div class="relative overflow-hidden h-60 sm:h-80">
+                                    <img src="{{ asset('assets-dashboard/assets') }}/src/img/demo/wotix.png" class="max-w-full h-full"
+                                        title="Tailwind dashboard analytics" alt="Tailwind dashboard analytics">
+                                </div>
+                                <div class="mt-4 px-6 py-3">
+                                    <div class="flex flex-row w-full items-center justify-between">
+                                        <h4 class="text-lg">Website WOTIX</h4>
+                                        <a href="https://wotix.sinarmeadow.com/login.php"
+                                            class="py-2 px-4 rounded bg-indigo-500 text-indigo-100 dark:text-indigo-100 dark:bg-indigo-700 ms-2"
+                                            target="_blank">
+                                            <span class="btn-inside">Visit</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-shrink max-w-full w-full md:w-1/2 lg:w-1/3 px-4 md:px-6 mb-8">
+                            <div
+                                class="transform transition duration-300 ease-in-out hover:-translate-y-2 bg-white dark:bg-gray-700 shadow-lg hover-box-up rounded-lg mb-6 hover-gradient ">
+                                <div class="relative overflow-hidden h-60 sm:h-80">
+                                    <img src="{{ asset('assets-dashboard/assets') }}/src/img/demo/frontend.png"
+                                        class="max-w-full h-full" title="Tailwind dashboard analytics"
+                                        alt="Tailwind dashboard analytics">
+                                </div>
+                                <div class="mt-4 px-6 py-3">
+                                    <div class="flex flex-row w-full items-center justify-between">
+                                        <h4 class="text-lg">Website FRONTEND</h4>
+                                        <a href="https://frontend.sinarmeadow.com/smii/login.php"
+                                            class="py-2 px-4 rounded bg-indigo-500 text-indigo-100 dark:text-indigo-100 dark:bg-indigo-700 ms-2"
+                                            target="_blank">
+                                            <span class="btn-inside">Visit</span>
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div><!-- End demo -->
 
-                <div class="flex justify-center mt-16 px-0 sm:items-center sm:justify-between">
-                    <div class="text-center text-sm sm:text-left">
-                        &nbsp;
-                    </div>
 
-                    <div class="text-center text-sm text-gray-500 dark:text-gray-400 sm:text-right sm:ml-0">
-                        Laravel v{{ Illuminate\Foundation\Application::VERSION }} (PHP v{{ PHP_VERSION }})
+    </main><!-- end main -->
+
+    <!-- =========={ FOOTER }==========  -->
+    <footer class="bg-gray-800 text-gray-400 dark:bg-indigo-950">
+        <div class="container xl:max-w-6xl mx-auto px-4 pt-8 pb-5 lg:pb-16">
+            <div class="flex flex-wrap flex-row">
+                <!-- left widget -->
+                <div class="flex-shrink max-w-full w-full lg:w-1/3 px-4 mb-7 lg:mb-0">
+                    <!-- Footer Content -->
+                    <div class="leading-relaxed">
+                        <h4 class="font-semibold text-xl mb-6 text-gray-300 align-middle">About Us</h4>
+                        <p class="mb-3">Sinar Meadow yang merupakan hasil kerja sama dari Sinar Mas Grup dan Goodman
+                            Fielder adalah perusahaan yang terdepan di Indonesia dalam bidang penghasil lemak nabati
+                            (edible fat).
+                        </p>
+                        <address class="mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="inline-block me-1" width="1.2rem"
+                                height="1.2rem" viewbox="0 0 512 512">
+                                <path fill="currentColor"
+                                    d="M256,48c-79.5,0-144,61.39-144,137,0,87,96,224.87,131.25,272.49a15.77,15.77,0,0,0,25.5,0C304,409.89,400,272.07,400,185,400,109.39,335.5,48,256,48Z"
+                                    style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px">
+                                </path>
+                                <circle fill="currentColor" cx="256" cy="192" r="48"
+                                    style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px">
+                                </circle>
+                            </svg>
+                            Kawasan Industri Pulogadung, <br>
+                            Jl. Pulo Ayang I No. 6. Jakarta 13260
+                        </address>
+                        <p class="mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="inline-block me-1" width="1.2rem"
+                                height="1.2rem" viewbox="0 0 512 512">
+                                <path fill="currentColor"
+                                    d="M451,374c-15.88-16-54.34-39.35-73-48.76C353.7,313,351.7,312,332.6,326.19c-12.74,9.47-21.21,17.93-36.12,14.75s-47.31-21.11-75.68-49.39-47.34-61.62-50.53-76.48,5.41-23.23,14.79-36c13.22-18,12.22-21,.92-45.3-8.81-18.9-32.84-57-48.9-72.8C119.9,44,119.9,47,108.83,51.6A160.15,160.15,0,0,0,83,65.37C67,76,58.12,84.83,51.91,98.1s-9,44.38,23.07,102.64,54.57,88.05,101.14,134.49S258.5,406.64,310.85,436c64.76,36.27,89.6,29.2,102.91,23s22.18-15,32.83-31a159.09,159.09,0,0,0,13.8-25.8C465,391.17,468,391.17,451,374Z"
+                                    style="fill:none;stroke:currentColor;stroke-miterlimit:10;stroke-width:32px">
+                                </path>
+                            </svg>
+                            Telp (+62-21) 4602981-85 / (+62-21) 4601935
+                        </p>
+                        <a href="mailto:cs@sinarmeadow.com" class="mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="inline-block me-1" width="1.2rem"
+                                height="1.2rem" viewbox="0 0 512 512">
+                                <rect fill="currentColor" x="48" y="96" width="416" height="320" rx="40"
+                                    ry="40"
+                                    style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px">
+                                </rect>
+                                <polyline fill="currentColor" points="112 160 256 272 400 160"
+                                    style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px">
+                                </polyline>
+                            </svg>
+                            cs@sinarmeadow.com
+                        </a>
                     </div>
+                </div>
+
+                <!-- center widget -->
+                <div class="flex-shrink max-w-full w-full lg:w-1/3 px-4 mb-7 lg:mb-0">
+
+                </div>
+
+                <!-- right widget -->
+                <div class="flex-shrink max-w-full w-full lg:w-1/3 px-4 mb-7 lg:mb-0">
+                    <!-- Footer Content -->
+                    <div class="leading-relaxed">
+                        <h4 class="font-semibold text-xl mb-6 text-gray-300">Popular Links</h4>
+                        <div class="flex flex-wrap flex-row -mx-4">
+                            <div class="flex-shrink max-w-full w-1/2 px-4">
+                                <ul class="space-y-2">
+                                    <li><a class="hover:text-gray-300" href="https://sinarmeadow.com">SinarMeadow
+                                            Official</a></li>
+                                    <li><a class="hover:text-gray-300" href="http://hris.sinarmeadow.com:8081/">Andal
+                                            Linkage</a></li>
+                                    <li><a class="hover:text-gray-300"
+                                            href="https://emgmt.sinarmeadow.com/loginPage?next=/">EMGMT WEB</a></li>
+                                    <li><a class="hover:text-gray-300"
+                                            href="https://wotix.sinarmeadow.com/login.php">WOTIX WEB</a></li>
+                                    <li><a class="hover:text-gray-300"
+                                            href="https://frontend.sinarmeadow.com/smii/login.php">FRONTEND WEB</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            {{-- <div class="flex-shrink max-w-full w-1/2 px-4">
+                                <ul class="space-y-2">
+                                    <li><a class="hover:text-gray-300" href="#">Latest post</a></li>
+                                    <li><a class="hover:text-gray-300" href="#">Popular post</a></li>
+                                    <li><a class="hover:text-gray-300" href="#">Blogs</a></li>
+                                    <li><a class="hover:text-gray-300" href="#">Events</a></li>
+                                    <li><a class="hover:text-gray-300" href="#">Fax</a></li>
+                                    <li><a class="hover:text-gray-300" href="#">Category</a></li>
+                                </ul>
+                            </div> --}}
+                        </div>
+                    </div>
+                </div><!-- end right widget -->
+            </div>
+        </div>
+        <!-- copyright  -->
+        <div class="container xl:max-w-6xl mx-auto px-4">
+            <div class="flex flex-wrap lg:flex-row -mx-4 py-9">
+                <div class="w-full text-center">
+                    <p>Copyright PT. SINAR MEADOW | MIS | All rights reserved.</p>
                 </div>
             </div>
         </div>
-    </body>
+    </footer>
+
+    {{-- <!-- Customizer (Only for demo purpose) -->
+    <div x-data="{ open: false }" class="relative">
+        <a href="javascript:;"
+            class="fixed bottom-4 end-4 text-gray-500 py-3 px-4 flex text-sm rounded-full focus:outline-none"
+            aria-controls="mobile-canvas" @click="open = !open" aria-expanded="false">
+            <span class="sr-only">Customizer</span>
+            <svg x-description="Icon closed" x-state:on="Menu open" x-state:off="Menu closed"
+                class="block h-6 w-6 animate-spin-slow" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                viewbox="0 0 16 16">
+                <path
+                    d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z">
+                </path>
+                <path
+                    d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z">
+                </path>
+            </svg>
+            <!-- <i class="text-2xl fas fa-cog"></i> -->
+        </a>
+
+        <!-- Right Offcanvas -->
+        <div class="fixed w-full h-full inset-0 z-50" id="mobile-canvas" x-description="Mobile menu" x-show="open"
+            style="display: none;">
+            <!-- bg open -->
+            <span class="fixed bg-gray-900 bg-opacity-70 w-full h-full inset-x-0 top-0"></span>
+
+            <nav id="mobile-nav"
+                class="flex flex-col end-0 w-72 fixed top-0 bg-white dark:bg-gray-800 h-full overflow-auto z-40 scrollbars show"
+                x-show="open" @click.away="open=false" x-description="Mobile menu" role="menu"
+                aria-orientation="vertical" aria-labelledby="navbartoggle"
+                x-transition:enter="transform transition-transform duration-300"
+                x-transition:enter-start="ltr:translate-x-full rtl:-translate-x-full"
+                x-transition:enter-end="translate-x-0"
+                x-transition:leave="transform transition-transform duration-300"
+                x-transition:leave-start="translate-x-0"
+                x-transition:leave-end="ltr:translate-x-full rtl:-translate-x-full">
+                <div class="p-6 bg-indigo-500 text-gray-100 border-b border-gray-200 dark:border-gray-700">
+                    <div class="flex flex-row justify-between">
+                        <h3 class="text-md font-bold">Customizer</h3>
+                        <button @click="open = false" type="button" class="inline-block w-4 h-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                                class="inline-block text-gray-100 bi bi-x-lg" viewbox="0 0 16 16" id="x-lg">
+                                <path
+                                    d="M1.293 1.293a1 1 0 011.414 0L8 6.586l5.293-5.293a1 1 0 111.414 1.414L9.414 8l5.293 5.293a1 1 0 01-1.414 1.414L8 9.414l-5.293 5.293a1 1 0 01-1.414-1.414L6.586 8 1.293 2.707a1 1 0 010-1.414z">
+                                </path>
+                            </svg>
+                            <!-- <i class="fas fa-times"></i> -->
+                        </button>
+                    </div>
+                </div>
+                <div class="py-3 px-6 border-b border-gray-200 dark:border-gray-700">
+                    <p class="text-base text-semibold">Color Scheme</p>
+                    <div class="flex flex-row">
+                        <div
+                            class="relative inline-block w-8 py-3 mt-0.5 me-3 align-middle select-none transition duration-200 ease-in">
+                            <input type="checkbox" name="lightdark" id="lightdark"
+                                class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white dark:bg-gray-900 border-2 dark:border-gray-700 appearance-none cursor-pointer">
+                            <label for="lightdark"
+                                class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 dark:bg-gray-700 cursor-pointer"></label>
+                        </div>
+                        <p class="text-sm text-gray-500 self-center">Light and Dark</p>
+                    </div>
+                </div>
+                <div class="py-3 px-6 border-b border-gray-200 dark:border-gray-700">
+                    <p class="text-base text-semibold">Sidebar Color</p>
+                    <div class="flex flex-row">
+                        <div
+                            class="relative inline-block w-8 py-3 mt-0.5 me-3 align-middle select-none transition duration-200 ease-in">
+                            <input type="checkbox" name="sidecolor" id="sidecolor"
+                                class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white dark:bg-gray-900 border-2 dark:border-gray-700 appearance-none cursor-pointer">
+                            <label for="sidecolor"
+                                class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 dark:bg-gray-700 cursor-pointer"></label>
+                        </div>
+                        <p class="text-sm text-gray-500 self-center">Light and Dark</p>
+                    </div>
+                </div>
+                <div class="py-3 px-6 border-b border-gray-200 dark:border-gray-700">
+                    <p class="text-base text-semibold">Direction</p>
+                    <div class="flex flex-row">
+                        <div
+                            class="relative inline-block w-8 py-3 mt-0.5 me-3 align-middle select-none transition duration-200 ease-in">
+                            <input type="checkbox" name="rtlmode" id="rtlmode"
+                                class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white dark:bg-gray-900 border-2 dark:border-gray-700 appearance-none cursor-pointer">
+                            <label for="rtlmode"
+                                class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 dark:bg-gray-700 cursor-pointer"></label>
+                        </div>
+                        <p class="text-sm text-gray-500 self-center">LTR and RTL</p>
+                    </div>
+                </div>
+                <div class="py-3 px-6 border-b border-gray-200 dark:border-gray-700">
+                    <p class="text-base text-semibold">Layout</p>
+                    <div class="relative mb-3">
+                        <a href="index.html"
+                            class="inline-block py-2 px-2.5 mt-2 rounded text-sm text-gray-500 bg-gray-100 dark:bg-gray-900 dark:bg-opacity-20 dark:hover:bg-opacity-60 hover:text-indigo-500 hover:bg-gray-200 self-center">Default</a>
+                        <a href="layout-compact.html"
+                            class="inline-block py-2 px-2.5 mt-2 rounded text-sm text-gray-500 bg-gray-100 dark:bg-gray-900 dark:bg-opacity-20 dark:hover:bg-opacity-60 hover:text-indigo-500 hover:bg-gray-200 self-center">Compact</a>
+                        <a href="layout-topnav.html"
+                            class="inline-block py-2 px-2.5 mt-2 rounded text-sm text-gray-500 bg-gray-100 dark:bg-gray-900 dark:bg-opacity-20 dark:hover:bg-opacity-60 hover:text-indigo-500 hover:bg-gray-200 self-center">Topnav</a>
+                    </div>
+                </div>
+                <div id="customcolor" class="py-3 px-6 border-b border-gray-200 dark:border-gray-700">
+                    <p class="text-base text-semibold">Primary Color</p>
+                    <div class="relative my-3">
+                        <div id="custred" title="red"
+                            class="inline-block p-3 me-1.5  bg-red-500 hover:opacity-90 rounded-full cursor-pointer">
+                        </div>
+                        <div id="custindigo" title="indigo"
+                            class="inline-block p-3 me-1.5  bg-indigo-500 hover:opacity-90 rounded-full cursor-pointer">
+                        </div>
+                        <div id="custgreen" title="green"
+                            class="inline-block p-3 me-1.5  bg-green-500 hover:opacity-90 rounded-full cursor-pointer">
+                        </div>
+                        <div id="custblue" title="blue"
+                            class="inline-block p-3 me-1.5  bg-blue-500 hover:opacity-90 rounded-full cursor-pointer">
+                        </div>
+                        <div id="custpurple" title="purple"
+                            class="inline-block p-3 me-1.5  bg-purple-500 hover:opacity-90 rounded-full cursor-pointer">
+                        </div>
+                        <div id="custindigo" title="indigo"
+                            class="inline-block p-3 me-1.5  bg-indigo-500 hover:opacity-90 rounded-full cursor-pointer">
+                        </div>
+                        <div id="custindigo" title="reset color" class="inline-block cursor-pointer">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                fill="currentColor" class="bi bi-arrow-counterclockwise" viewbox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"></path>
+                                <path
+                                    d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z">
+                                </path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+               
+            </nav>
+        </div>
+    </div><!-- End Customizer (Only for demo purpose) --> --}}
+
+    <!--start::Global javascript (used in all pages)-->
+    <script src="{{ asset('assets-dashboard/assets') }}/vendors/alpinejs/dist/cdn.min.js"></script><!-- core js -->
+    <script src="{{ asset('assets-dashboard/assets') }}/vendors/flatpickr/dist/flatpickr.min.js"></script><!-- input date -->
+    <script src="{{ asset('assets-dashboard/assets') }}/vendors/flatpickr/dist/plugins/rangePlugin.js"></script><!-- input range date -->
+    <script src="{{ asset('assets-dashboard/assets') }}/vendors/%40yaireo/tagify/dist/tagify.min.js"></script><!-- input tags -->
+    <script src="{{ asset('assets-dashboard/assets') }}/vendors/pristinejs/dist/pristine.min.js"></script><!-- form validation -->
+    <script src="{{ asset('assets-dashboard/assets') }}/vendors/simple-datatables/dist/umd/simple-datatables.js"></script><!--sort table-->
+    <!--end::Global javascript (used in all pages)-->
+
+    <!-- Minify Global javascript (for production purpose) -->
+    <!-- <script src="dist/js/scripts.js"></script> -->
+    <!--start::Demo javascript ( initialize global javascript )-->
+    <script src="{{ asset('assets-dashboard/assets') }}/src/js/demo.js"></script>
+
+    <script src="{{ asset('assets-dashboard/assets') }}/vendors/flickity/dist/flickity.pkgd.min.js"></script><!-- slider -->
+
+    <!--start::Customizer js ( Only for demo purpose )-->
+    <script src="{{ asset('assets-dashboard/assets') }}/src/js/customizer.js"></script>
+
+    <!-- Add Slick slider library -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('.slider-container').slick({
+                slidesToShow: 4,
+                slidesToScroll: 1,
+                arrows: true,
+                dots: false,
+                autoplay: true,
+                autoplaySpeed: 3000,
+                responsive: [{
+                    breakpoint: 768,
+                    settings: {
+                        slidesToShow: 1,
+                        slidesToScroll: 1,
+                    }
+                }]
+            });
+        });
+    </script>
+</body>
+
 </html>

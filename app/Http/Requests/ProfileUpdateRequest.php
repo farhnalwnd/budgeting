@@ -18,7 +18,7 @@ class ProfileUpdateRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($this->user()->id)],
-            'nik' => ['required', 'string', 'nik', 'exists:users,nik','min:6','max:6'],
+            'nik' => ['required', 'string', 'exists:users,nik','min:6','max:6'],
         ];
     }
 }
