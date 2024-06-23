@@ -668,175 +668,155 @@ class RQMController extends Controller
     }
 
     public function update(Request $request)
-    {
-        // Log data received from the request
-        Log::channel('custom')->info('Received request data update: '. json_encode($request->all()));
+{
+    // Log data received from the request
+    Log::channel('custom')->info('Received request data update: ' . json_encode($request->all()));
 
-        // Extract data from request
-        $rqmNbr = $request->prNumber;
-        $rqmShip = $request->input('rqmShip', '1000');
-        $rqmVend = $request->rqmVend;
-        $enterby = $request->enterby;
-        $rqmReqDate = $request->rqmReqDate;
-        $rqmNeedDate = $request->rqmNeedDate;
-        $rqmDueDate = $request->rqmDueDate;
-        $rqmRqbyUserid = $request->rqmRqbyUserid;
-        $rqmEndUserid = $request->rqmEndUserid;
-        $rqmReason = $request->rqmReason;
-        $rqmRmks = $request->rqmRmks;
-        $rqmCc = $request->rqmCc;
-        $rqmSite = $request->input('rqmSite', '1000');
-        $rqmEntity = $request->input('rqmEntity', 'SMII');
-        $rqmCurr = $request->rqmCurr;
-        $rqmLang = $request->rqmLang;
-        $emailOptEntry = $request->input('emailOptEntry', 'R');
-        $rqmDirect = $request->input('rqmDirect', false);
-        $rqm__log01 = $request->input('rqm__log01', false);
-        $rqmAprvStat = $request->input('rqmAprvStat', 'Unapproved');
-        $routeToApr = $request->routeToApr;
-        $routeToBuyer = $request->routeToBuyer;
-        $allInfoCorrect = $request->allInfoCorrect;
+    // Extract data from request
+    $rqmNbr = $request->prNumber;
+    $rqmShip = $request->input('rqmShip', '1000');
+    $rqmVend = $request->rqmVend;
+    $enterby = $request->enterby;
+    $rqmReqDate = $request->rqmReqDate;
+    $rqmNeedDate = $request->rqmNeedDate;
+    $rqmDueDate = $request->rqmDueDate;
+    $rqmRqbyUserid = $request->rqmRqbyUserid;
+    $rqmEndUserid = $request->rqmEndUserid;
+    $rqmReason = $request->rqmReason;
+    $rqmRmks = $request->rqmRmks;
+    $rqmCc = $request->rqmCc;
+    $rqmSite = $request->input('rqmSite', '1000');
+    $rqmEntity = $request->input('rqmEntity', 'SMII');
+    $rqmCurr = $request->rqmCurr;
+    $rqmLang = $request->rqmLang;
+    $emailOptEntry = $request->input('emailOptEntry', 'R');
+    $rqmDirect = $request->input('rqmDirect', false);
+    $rqm__log01 = $request->input('rqm__log01', false);
+    $rqmAprvStat = $request->input('rqmAprvStat', 'Unapproved');
+    $routeToApr = $request->routeToApr;
+    $routeToBuyer = $request->routeToBuyer;
+    $allInfoCorrect = $request->allInfoCorrect;
 
-        // Check if a record with the same rqmNbr value already exists
-        $existingRecord = RequisitionMaster::where('rqmNbr', $rqmNbr)->first();
+    // Check if a record with the same rqmNbr value already exists
+    $existingRecord = RequisitionMaster::where('rqmNbr', $rqmNbr)->first();
 
-        if ($existingRecord) {
-            // Update the existing record
-            $existingRecord->update([
-                'rqmShip' => $rqmShip,
-                'rqmVend' => $rqmVend,
-                'enterby' => $enterby,
-                'rqmReqDate' => $rqmReqDate,
-                'rqmNeedDate' => $rqmNeedDate,
-                'rqmDueDate' => $rqmDueDate,
-                'rqmRqbyUserid' => $rqmRqbyUserid,
-                'rqmEndUserid' => $rqmEndUserid,
-                'rqmReason' => $rqmReason,
-                'rqmRmks' => $rqmRmks,
-                'rqmCc' => $rqmCc,
-                'rqmSite' => $rqmSite,
-                'rqmEntity' => $rqmEntity,
-                'rqmCurr' => $rqmCurr,
-                'rqmLang' => $rqmLang,
-                'emailOptEntry' => $emailOptEntry,
-                'rqmDirect' => $rqmDirect,
-                'rqm__log01' => $rqm__log01,
-                'rqmAprvStat' => $rqmAprvStat,
-                'routeToApr' => $routeToApr,
-                'routeToBuyer' => $routeToBuyer,
-                'allInfoCorrect' => $allInfoCorrect,
-            ]);
-        } else {
-            // Create a new record
-            $requisitionMaster = RequisitionMaster::create([
-                'rqmNbr' => $rqmNbr,
-                'rqmShip' => $rqmShip,
-                'rqmVend' => $rqmVend,
-                'enterby' => $enterby,
-                'rqmReqDate' => $rqmReqDate,
-                'rqmNeedDate' => $rqmNeedDate,
-                'rqmDueDate' => $rqmDueDate,
-                'rqmRqbyUserid' => $rqmRqbyUserid,
-                'rqmEndUserid' => $rqmEndUserid,
-                'rqmReason' => $rqmReason,
-                'rqmRmks' => $rqmRmks,
-                'rqmCc' => $rqmCc,
-                'rqmSite' => $rqmSite,
-                'rqmEntity' => $rqmEntity,
-                'rqmCurr' => $rqmCurr,
-                'rqmLang' => $rqmLang,
-                'emailOptEntry' => $emailOptEntry,
-                'rqmDirect' => $rqmDirect,
-                'rqm__log01' => $rqm__log01,
-                'rqmAprvStat' => $rqmAprvStat,
-                'routeToApr' => $routeToApr,
-                'routeToBuyer' => $routeToBuyer,
-                'allInfoCorrect' => $allInfoCorrect,
-            ]);
-        }
-
-        // Prepare items data for insertion into requisition_details
-        $items = [];
-        $rqdParts = $request->input('rqdPart', []);
-        $rqdVends = $request->input('rqdVend', []);
-        $rqdReqQtys = $request->input('rqdReqQty', []);
-        $rqdUms = $request->input('rqdUm', []);
-        $rqdPurCosts = $request->input('rqdPurCost', []);
-        $rqdDueDates = $request->input('rqdDueDate', []);
-        $rqdNeedDates = $request->input('rqdNeedDate', []);
-        $rqdAccts = $request->input('rqdAcct', []);
-        $rqdUmConvs = $request->input('rqdUmConv', []);
-        $rqdMaxCosts = $request->input('rqdMaxCost', []);
-        $lineCmmtss = $request->input('lineCmmts', []);
-        $rqdCmtss = $request->input('cmtCmmt', []);
-
-        foreach ($rqdParts as $index => $part) {
-            $items[] = [
-                'rqdNbr' => $request->prNumber,
-                'rqdPart' => $part,
-                'rqdVend' => $rqdVends[$index],
-                'rqdReqQty' => $rqdReqQtys[$index],
-                'rqdUm' => $rqdUms[$index],
-                'rqdPurCost' => $rqdPurCosts[$index],
-                'rqdDiscPct' => '0',
-                'rqdDueDate' => $rqdDueDates[$index],
-                'rqdNeedDate' => $rqdNeedDates[$index],
-                'rqdAcct' => $rqdAccts[$index],
-                'rqdUmConv' => $rqdUmConvs[$index],
-                'rqdMaxCost' => $rqdMaxCosts[$index],
-                'lineCmmts' => $lineCmmtss[$index],
-                'rqdCmt' => $rqdCmtss[$index],
-            ];
-        }
-
-        foreach ($rqdParts as $index => $rqdPart) {
-            $existingRecordDetail = RequisitionDetail::where('rqdNbr', $rqmNbr)->where('rqdPart', $rqdPart)->first();
-            if ($existingRecordDetail) {
-                // Update the existing detail record
-                $existingRecordDetail->update([
-                    'rqdNbr' => $rqmNbr,
-                    'rqdPart' => $rqdPart,
-                    'rqdVend' => $rqdVends[$index],
-                    'rqdReqQty' => $rqdReqQtys[$index],
-                    'rqdPurCost' => $rqdPurCosts[$index],
-                    'rqdDueDate' => $rqdDueDates[$index],
-                    'rqdNeedDate' => $rqdNeedDates[$index],
-                    'rqdAcct' => $rqdAccts[$index],
-                    'rqdUmConv' => $rqdUmConvs[$index],
-                    'rqdMaxCost' => $rqdMaxCosts[$index],
-                    'lineCmmts' => $lineCmmtss[$index],
-                    'rqdCmt' => $rqdCmtss[$index],
-                ]);
-            } else {
-                // Create a new detail record
-                RequisitionDetail::create([
-                    'rqdNbr' => $rqmNbr,
-                    'rqdPart' => $rqdPart,
-                    'rqdVend' => $rqdVends[$index],
-                    'rqdReqQty' => $rqdReqQtys[$index],
-                    'rqdPurCost' => $rqdPurCosts[$index],
-                    'rqdDueDate' => $rqdDueDates[$index],
-                    'rqdNeedDate' => $rqdNeedDates[$index],
-                    'rqdAcct' => $rqdAccts[$index],
-                    'rqdUmConv' => $rqdUmConvs[$index],
-                    'rqdMaxCost' => $rqdMaxCosts[$index],
-                    'lineCmmts' => $lineCmmtss[$index],
-                    'rqdCmt' => $rqdCmtss[$index],
-                ]);
-            }
-        }
-
-        // Call inboundUpdate function with necessary data
-        $this->inboundUpdate($request->prNumber, $rqmVend, $rqmShip, $rqmReqDate, $rqmNeedDate, $rqmDueDate, $rqmRqbyUserid, $rqmEndUserid, $rqmReason, $rqmRmks, $rqmCc, $rqmSite, $rqmEntity, $rqmCurr, $rqmLang, $rqmDirect, $emailOptEntry, $rqmAprvStat, $routeToApr, $routeToBuyer, $allInfoCorrect, $items);
-
-        // Redirect back with success message
-        if ($existingRecord) {
-            return redirect()->route('rqm.browser')->with('success', 'Data berhasil diperbarui.');
-        } else {
-            return redirect()->route('rqm.browser')->with('error', 'Gagal memperbarui data.');
-        }
+    if ($existingRecord) {
+        // Update the existing record
+        Log::channel('custom')->info('Updating RequisitionMaster: ' . $rqmNbr);
+        $existingRecord->update([
+            'rqmShip' => $rqmShip,
+            'rqmVend' => $rqmVend,
+            'enterby' => $enterby,
+            'rqmReqDate' => $rqmReqDate,
+            'rqmNeedDate' => $rqmNeedDate,
+            'rqmDueDate' => $rqmDueDate,
+            'rqmRqbyUserid' => $rqmRqbyUserid,
+            'rqmEndUserid' => $rqmEndUserid,
+            'rqmReason' => $rqmReason,
+            'rqmRmks' => $rqmRmks,
+            'rqmCc' => $rqmCc,
+            'rqmSite' => $rqmSite,
+            'rqmEntity' => $rqmEntity,
+            'rqmCurr' => $rqmCurr,
+            'rqmLang' => $rqmLang,
+            'emailOptEntry' => $emailOptEntry,
+            'rqmDirect' => $rqmDirect,
+            'rqm__log01' => $rqm__log01,
+            'rqmAprvStat' => $rqmAprvStat,
+            'routeToApr' => $routeToApr,
+            'routeToBuyer' => $routeToBuyer,
+            'allInfoCorrect' => $allInfoCorrect,
+        ]);
+    } else {
+        // Create a new record
+        Log::channel('custom')->info('Creating new RequisitionMaster: ' . $rqmNbr);
+        $requisitionMaster = RequisitionMaster::create([
+            'rqmNbr' => $rqmNbr,
+            'rqmShip' => $rqmShip,
+            'rqmVend' => $rqmVend,
+            'enterby' => $enterby,
+            'rqmReqDate' => $rqmReqDate,
+            'rqmNeedDate' => $rqmNeedDate,
+            'rqmDueDate' => $rqmDueDate,
+            'rqmRqbyUserid' => $rqmRqbyUserid,
+            'rqmEndUserid' => $rqmEndUserid,
+            'rqmReason' => $rqmReason,
+            'rqmRmks' => $rqmRmks,
+            'rqmCc' => $rqmCc,
+            'rqmSite' => $rqmSite,
+            'rqmEntity' => $rqmEntity,
+            'rqmCurr' => $rqmCurr,
+            'rqmLang' => $rqmLang,
+            'emailOptEntry' => $emailOptEntry,
+            'rqmDirect' => $rqmDirect,
+            'rqm__log01' => $rqm__log01,
+            'rqmAprvStat' => $rqmAprvStat,
+            'routeToApr' => $routeToApr,
+            'routeToBuyer' => $routeToBuyer,
+            'allInfoCorrect' => $allInfoCorrect,
+        ]);
     }
 
+    // Prepare items data for insertion into requisition_details
+    $items = [];
+    $rqdParts = $request->input('rqdPart', []);
+    $rqdVends = $request->input('rqdVend', []);
+    $rqdReqQtys = $request->input('rqdReqQty', []);
+    $rqdUms = $request->input('rqdUm', []);
+    $rqdPurCosts = $request->input('rqdPurCost', []);
+    $rqdDueDates = $request->input('rqdDueDate', []);
+    $rqdNeedDates = $request->input('rqdNeedDate', []);
+    $rqdAccts = $request->input('rqdAcct', []);
+    $rqdUmConvs = $request->input('rqdUmConv', []);
+    $rqdMaxCosts = $request->input('rqdMaxCost', []);
+    $lineCmmtss = $request->input('lineCmmts', []);
+    $rqdCmtss = $request->input('cmtCmmt', []);
+
+    foreach ($rqdParts as $index => $part) {
+        $existingRecordDetail = RequisitionDetail::where('rqdNbr', $rqmNbr)->where('rqdPart', $part)->first();
+
+        $item = [
+            'rqdNbr' => $rqmNbr,
+            'rqdPart' => $part,
+            'rqdVend' => $rqdVends[$index],
+            'rqdReqQty' => $rqdReqQtys[$index],
+            'rqdUm' => $rqdUms[$index],
+            'rqdPurCost' => $rqdPurCosts[$index],
+            'rqdDiscPct' => '0',
+            'rqdDueDate' => $rqdDueDates[$index],
+            'rqdNeedDate' => $rqdNeedDates[$index],
+            'rqdAcct' => $rqdAccts[$index],
+            'rqdUmConv' => $rqdUmConvs[$index],
+            'rqdMaxCost' => $rqdMaxCosts[$index],
+            'lineCmmts' => $lineCmmtss[$index],
+            'rqdCmt' => $rqdCmtss[$index],
+        ];
+
+        if ($existingRecordDetail) {
+            // Log detail update action
+            Log::channel('custom')->info('Updating RequisitionDetail for part: ' . $part);
+            // Update the existing detail record
+            $existingRecordDetail->update($item);
+        } else {
+            // Log detail create action
+            Log::channel('custom')->info('Creating new RequisitionDetail for part: ' . $part);
+            // Create a new detail record
+            RequisitionDetail::create($item);
+        }
+
+        $items[] = $item;
+    }
+
+    // Call inboundUpdate function with necessary data
+    $this->inboundUpdate($rqmNbr, $rqmVend, $rqmShip, $rqmReqDate, $rqmNeedDate, $rqmDueDate, $rqmRqbyUserid, $rqmEndUserid, $rqmReason, $rqmRmks, $rqmCc, $rqmSite, $rqmEntity, $rqmCurr, $rqmLang, $rqmDirect, $emailOptEntry, $rqmAprvStat, $routeToApr, $routeToBuyer, $allInfoCorrect, $items);
+
+    // Redirect back with success message
+    if ($existingRecord) {
+        return redirect()->route('rqm.browser')->with('success', 'Data berhasil diperbarui.');
+    } else {
+        return redirect()->route('rqm.browser')->with('error', 'Gagal memperbarui data.');
+    }
+}
 
 
     public function inboundUpdate($rqmNbr, $rqmVend, $rqmShip, $rqmReqDate, $rqmNeedDate, $rqmDueDate, $rqmRqbyUserid, $rqmEndUserid, $rqmReason, $rqmRmks, $rqmCc, $rqmSite, $rqmEntity, $rqmCurr, $rqmLang, $rqmDirect, $emailOptEntry, $rqmAprvStat, $routeToApr, $routeToBuyer, $allInfoCorrect, $items)

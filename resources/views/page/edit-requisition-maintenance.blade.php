@@ -2,7 +2,7 @@
     <div class="content-header">
         <div class="flex items-center justify-between">
 
-            <h4 class="page-title text-2xl font-medium">Edit Requisition Maintenance</h4>
+            <h4 class="page-title text-2xl font-medium">Edit Requisition Maintenance - {{ $editRqm->rqmNbr }}</h4>
             <div class="inline-flex items-center">
                 <nav>
                     <ol class="breadcrumb flex items-center">
