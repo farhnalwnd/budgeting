@@ -96,9 +96,9 @@ return array(
             "https://" => ["rules" => []]
         ],
 
-         /**
-          * @var string
-          */
+        /**
+         * @var string
+         */
         'log_output_file' => null,
 
         /**
@@ -134,7 +134,7 @@ return array(
          * @link http://www.ros.co.nz/pdf
          * @link http://www.php.net/image
          */
-        "pdf_backend" => "CPDF",
+        "pdf_backend" => "auto",
 
         /**
          * PDFlib license key
@@ -171,13 +171,13 @@ return array(
          */
         "default_paper_size" => "a4",
 
-         /**
-          * The default paper orientation.
-          *
-          * The orientation of the page (portrait or landscape).
-          *
-          * @var string
-          */
+        /**
+         * The default paper orientation.
+         *
+         * The orientation of the page (portrait or landscape).
+         *
+         * @var string
+         */
         'default_paper_orientation' => "portrait",
 
         /**
@@ -269,7 +269,6 @@ return array(
         /**
          * A ratio applied to the fonts height to be more like browsers' line height
          */
-        "font_height_ratio" => 1.1,
 
         /**
          * Use the HTML5 Lib parser
@@ -278,6 +277,13 @@ return array(
          * @var bool
          */
         "enable_html5_parser" => true,
+
+        'margin_left' => 0,
+        'margin_right' => 0,
+        'margin_top' => 0,
+        'margin_bottom' => 0,
+        'margin_header' => 0,
+        'margin_footer' => 0,
     ),
 
 

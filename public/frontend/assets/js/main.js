@@ -110,31 +110,31 @@
   });
   cu.start();
 
-  //======== tiny slider for clients
-  tns({
-    container: ".testimonial-active",
-    autoplay: true,
-    autoplayTimeout: 5000,
-    autoplayButtonOutput: false,
-    mouseDrag: true,
-    gutter: 24,
-    nav: true,
-    navPosition: "bottom",
-    controls: false,
-    controlsText: [
-      '<i class="lni lni-chevron-left"></i>',
-      '<i class="lni lni-chevron-right"></i>',
-    ],
-    items: 1,
-    responsive: {
-      768: {
-        items: 2,
-      },
-      992: {
-        items: 3,
-      },
-    },
-  });
+//   //======== tiny slider for clients
+//   tns({
+//     container: ".testimonial-active",
+//     autoplay: true,
+//     autoplayTimeout: 5000,
+//     autoplayButtonOutput: false,
+//     mouseDrag: true,
+//     gutter: 24,
+//     nav: true,
+//     navPosition: "bottom",
+//     controls: false,
+//     controlsText: [
+//       '<i class="lni lni-chevron-left"></i>',
+//       '<i class="lni lni-chevron-right"></i>',
+//     ],
+//     items: 1,
+//     responsive: {
+//       768: {
+//         items: 2,
+//       },
+//       992: {
+//         items: 3,
+//       },
+//     },
+//   });
 
   //=====  WOW active
   new WOW().init();

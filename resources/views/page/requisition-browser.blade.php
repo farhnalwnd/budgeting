@@ -339,7 +339,7 @@
 
             function printRequisition(rqmNbr) {
                 var url = '{{ route('rqm.print', ':rqmNbr') }}'.replace(':rqmNbr', rqmNbr);
-                window.open(url, '_self');
+                window.open(url, '_blank');
             }
         </script>
     @endpush

@@ -7,6 +7,8 @@ export default defineConfig({
             input: [
                 'resources/css/app.css',
                 'resources/js/app.js',
+                'public/frontend/assets/js/main.js',
+                'public/frontend/assets/css/style.css',
                 'public/assets/src/js/menus.js',
                 'public/assets/src/js/tailwind.min.js',
                 'public/assets/src/js/template.js',

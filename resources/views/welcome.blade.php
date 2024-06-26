@@ -550,7 +550,7 @@
             autoplayButtonOutput: false,
             mouseDrag: true,
             swipeAngle: false,
-            speed: 800,
+            speed: 100,
             controls: false,
             nav: false,
             responsive: {

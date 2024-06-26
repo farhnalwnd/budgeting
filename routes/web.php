@@ -29,16 +29,15 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    $cost = CostCenter::all();
-    return view('welcome', ['cost' => $cost]);
+    return view('welcome');
 });
 
 
 Route::middleware('auth')->group(function () {
     /* Dashboard */
-    Route::get('/dashboard',[DashboardController::class,'index'])->name('dashboard');
-    Route::get('/dashboard-finance',[DashboardController::class,'index-finance'])->name('dashboard-finance');
-    Route::get('/dashboard-sales',[DashboardController::class,'index-sales'])->name('dashboard-sales');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard-finance', [DashboardController::class, 'index-finance'])->name('dashboard-finance');
+    Route::get('/dashboard-sales', [DashboardController::class, 'index-sales'])->name('dashboard-sales');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -53,7 +52,7 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/update-rqm/{rqmNbr}', [RQMController::class, 'update'])->name('rqm.update');
     Route::post('/deletepr/{rqmNbr}', [RQMController::class, 'delete'])->name('rqm.delete');
-    Route::get('/requisition/print/{rqmNbr}',[RQMController::class, 'printRequisition'])->name('rqm.print');
+    Route::get('/requisition/print/{rqmNbr}', [RQMController::class, 'printRequisition'])->name('rqm.print');
 
     /* items */
     Route::post('/getitems', [ItemController::class, 'getItemAndStoreMaster'])->name('get.items');
@@ -77,6 +76,7 @@ Route::get('/get-approver', [ApproverController::class, 'getApprover']);
 Route::get('/getSupplier', [SupplierController::class, 'getSupplierAjax'])->name('get.suppliers.ajax');
 Route::get('/getitems', [ItemController::class, 'getItemAjax'])->name('get.items.ajax');
 Route::get('/getaccount', [AccountController::class, 'getAccountAjax'])->name('get.account.ajax');
+Route::post('/delete-line', [RQMController::class, 'deleteLine'])->name('rqm.deleteLine');
 
 
 

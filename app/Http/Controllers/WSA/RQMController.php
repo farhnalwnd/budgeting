@@ -12,8 +12,7 @@ use App\Models\Item;
 use App\Models\RequisitionDetail;
 use App\Models\RequisitionMaster;
 use App\Models\Supplier;
-use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Support\Facades\DB;
+use PDF;
 
 class RQMController extends Controller
 {
@@ -263,6 +262,9 @@ class RQMController extends Controller
 
     public function store(Request $request)
     {
+        // \dd($request->all());
+
+        // \dd($request->all());
         // Log data received from the request
         Log::channel('custom')->info('Received request data: ' . json_encode($request->all()));
 
@@ -334,6 +336,7 @@ class RQMController extends Controller
         $rqdCmts = $request->input('cmtCmmt', []);
 
         foreach ($rqdParts as $index => $part) {
+
             $items[] = [
                 'rqdNbr' => $rqmNbr,
                 'rqdPart' => $part,
@@ -348,10 +351,11 @@ class RQMController extends Controller
                 'rqdUmConv' => $rqdUmConvs[$index],
                 'rqdMaxCost' => $rqdMaxCosts[$index],
                 'lineCmmts' => $lineCmmtss[$index],
-                'rqdCmt' => $rqdCmts[$index],
+                'rqdCmt' => isset($rqdCmts[$index]) ? $rqdCmts[$index] : '-',
             ];
         }
         foreach ($rqdParts as $index => $rqdPart) {
+
             // Tambahkan log untuk memeriksa data sebelum disimpan
             Log::info('Data before saving: ' . json_encode([
                 'rqdNbr' => $rqmNbr,
@@ -366,7 +370,7 @@ class RQMController extends Controller
                 'rqdUmConv' => $rqdUmConvs[$index],
                 'rqdMaxCost' => $rqdMaxCosts[$index],
                 'lineCmmts' => $lineCmmtss[$index],
-                'rqdCmt' => $rqdCmts[$index],
+                'rqdCmt' => isset($rqdCmts[$index]) ? $rqdCmts[$index] : '-',
             ]));
             RequisitionDetail::create([
                 'rqdNbr' => $rqmNbr,
@@ -380,7 +384,7 @@ class RQMController extends Controller
                 'rqdUmConv' => $rqdUmConvs[$index],
                 'rqdMaxCost' => $rqdMaxCosts[$index],
                 'lineCmmts' => $lineCmmtss[$index],
-                'rqdCmt' => $rqdCmts[$index],
+                'rqdCmt' => isset($rqdCmts[$index]) ? $rqdCmts[$index] : '-',
             ]);
         }
 
@@ -515,6 +519,8 @@ class RQMController extends Controller
         $cdSeq = 1;
         $cmtSeq = 1;
         foreach ($items as $item) {
+            $commentParts = $this->splitCommentParts($item['rqdCmt']);
+            $numberOfParts = count($commentParts);
             $qdocBody .= '
                         <lineDetail>
                             <operation>A</operation>
@@ -536,8 +542,9 @@ class RQMController extends Controller
                                 <operation>A</operation>
                                 <cmtSeq>' . $cmtSeq . '</cmtSeq>
                                 <cdLang>us</cdLang>
-                                <cdSeq>' . $cdSeq . '</cdSeq>
-                                <cmtCmmt>' . $item['rqdCmt'] . '</cmtCmmt>
+                                <cdSeq>' . $cdSeq . '</cdSeq>';
+            $qdocBody .= $this->buildCommentParts($commentParts);
+            $qdocBody .= '
                                 <prtOnQuote>true</prtOnQuote>
                                 <prtOnSo>true</prtOnSo>
                                 <prtOnInvoice>true</prtOnInvoice>
@@ -555,6 +562,9 @@ class RQMController extends Controller
                                 <prtOnIntern>true</prtOnIntern>
                             </lineDetailTransComment>
                         </lineDetail>';
+            // Increment cmtSeq and cdSeq based on the number of comment parts
+            $cmtSeq += $numberOfParts;
+            $cdSeq += $numberOfParts;
             $lineNumber++;
         }
 
@@ -643,10 +653,7 @@ class RQMController extends Controller
         }
     }
 
-    public function getDataMaster()
-    {
-        return \view('page.wsa-getmstr');
-    }
+
 
     public function requisitionBrowser()
     {
@@ -654,8 +661,6 @@ class RQMController extends Controller
         // \dd($rqmbrowsers);
         return \view('page.requisition-browser', \compact('rqmbrowsers'));
     }
-
-
 
     public function edit($rqmNbr)
     {
@@ -668,161 +673,242 @@ class RQMController extends Controller
     }
 
     public function update(Request $request)
-{
-    // Log data received from the request
-    Log::channel('custom')->info('Received request data update: ' . json_encode($request->all()));
+    {
+        $request->validate([
 
-    // Extract data from request
-    $rqmNbr = $request->prNumber;
-    $rqmShip = $request->input('rqmShip', '1000');
-    $rqmVend = $request->rqmVend;
-    $enterby = $request->enterby;
-    $rqmReqDate = $request->rqmReqDate;
-    $rqmNeedDate = $request->rqmNeedDate;
-    $rqmDueDate = $request->rqmDueDate;
-    $rqmRqbyUserid = $request->rqmRqbyUserid;
-    $rqmEndUserid = $request->rqmEndUserid;
-    $rqmReason = $request->rqmReason;
-    $rqmRmks = $request->rqmRmks;
-    $rqmCc = $request->rqmCc;
-    $rqmSite = $request->input('rqmSite', '1000');
-    $rqmEntity = $request->input('rqmEntity', 'SMII');
-    $rqmCurr = $request->rqmCurr;
-    $rqmLang = $request->rqmLang;
-    $emailOptEntry = $request->input('emailOptEntry', 'R');
-    $rqmDirect = $request->input('rqmDirect', false);
-    $rqm__log01 = $request->input('rqm__log01', false);
-    $rqmAprvStat = $request->input('rqmAprvStat', 'Unapproved');
-    $routeToApr = $request->routeToApr;
-    $routeToBuyer = $request->routeToBuyer;
-    $allInfoCorrect = $request->allInfoCorrect;
-
-    // Check if a record with the same rqmNbr value already exists
-    $existingRecord = RequisitionMaster::where('rqmNbr', $rqmNbr)->first();
-
-    if ($existingRecord) {
-        // Update the existing record
-        Log::channel('custom')->info('Updating RequisitionMaster: ' . $rqmNbr);
-        $existingRecord->update([
-            'rqmShip' => $rqmShip,
-            'rqmVend' => $rqmVend,
-            'enterby' => $enterby,
-            'rqmReqDate' => $rqmReqDate,
-            'rqmNeedDate' => $rqmNeedDate,
-            'rqmDueDate' => $rqmDueDate,
-            'rqmRqbyUserid' => $rqmRqbyUserid,
-            'rqmEndUserid' => $rqmEndUserid,
-            'rqmReason' => $rqmReason,
-            'rqmRmks' => $rqmRmks,
-            'rqmCc' => $rqmCc,
-            'rqmSite' => $rqmSite,
-            'rqmEntity' => $rqmEntity,
-            'rqmCurr' => $rqmCurr,
-            'rqmLang' => $rqmLang,
-            'emailOptEntry' => $emailOptEntry,
-            'rqmDirect' => $rqmDirect,
-            'rqm__log01' => $rqm__log01,
-            'rqmAprvStat' => $rqmAprvStat,
-            'routeToApr' => $routeToApr,
-            'routeToBuyer' => $routeToBuyer,
-            'allInfoCorrect' => $allInfoCorrect,
+            'lineCmmts.*' => 'required|in:true,false',
+            'cmtCmmt.*' => function ($attribute, $value, $fail) use ($request) {
+                // Memvalidasi hanya ketika lineCmmts tercentang
+                foreach ($request->lineCmmts as $key => $lineCmmt) {
+                    if ($lineCmmt === 'true' && empty($request->cmtCmmt[$key])) {
+                        $fail("The $attribute field is required when lineCmmts is true.");
+                    }
+                }
+            },
         ]);
-    } else {
-        // Create a new record
-        Log::channel('custom')->info('Creating new RequisitionMaster: ' . $rqmNbr);
-        $requisitionMaster = RequisitionMaster::create([
-            'rqmNbr' => $rqmNbr,
-            'rqmShip' => $rqmShip,
-            'rqmVend' => $rqmVend,
-            'enterby' => $enterby,
-            'rqmReqDate' => $rqmReqDate,
-            'rqmNeedDate' => $rqmNeedDate,
-            'rqmDueDate' => $rqmDueDate,
-            'rqmRqbyUserid' => $rqmRqbyUserid,
-            'rqmEndUserid' => $rqmEndUserid,
-            'rqmReason' => $rqmReason,
-            'rqmRmks' => $rqmRmks,
-            'rqmCc' => $rqmCc,
-            'rqmSite' => $rqmSite,
-            'rqmEntity' => $rqmEntity,
-            'rqmCurr' => $rqmCurr,
-            'rqmLang' => $rqmLang,
-            'emailOptEntry' => $emailOptEntry,
-            'rqmDirect' => $rqmDirect,
-            'rqm__log01' => $rqm__log01,
-            'rqmAprvStat' => $rqmAprvStat,
-            'routeToApr' => $routeToApr,
-            'routeToBuyer' => $routeToBuyer,
-            'allInfoCorrect' => $allInfoCorrect,
-        ]);
-    }
+        // \dd($request->all());
+        // Log data received from the request
+        Log::channel('custom')->info('Received request data update: ' . json_encode($request->all()));
 
-    // Prepare items data for insertion into requisition_details
-    $items = [];
-    $rqdParts = $request->input('rqdPart', []);
-    $rqdVends = $request->input('rqdVend', []);
-    $rqdReqQtys = $request->input('rqdReqQty', []);
-    $rqdUms = $request->input('rqdUm', []);
-    $rqdPurCosts = $request->input('rqdPurCost', []);
-    $rqdDueDates = $request->input('rqdDueDate', []);
-    $rqdNeedDates = $request->input('rqdNeedDate', []);
-    $rqdAccts = $request->input('rqdAcct', []);
-    $rqdUmConvs = $request->input('rqdUmConv', []);
-    $rqdMaxCosts = $request->input('rqdMaxCost', []);
-    $lineCmmtss = $request->input('lineCmmts', []);
-    $rqdCmtss = $request->input('cmtCmmt', []);
+        // Extract data from request
+        $rqmNbr = $request->prNumber;
+        $rqmShip = $request->input('rqmShip', '1000');
+        $rqmVend = $request->rqmVend;
+        $enterby = $request->enterby;
+        $rqmReqDate = $request->rqmReqDate;
+        $rqmNeedDate = $request->rqmNeedDate;
+        $rqmDueDate = $request->rqmDueDate;
+        $rqmRqbyUserid = $request->rqmRqbyUserid;
+        $rqmEndUserid = $request->rqmEndUserid;
+        $rqmReason = $request->rqmReason;
+        $rqmRmks = $request->rqmRmks;
+        $rqmCc = $request->rqmCc;
+        $rqmSite = $request->input('rqmSite', '1000');
+        $rqmEntity = $request->input('rqmEntity', 'SMII');
+        $rqmCurr = $request->rqmCurr;
+        $rqmLang = $request->rqmLang;
+        $emailOptEntry = $request->input('emailOptEntry', 'R');
+        $rqmDirect = $request->input('rqmDirect', false);
+        $rqm__log01 = $request->input('rqm__log01', false);
+        $rqmAprvStat = $request->input('rqmAprvStat', 'Unapproved');
+        $routeToApr = $request->routeToApr;
+        $routeToBuyer = $request->routeToBuyer;
+        $allInfoCorrect = $request->allInfoCorrect;
 
-    foreach ($rqdParts as $index => $part) {
-        $existingRecordDetail = RequisitionDetail::where('rqdNbr', $rqmNbr)->where('rqdPart', $part)->first();
 
-        $item = [
-            'rqdNbr' => $rqmNbr,
-            'rqdPart' => $part,
-            'rqdVend' => $rqdVends[$index],
-            'rqdReqQty' => $rqdReqQtys[$index],
-            'rqdUm' => $rqdUms[$index],
-            'rqdPurCost' => $rqdPurCosts[$index],
-            'rqdDiscPct' => '0',
-            'rqdDueDate' => $rqdDueDates[$index],
-            'rqdNeedDate' => $rqdNeedDates[$index],
-            'rqdAcct' => $rqdAccts[$index],
-            'rqdUmConv' => $rqdUmConvs[$index],
-            'rqdMaxCost' => $rqdMaxCosts[$index],
-            'lineCmmts' => $lineCmmtss[$index],
-            'rqdCmt' => $rqdCmtss[$index],
-        ];
+        // Check if a record with the same rqmNbr value already exists
+        $existingRecord = RequisitionMaster::where('rqmNbr', $rqmNbr)->first();
 
-        if ($existingRecordDetail) {
-            // Log detail update action
-            Log::channel('custom')->info('Updating RequisitionDetail for part: ' . $part);
-            // Update the existing detail record
-            $existingRecordDetail->update($item);
+        if ($existingRecord) {
+            // Update the existing record
+            Log::channel('custom')->info('Updating RequisitionMaster: ' . $rqmNbr);
+            $existingRecord->update([
+                'rqmShip' => $request->input('rqmShip', '1000'),
+                'rqmVend' => $request->rqmVend,
+                'enterby' => $request->enterby,
+                'rqmReqDate' => $request->rqmReqDate,
+                'rqmNeedDate' => $request->rqmNeedDate,
+                'rqmDueDate' => $request->rqmDueDate,
+                'rqmRqbyUserid' => $request->rqmRqbyUserid,
+                'rqmEndUserid' => $request->rqmEndUserid,
+                'rqmReason' => $request->rqmReason,
+                'rqmRmks' => $request->rqmRmks,
+                'rqmCc' => $request->rqmCc,
+                'rqmSite' => $request->input('rqmSite', '1000'),
+                'rqmEntity' => $request->input('rqmEntity', 'SMII'),
+                'rqmCurr' => $request->rqmCurr,
+                'rqmLang' => $request->rqmLang,
+                'emailOptEntry' => $request->input('emailOptEntry', 'R'),
+                'rqmDirect' => $request->input('rqmDirect', false),
+                'rqm__log01' => $request->input('rqm__log01', false),
+                'rqmAprvStat' => $request->input('rqmAprvStat', 'Unapproved'),
+                'routeToApr' => $request->routeToApr,
+                'routeToBuyer' => $request->routeToBuyer,
+                'allInfoCorrect' => $request->allInfoCorrect,
+            ]);
         } else {
-            // Log detail create action
-            Log::channel('custom')->info('Creating new RequisitionDetail for part: ' . $part);
-            // Create a new detail record
-            RequisitionDetail::create($item);
+            // Create a new record if it doesn't exist
+            Log::channel('custom')->info('Creating new RequisitionMaster: ' . $rqmNbr);
+            $existingRecord = RequisitionMaster::create([
+                'rqmNbr' => $rqmNbr,
+                'rqmShip' => $request->input('rqmShip', '1000'),
+                'rqmVend' => $request->rqmVend,
+                'enterby' => $request->enterby,
+                'rqmReqDate' => $request->rqmReqDate,
+                'rqmNeedDate' => $request->rqmNeedDate,
+                'rqmDueDate' => $request->rqmDueDate,
+                'rqmRqbyUserid' => $request->rqmRqbyUserid,
+                'rqmEndUserid' => $request->rqmEndUserid,
+                'rqmReason' => $request->rqmReason,
+                'rqmRmks' => $request->rqmRmks,
+                'rqmCc' => $request->rqmCc,
+                'rqmSite' => $request->input('rqmSite', '1000'),
+                'rqmEntity' => $request->input('rqmEntity', 'SMII'),
+                'rqmCurr' => $request->rqmCurr,
+                'rqmLang' => $request->rqmLang,
+                'emailOptEntry' => $request->input('emailOptEntry', 'R'),
+                'rqmDirect' => $request->input('rqmDirect', false),
+                'rqm__log01' => $request->input('rqm__log01', false),
+                'rqmAprvStat' => $request->input('rqmAprvStat', 'Unapproved'),
+                'routeToApr' => $request->routeToApr,
+                'routeToBuyer' => $request->routeToBuyer,
+                'allInfoCorrect' => $request->allInfoCorrect,
+            ]);
         }
 
-        $items[] = $item;
+        // Prepare items data for insertion into requisition_details
+        $items = [];
+        $rqdIds = $request->input('rqdId.*');
+        $rqdParts = $request->input('rqdPart.*');
+        $rqdVends = $request->input('rqdVend.*');
+        $rqdReqQtys = $request->input('rqdReqQty.*');
+        $rqdUms = $request->input('rqdUm.*');
+        $rqdPurCosts = $request->input('rqdPurCost.*');
+        $rqdDueDates = $request->input('rqdDueDate.*');
+        $rqdNeedDates = $request->input('rqdNeedDate.*');
+        $rqdAccts = $request->input('rqdAcct.*');
+        $rqdUmConvs = $request->input('rqdUmConv.*');
+        $rqdMaxCosts = $request->input('rqdMaxCost.*');
+        $lineCmmtss = $request->input('lineCmmts.*');
+        $rqdCmtss = $request->input('cmtCmmt.*'); // Adjust to match the textarea name attribute
+
+        $deletedLineNumbers  = $request->input('deletedLineNumbers');
+
+        foreach ($rqdParts as $index => $part) {
+            $items[] = [
+                'rqdNbr' => $rqmNbr,
+                'rqdPart' => $part,
+                'rqdVend' => isset($rqdVends[$index]) ? $rqdVends[$index] : null,
+                'rqdReqQty' => isset($rqdReqQtys[$index]) ? $rqdReqQtys[$index] : null,
+                'rqdUm' => isset($rqdUms[$index]) ? $rqdUms[$index] : null,
+                'rqdPurCost' => isset($rqdPurCosts[$index]) ? $rqdPurCosts[$index] : null,
+                'rqdDiscPct' => '0',
+                'rqdDueDate' => isset($rqdDueDates[$index]) ? $rqdDueDates[$index] : null,
+                'rqdNeedDate' => isset($rqdNeedDates[$index]) ? $rqdNeedDates[$index] : null,
+                'rqdAcct' => isset($rqdAccts[$index]) ? $rqdAccts[$index] : null,
+                'rqdUmConv' => isset($rqdUmConvs[$index]) ? $rqdUmConvs[$index] : null,
+                'rqdMaxCost' => isset($rqdMaxCosts[$index]) ? $rqdMaxCosts[$index] : null,
+                'lineCmmts' => isset($lineCmmtss[$index]) ? $lineCmmtss[$index] : null,
+                'rqdCmt' => isset($rqdCmts[$index]) ? $rqdCmts[$index] : '-',
+                'deletedLineNumbers' => isset($deletedLineNumbers[$index]) ? $deletedLineNumbers[$index] : null,
+            ];
+        }
+
+        $rqdIdsInRequest = $request->input('rqdId.*');
+
+        // Get all rqdIds associated with the requisition number $rqmNbr from the database
+        $existingRqdIds = RequisitionDetail::where('rqdNbr', $rqmNbr)->pluck('id')->toArray();
+
+        // Determine rqdIds that are in the database but not in the request
+        $rqdIdsToDelete = array_diff($existingRqdIds, $rqdIdsInRequest);
+
+        // Delete requisition details that are no longer in the request
+        RequisitionDetail::whereIn('id', $rqdIdsToDelete)->delete();
+        Log::channel('custom')->info('Menghapus detail requisition yang tidak ada dalam permintaan');
+
+
+
+        // Proses Update Data yang Sudah Ada
+        foreach ($rqdIds as $index => $rqdId) {
+            if (!empty($rqdId)) {
+                RequisitionDetail::where('id', $rqdId)->update([
+                    'rqdNbr' => $rqmNbr,
+                    'rqdPart' => $rqdParts[$index],
+                    'rqdVend' => $rqdVends[$index] ?? null,
+                    'rqdReqQty' => $rqdReqQtys[$index] ?? null,
+                    'rqdUm' => $rqdUms[$index] ?? null,
+                    'rqdPurCost' => $rqdPurCosts[$index] ?? null,
+                    'rqdDiscPct' => '0',
+                    'rqdDueDate' => $rqdDueDates[$index] ?? null,
+                    'rqdNeedDate' => $rqdNeedDates[$index] ?? null,
+                    'rqdAcct' => $rqdAccts[$index] ?? null,
+                    'rqdUmConv' => $rqdUmConvs[$index] ?? null,
+                    'rqdMaxCost' => $rqdMaxCosts[$index] ?? null,
+                    'lineCmmts' => $lineCmmtss[$index] ?? null,
+                    'rqdCmt' => isset($rqdCmts[$index]) ? $rqdCmts[$index] : '-',
+                ]);
+                Log::info('Mengupdate detail requisition: ' . $rqdId);
+            }
+        }
+
+        // Proses Create Data Baru
+        foreach ($rqdIds as $index => $rqdId) {
+            if (empty($rqdId)) {
+                RequisitionDetail::create([
+                    'rqdNbr' => $rqmNbr,
+                    'rqdPart' => $rqdParts[$index],
+                    'rqdVend' => $rqdVends[$index] ?? null,
+                    'rqdReqQty' => $rqdReqQtys[$index] ?? null,
+                    'rqdUm' => $rqdUms[$index] ?? null,
+                    'rqdPurCost' => $rqdPurCosts[$index] ?? null,
+                    'rqdDiscPct' => '0',
+                    'rqdDueDate' => $rqdDueDates[$index] ?? null,
+                    'rqdNeedDate' => $rqdNeedDates[$index] ?? null,
+                    'rqdAcct' => $rqdAccts[$index] ?? null,
+                    'rqdUmConv' => $rqdUmConvs[$index] ?? null,
+                    'rqdMaxCost' => $rqdMaxCosts[$index] ?? null,
+                    'lineCmmts' => $lineCmmtss[$index] ?? null,
+                    'rqdCmt' => isset($rqdCmts[$index]) ? $rqdCmts[$index] : '-',
+                ]);
+                Log::info('Membuat detail requisition baru');
+            }
+        }
+
+        // Refresh $items array after all updates and deletions
+        $items = [];
+
+        // Retrieve updated requisition details data after modifications
+        $updatedDetails = RequisitionDetail::where('rqdNbr', $rqmNbr)->get();
+
+        // Populate $items with updated data
+        foreach ($updatedDetails as $detail) {
+            $items[] = [
+                'rqdNbr' => $detail->rqdNbr,
+                'rqdPart' => $detail->rqdPart,
+                'rqdVend' => $detail->rqdVend,
+                'rqdReqQty' => $detail->rqdReqQty,
+                'rqdUm' => $detail->rqdUm,
+                'rqdPurCost' => $detail->rqdPurCost,
+                'rqdDiscPct' => '0', // Assuming this is constant or fetched from somewhere
+                'rqdDueDate' => $detail->rqdDueDate,
+                'rqdNeedDate' => $detail->rqdNeedDate,
+                'rqdAcct' => $detail->rqdAcct,
+                'rqdUmConv' => $detail->rqdUmConv,
+                'rqdMaxCost' => $detail->rqdMaxCost,
+                'lineCmmts' => $detail->lineCmmts,
+                'rqdCmt' => isset($detail->rqdCmt) ? $detail->rqdCmt : '-',
+            ];
+        }
+        $this->inboundUpdate($rqmNbr, $rqmVend, $rqmShip, $rqmReqDate, $rqmNeedDate, $rqmDueDate, $rqmRqbyUserid, $rqmEndUserid, $rqmReason, $rqmRmks, $rqmCc, $rqmSite, $rqmEntity, $rqmCurr, $rqmLang, $rqmDirect, $emailOptEntry, $rqmAprvStat, $routeToApr, $routeToBuyer, $allInfoCorrect, $items, $deletedLineNumbers);
+        // Return a response indicating success or failure
+        return redirect()->route('rqm.browser');
     }
 
-    // Call inboundUpdate function with necessary data
-    $this->inboundUpdate($rqmNbr, $rqmVend, $rqmShip, $rqmReqDate, $rqmNeedDate, $rqmDueDate, $rqmRqbyUserid, $rqmEndUserid, $rqmReason, $rqmRmks, $rqmCc, $rqmSite, $rqmEntity, $rqmCurr, $rqmLang, $rqmDirect, $emailOptEntry, $rqmAprvStat, $routeToApr, $routeToBuyer, $allInfoCorrect, $items);
 
-    // Redirect back with success message
-    if ($existingRecord) {
-        return redirect()->route('rqm.browser')->with('success', 'Data berhasil diperbarui.');
-    } else {
-        return redirect()->route('rqm.browser')->with('error', 'Gagal memperbarui data.');
-    }
-}
-
-
-    public function inboundUpdate($rqmNbr, $rqmVend, $rqmShip, $rqmReqDate, $rqmNeedDate, $rqmDueDate, $rqmRqbyUserid, $rqmEndUserid, $rqmReason, $rqmRmks, $rqmCc, $rqmSite, $rqmEntity, $rqmCurr, $rqmLang, $rqmDirect, $emailOptEntry, $rqmAprvStat, $routeToApr, $routeToBuyer, $allInfoCorrect, $items)
+    public function inboundUpdate($rqmNbr, $rqmVend, $rqmShip, $rqmReqDate, $rqmNeedDate, $rqmDueDate, $rqmRqbyUserid, $rqmEndUserid, $rqmReason, $rqmRmks, $rqmCc, $rqmSite, $rqmEntity, $rqmCurr, $rqmLang, $rqmDirect, $emailOptEntry, $rqmAprvStat, $routeToApr, $routeToBuyer, $allInfoCorrect, $items, $deletedLineNumbers)
     {
 
-        Log::channel('custom')->info('Received request data inbound: ' . json_encode(func_get_args()));
+        Log::channel('custom')->info('Received request data inbound updated: ' . json_encode(func_get_args()));
 
         $qxUrl = 'http://smii.qad:24079/qxi/services/QdocWebService';
         $timeout = 10;
@@ -934,10 +1020,18 @@ class RQMController extends Controller
         $cdSeq = 1;
         $cmtSeq = 1;
         foreach ($items as $item) {
+            $operation = 'M'; // Default operation is 'M'
+            // Check if the item already exists
+            $existingItem = RequisitionDetail::where('rqdPart', $item['rqdPart'])->first();
+            if ($existingItem) {
+                $operation = 'A'; // Change operation to 'A' if item exists
+
+                $commentParts = $this->splitCommentParts($item['rqdCmt']);
+            }
             $qdocBody .= '
                         <lineDetail>
-                            <operation>M</operation>
-                            <line>' . $lineNumber . '</line>
+                        <operation>' . $operation . '</operation>
+                        <line>' . $lineNumber . '</line>
                             <lYn>true</lYn>
                             <rqdSite>' . $rqmShip . '</rqdSite>
                             <rqdPart>' . $item['rqdPart'] . '</rqdPart>
@@ -955,8 +1049,9 @@ class RQMController extends Controller
                                 <operation>A</operation>
                                 <cmtSeq>' . $cmtSeq . '</cmtSeq>
                                 <cdLang>us</cdLang>
-                                <cdSeq>' . $cdSeq . '</cdSeq>
-                                <cmtCmmt>' . $item['rqdCmt'] . '</cmtCmmt>
+                                <cdSeq>' . $cdSeq . '</cdSeq>';
+            $qdocBody .= $this->buildCommentParts($commentParts);
+            $qdocBody .= '
                                 <prtOnQuote>true</prtOnQuote>
                                 <prtOnSo>true</prtOnSo>
                                 <prtOnInvoice>true</prtOnInvoice>
@@ -986,8 +1081,7 @@ class RQMController extends Controller
 
         $qdocRequest = $qdocHead . $qdocBody . $qdocFoot;
 
-        Log::channel('custom')->info('Constructed Qdoc request: ' . $qdocRequest);
-        Log::channel('custom')->info('Constructed Qdoc body: ' . $qdocBody);
+        Log::channel('custom')->info('Constructed Qdoc request udpate: ' . $qdocRequest);
 
         $curlOptions = array(
             CURLOPT_URL => $qxUrl,
@@ -1061,6 +1155,111 @@ class RQMController extends Controller
             return [false, $errorlist];
         }
     }
+
+    public function deleteLine(Request $request)
+{
+    try {
+        $rqmNbr = $request->input('rqmNbr');
+        $deletedLineNumbers = json_decode($request->input('deletedLineNumbers'), true); // Convert JSON to array
+
+        // Ensure $deletedLineNumbers is an array
+        if (!is_array($deletedLineNumbers)) {
+            $deletedLineNumbers = [];
+        }
+
+        // Log for checking received data
+        Log::info('rqmNbr: ' . $rqmNbr);
+        Log::info('deletedLineNumbers: ' . implode(', ', $deletedLineNumbers)); // Convert array to string for logging
+
+        $qxUrl = 'http://smii.qad:24079/wsa/smiiwsa';
+        $timeout = 10;
+        $domain = 'SMII';
+
+        // Convert deletedLineNumbers array to a suitable string format
+        $lines = implode(',', $deletedLineNumbers);
+
+        $qdocRequest =
+            '<Envelope xmlns="http://schemas.xmlsoap.org/soap/envelope/">
+                <Body>
+                    <deleteLine xmlns="urn:services-qad-com:smiiwsa:0001:smiiwsa">
+                        <noPR>' . $rqmNbr . '</noPR>
+                        <line>' . $lines . '</line>
+                    </deleteLine>
+                </Body>
+            </Envelope>';
+
+        Log::info('QdocRequest: ' . $qdocRequest);
+
+        $curlOptions = array(
+            CURLOPT_URL => $qxUrl,
+            CURLOPT_CONNECTTIMEOUT => $timeout,
+            CURLOPT_TIMEOUT => $timeout + 5,
+            CURLOPT_HTTPHEADER => $this->httpHeader($qdocRequest),
+            CURLOPT_POSTFIELDS => preg_replace("/\s+/", " ", $qdocRequest),
+            CURLOPT_POST => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false
+        );
+
+        $curl = curl_init();
+        if ($curl) {
+            curl_setopt_array($curl, $curlOptions);
+            $qdocResponse = curl_exec($curl);
+            Log::info('CURL Response: ' . $qdocResponse);
+
+            if (curl_errno($curl)) {
+                Log::error('CURL Error: ' . curl_error($curl));
+                return response()->json(['error' => 'Failed to connect to ERP'], 500);
+            }
+            curl_close($curl);
+        } else {
+            Log::error('CURL initialization failed');
+            return response()->json(['error' => 'Failed to initialize CURL'], 500);
+        }
+
+        if (is_bool($qdocResponse)) {
+            Log::error('Invalid response from ERP, response is boolean');
+            return response()->json(['error' => 'Invalid response from ERP'], 500);
+        }
+
+        libxml_use_internal_errors(true);
+        $xmlResp = simplexml_load_string($qdocResponse);
+        if ($xmlResp === false) {
+            foreach (libxml_get_errors() as $error) {
+                Log::error('XML Parsing Error: ' . $error->message);
+            }
+            libxml_clear_errors();
+            return response()->json(['error' => 'Failed to parse XML'], 500);
+        }
+
+        $xmlResp->registerXPathNamespace('SOAP-ENV', 'http://schemas.xmlsoap.org/soap/envelope/');
+        $xmlResp->registerXPathNamespace('ns', 'urn:services-qad-com:smiiwsa:0001:smiiwsa');
+
+        // Check for 'result' element in the response
+        $result = $xmlResp->xpath('//ns:deleteLineResponse/ns:result');
+
+        if (empty($result)) {
+            Log::error('Invalid XML response: missing <result> element');
+            return response()->json(['error' => 'Invalid XML response: missing <result> element'], 500);
+        }
+
+        // Get the value of the xsi:nil attribute
+        $isNil = (string) $result[0]['xsi:nil'];
+
+        if ($isNil === 'true') {
+            Log::info('DeleteLine result: success');
+            return response()->json(['success' => 'Berhasil'], 200);
+        } else {
+            Log::error('DeleteLine result: failure');
+            return response()->json(['error' => 'Failed to delete line'], 500);
+        }
+    } catch (Exception $e) {
+        Log::error('Exception: ' . $e->getMessage());
+        return response()->json(['error' => 'An error occurred while processing your request'], 500);
+    }
+}
+
 
     public function delete(Request $request)
     {
@@ -1242,11 +1441,93 @@ class RQMController extends Controller
 
     public function printRequisition($rqmNbr)
     {
-        $item = RequisitionMaster::with('supplier')->where('rqmNbr', $rqmNbr)->firstOrFail();
+        $item = RequisitionMaster::with('supplier', 'rqdDets')->where('rqmNbr', $rqmNbr)->first();
 
-        // Load the view with the data and create a PDF
-        $pdf = Pdf::loadView('page.report-requisition', compact('item'));
-        // Return the PDF for download
-        return $pdf->stream();
+        // Muat tampilan dengan data dan buat PDF dengan orientasi landscape
+        return view('page.report-requisition', compact('item'));
+
+        //     $pdf = PDF::loadView('page.report-requisition', compact('item'));
+        //   return $pdf->stream('Laporan-Data-Santri.pdf');
+    }
+
+    public function getDataMaster()
+    {
+        return \view('page.wsa-getmstr');
+    }
+
+    private function buildCommentParts($commentParts)
+    {
+        $commentXml = '';
+
+        foreach ($commentParts as $part) {
+            $commentXml .= '<cmtCmmt>' . $part . '</cmtCmmt>' . "\n";
+        }
+
+        return $commentXml;
+    }
+
+    private function splitCommentParts($comment)
+    {
+        return str_split($comment, 75);
+    }
+
+    public function deleteLinesEdit()
+    {
+        $qxUrl = 'http://smii.qad:24079/wsa/smiiwsa';
+        $timeout = 10;
+        $domain = 'SMII';
+        $qdocRequest =
+            '<Envelope xmlns="http://schemas.xmlsoap.org/soap/envelope/">
+        <Body>
+            <getlastnumber xmlns="urn:services-qad-com:smiiwsa:0001:smiiwsa"/>
+        </Body>
+        </Envelope>';
+
+        $curlOptions = array(
+            CURLOPT_URL => $qxUrl,
+            CURLOPT_CONNECTTIMEOUT => $timeout,
+            CURLOPT_TIMEOUT => $timeout + 5,
+            CURLOPT_HTTPHEADER => $this->httpHeader($qdocRequest),
+            CURLOPT_POSTFIELDS => preg_replace("/\s+/", " ", $qdocRequest),
+            CURLOPT_POST => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false
+        );
+
+        $curl = curl_init();
+        if ($curl) {
+            curl_setopt_array($curl, $curlOptions);
+            $qdocResponse = curl_exec($curl);
+            if (curl_errno($curl)) {
+                return response()->json(['error' => 'Failed to connect to ERP'], 500);
+            }
+            curl_close($curl);
+        }
+
+        if (is_bool($qdocResponse)) {
+            return response()->json(['error' => 'Invalid response from ERP'], 500);
+        }
+
+        libxml_use_internal_errors(true);
+        $xmlResp = simplexml_load_string($qdocResponse);
+        if ($xmlResp === false) {
+            foreach (libxml_get_errors() as $error) {
+                // Log the error or handle it as needed
+            }
+            libxml_clear_errors();
+            return response()->json(['error' => 'Failed to parse XML'], 500);
+        }
+
+        $xmlResp->registerXPathNamespace('ns', 'urn:services-qad-com:smiiwsa:0001:smiiwsa');
+        $outNumber = (string) $xmlResp->xpath('//ns:outnumber')[0];
+
+        if (isset($outNumber)) {
+            $outNumber = (string) $outNumber;
+            $this->updateNumber($outNumber);
+            return response()->json(['prNumber' => $outNumber]);
+        }
+
+        return response()->json(['error' => 'No PR number found'], 500);
     }
 }

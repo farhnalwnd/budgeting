@@ -37,7 +37,7 @@
                                 <label for="prNumber" class="block mb-2 text-md font-medium">Req Number: <span
                                         class="text-danger">*</span></label>
                                 <input type="text" id="prNumberInput" name="prNumber" readonly
-                                    class="bg-gray-200 border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                                    class="bg-gray-200 border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 required"
                                     placeholder="Tekan Enter untuk mendapatkan Nomor PR">
                             </div>
 
@@ -45,7 +45,7 @@
                                 <label for="supplier" class="block mb-2 text-md font-medium">Supplier:</label>
                                 <div class="relative">
                                     <input type="text" name="rqmVend"
-                                        class="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-3 pr-10 p-2.5"
+                                        class="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-3 pr-10 p-2.5 "
                                         id="supplier">
                                     <a data-modal-target="large-modal" data-modal-toggle="large-modal"
                                         class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer">
@@ -103,7 +103,7 @@
                                         Center: <span class="text-danger">*</span></label>
                                     <div class="relative">
                                         <input type="text" name="rqmCc"
-                                            class="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-3 pr-10 p-2.5 "
+                                            class="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-3 pr-10 p-2.5 required"
                                             id="costcenter">
                                         <a data-modal-target="large-modal-cost" data-modal-toggle="large-modal-cost"
                                             class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer">
@@ -542,8 +542,16 @@
                         }
                     });
 
+                    const commentText = lineItemTemplate.querySelector('.commentText');
+                    if (commentText) {
+                        commentText.value = '';
+                    }
+
                     // Unhide the remove button
-                    lineItemTemplate.querySelector('.removeLineItem').classList.remove('hidden');
+                    const removeButton = lineItemTemplate.querySelector('.removeLineItem');
+                    if (removeButton) {
+                        removeButton.classList.remove('hidden');
+                    }
 
                     // Update the data-row-id attribute
                     const newLineIndex = lineItemContainer.querySelectorAll('.lineItem').length + 1;
@@ -553,9 +561,9 @@
                     const newLineNumber = document.createElement('div');
                     newLineNumber.classList.add('line-number');
                     newLineNumber.innerHTML = `
-                        <div class="text-md p-5 font-bold">Line ${newLineIndex}</div>
-                        <div class="grid grid-cols-2 md:grid-cols-5 gap-4"></div>
-                    `;
+                                <div class="text-md p-5 font-bold">Line ${newLineIndex}</div>
+                                <div class="grid grid-cols-2 md:grid-cols-5 gap-4"></div>
+                            `;
                     lineItemTemplate.prepend(newLineNumber);
 
                     // Remove existing comments checkbox and label
@@ -565,19 +573,19 @@
                     }
 
                     // Add event listeners for quantity and cost inputs
-                    lineItemTemplate.querySelector('.reqQty').addEventListener('input', function() {
+                    lineItemTemplate.querySelector('.reqQty')?.addEventListener('input', function() {
                         updateRealTimeValues.call(this);
                         generateOverviewTable();
                     });
-                    lineItemTemplate.querySelector('.unitCost').addEventListener('input', function() {
+                    lineItemTemplate.querySelector('.unitCost')?.addEventListener('input', function() {
                         updateRealTimeValues.call(this);
                         generateOverviewTable();
                     });
-                    lineItemTemplate.querySelector('.itemnumber').addEventListener('input', function() {
+                    lineItemTemplate.querySelector('.itemnumber')?.addEventListener('input', function() {
                         generateOverviewTable();
                     });
 
-                    // Handle comment checkbox
+                    // Handle comment checkbox creation
                     const commentsCheckbox = document.createElement('input');
                     commentsCheckbox.type = 'checkbox';
                     commentsCheckbox.id = `commentsCheckbox-row-${newLineIndex}`;
@@ -586,11 +594,22 @@
                     commentsCheckbox.setAttribute('data-row-id', newLineIndex);
                     commentsCheckbox.setAttribute('data-toggle', 'modal');
                     commentsCheckbox.setAttribute('data-target', `#commentsModal-row-${newLineIndex}`);
-                    commentsCheckbox.checked = false; // Set default to unchecked
                     commentsCheckbox.value = 'false'; // Set default value to false
 
+                    // Create a hidden input that mimics the checkbox
+                    const hiddenCheckbox = document.createElement('input');
+                    hiddenCheckbox.type = 'hidden';
+                    hiddenCheckbox.name = 'lineCmmts[]';
+                    hiddenCheckbox.value = 'false';
+
+                    // Event listener to toggle modal and update checkbox value
                     commentsCheckbox.addEventListener('change', function(event) {
                         toggleModal(event.target);
+                        commentsCheckbox.value = event.target.checked ? 'true' : 'false';
+                        hiddenCheckbox.disabled = event.target
+                        .checked; // Disable hidden input when checkbox is checked
+                        updateCommentTextarea(event.target.checked,
+                        newLineIndex); // Call function to update comment textarea based on checkbox status
                     });
 
                     // Create a label for the comments checkbox
@@ -599,19 +618,38 @@
                     commentsLabel.textContent = 'Comments';
                     commentsLabel.classList.add('text-sm', 'font-medium', 'ml-2');
 
-                    // Add the checkbox and label to a container
+                    // Create a container for checkbox and label
                     const checkboxContainer = document.createElement('div');
                     checkboxContainer.classList.add('mt-4', 'flex', 'items-center');
                     checkboxContainer.appendChild(commentsCheckbox);
                     checkboxContainer.appendChild(commentsLabel);
+                    checkboxContainer.appendChild(hiddenCheckbox); // Append the hidden input
 
-                    // Find the target insert point
+                    // Find the target insert point or fallback to appending to template
                     const targetInsertPoint = lineItemTemplate.querySelector('.target-insert-point');
                     if (targetInsertPoint) {
                         targetInsertPoint.appendChild(checkboxContainer);
                     } else {
-                        // Fallback: append the checkbox container to the line item template
                         lineItemTemplate.appendChild(checkboxContainer);
+                    }
+
+                    // Function to update comment textarea based on checkbox status
+                    function updateCommentTextarea(checked, rowIndex) {
+                        const commentTextarea = document.getElementById(`commentText-${rowIndex}`);
+                        if (commentTextarea) {
+                            if (checked) {
+                                // Enable textarea and set initial value if necessary
+                                commentTextarea.removeAttribute('disabled');
+                                if (commentTextarea.value.trim() === '') {
+                                    commentTextarea.value =
+                                    'Initial comment'; // Set your initial comment text here if needed
+                                }
+                            } else {
+                                // Disable textarea and clear value
+                                commentTextarea.setAttribute('disabled', true);
+                                commentTextarea.value = '';
+                            }
+                        }
                     }
 
                     // Append the new line item to the container
@@ -620,9 +658,6 @@
                     updateCosts();
                     generateOverviewTable();
                 }
-
-
-
 
                 function removeLineItem(button) {
                     button.closest('.lineItem').remove();
@@ -1027,7 +1062,7 @@
                 // Set initial values
                 appstatusSelect.value = appstatusSelect.value === '2' ? 'Approved' : 'Unapproved';
                 directCheckbox.value = directCheckbox.checked ? 'true' : 'false';
-                nonPOCheckbox.value = nonPOCheckbox.checked ? 'true' : 'false';
+                nonPOCheckbox.value = nonPOCheckbox.checked ? 'yes' : 'no';
                 allInfoCorrectCheckbox.value = allInfoCorrectCheckbox.checked ? 'true' : 'false';
 
                 // Mengatur nilai awal untuk lineCmmtsCheckboxes
@@ -1041,7 +1076,7 @@
                 });
 
                 nonPOCheckbox.addEventListener('change', function() {
-                    this.value = this.checked ? 'true' : 'false';
+                    this.value = this.checked ? 'yes' : 'no';
                 });
 
                 allInfoCorrectCheckbox.addEventListener('change', function() {

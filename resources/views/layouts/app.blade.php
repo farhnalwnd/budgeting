@@ -113,6 +113,7 @@
     <script src="{{ asset('assets') }}/vendor_components/jquery-steps-master/build/jquery.steps.js"></script>
     <script src="{{ asset('assets') }}/vendor_components/jquery-validation-1.17.0/dist/jquery.validate.min.js"></script>
     <script src="{{ asset('assets') }}/src/js/pages/steps.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('assets') }}/vendor_components/sweetalert/sweetalert.min.js"></script>
     <script src="{{ asset('assets') }}/src/js/pages/data-table.js"></script>
 
