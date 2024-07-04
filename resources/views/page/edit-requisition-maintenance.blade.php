@@ -19,6 +19,9 @@
 
         </div>
     </div>
+
+
+
     <!-- Main content -->
     <section class="content">
         <!-- Step wizard -->
@@ -447,7 +450,30 @@
                             </div>
                         </div>
                     </section>
-                   
+                    <div class="modalcomment">
+                        {{-- Modal Comment Template --}}
+                        <div id="commentsModal-template"
+                            class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto bg-opacity-50 modal hidden"
+                            aria-hidden="true">
+                            <div class="relative w-full max-w-4xl max-h-full bg-white rounded-lg shadow-lg">
+                                <!-- Modal Content -->
+                                <div class="relative">
+                                    <!-- Modal header -->
+                                    <div
+                                        class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                                        <label class="text-xl font-medium text-gray-900">Comment</label>
+                                        <label class="modal-close text-medium font-medium text-gray-900 cursor-pointer"
+                                            data-target="#commentsModal-template">
+                                            <i class="modal-close fa fa-times" aria-hidden="true"></i>
+                                        </label>
+                                    </div>
+                                    <div class="p-2 md:p-3 space-y-4 controls">
+                                        <textarea class="commentText form-control" cols="30" rows="10" style="border: none; width: 100%;"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </form>
             </div>
         </div>
