@@ -1,7 +1,5 @@
 <x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600">
-        {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
-    </div>
+
 
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
@@ -9,17 +7,40 @@
     <form method="POST" action="{{ route('password.email') }}">
         @csrf
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
+        <div class="row m-0">
+            <div class="col-12 p-0">
+                <div class="login-card login-dark">
+                    <div>
+                    <div class="bg-white rounded10 shadow-lg">
+                        <div class="content-top-agile px-20 pt-20 pb-0">
+                            <h2 class="mb-10 text-2xl font-semibold text-primary">Forgot Password ?</h2>
+                            <p class="mb-0 text-fade">Enter your email to reset your password.</p>
+                        </div>
+                        <div class="px-20 pt-0 pb-20">
+                            <form action="index.html" method="post">
+                                <div class="form-group">
+                                        <div class="relative w-full mt-4">
+                                    <label for="input-label" class="block font-medium mb-2 dark:text-white text-xl">Email Address</label>
+                                    <input type="email" name="email" id="input-label" class="border-1 py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 dark:focus:ring-gray-600" placeholder="Example@smii.co.id">
+                                </div>
+                                <x-input-error :messages="$errors->get('email')" class="mt-2" />
 
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Email Password Reset Link') }}
-            </x-primary-button>
+                                    <!-- <div class="input-group mb-3">
+                                        <span class="input-group-text bg-transparent"><i class="text-fade ti-email"></i></span>
+                                        <input type="email" class="form-control ps-15 bg-transparent" placeholder="Your Email">
+                                    </div> -->
+                                </div>
+                                  <div class="row">
+                                    <div class="col-12 text-center">
+                                      <button type="submit" class="btn btn-primary w-p100 mt-10">Reset</button>
+                                    </div>
+                                    <!-- /.col -->
+                                  </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </form>
 </x-guest-layout>

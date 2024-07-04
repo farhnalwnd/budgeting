@@ -1,4 +1,7 @@
 <x-app-layout>
+    @section('title')
+Dashboard
+    @endsection
     @can('view dashboard Finance')
         @include('dashboard.dashboardFinance')
     @endcan

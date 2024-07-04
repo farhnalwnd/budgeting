@@ -6,13 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <!-- PWA  -->
+    {{-- <!-- PWA  -->
     <meta name="theme-color" content="#6777ef" />
     <link rel="apple-touch-icon" href="{{ asset('assets/images/sinarmeadow.png') }}">
-    <link rel="manifest" href="{{ asset('/manifest.json') }}">
 
-    <title>{{ config('app.name', 'INTRA SMII') }}</title>
+    <link rel="manifest" href="{{ asset('/manifest.json') }}"> --}}
+    <link rel="icon" href="{{ url('assets/images/sinarmeadow.png') }}">
 
+    <title>{{ config('app.name', 'INTRA SMII') }} - @yield('title')</title>
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
@@ -30,6 +31,7 @@
     <link rel="stylesheet" href="{{ asset('assets') }}/src/css/style.css">
     <link rel="stylesheet" href="{{ asset('assets') }}/src/css/skin_color.css">
     <link rel="stylesheet" href="{{ asset('assets') }}/src/css/custom.css">
+    @stack('css')
 
 <style>
  body {
@@ -53,6 +55,7 @@
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
             <div class="px-4 md:px-0">
+                @include('sweetalert::alert')
                 {{ $slot   }}
             </div>
         </div>
@@ -104,7 +107,7 @@
     <script src="{{ asset('assets') }}/vendor_components/morris.js/morris.min.js"></script>
     <script src="{{ asset('assets') }}/src/js/tailwind.min.js"></script>
     <!-- Warehouse App -->
-    <script src="{{ asset('assets') }}/src/js/demo.js"></script>
+    {{-- <script src="{{ asset('assets') }}/src/js/demo.js"></script> --}}
     <script src="{{ asset('assets') }}/src/js/jquery.smartmenus.js"></script>
     <script src="{{ asset('assets') }}/src/js/menus.js"></script>
     <script src="{{ asset('assets') }}/src/js/template.js"></script>
@@ -120,7 +123,8 @@
     <script src="{{ asset('assets') }}/src/js/pages/toastr.js"></script>
     <script src="{{ asset('assets') }}/src/js/pages/notification.js"></script>
 
-    <script src="{{ asset('/sw.js') }}"></script>
+
+    {{-- <script src="{{ asset('/sw.js') }}"></script> --}}
     {{-- <script>
         if ("serviceWorker" in navigator) {
             // Register a service worker hosted at the root of the

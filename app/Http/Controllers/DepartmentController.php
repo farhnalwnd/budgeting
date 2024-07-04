@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Department;
 use Illuminate\Http\Request;
+use RealRashid\SweetAlert\Facades\Alert;
+use Spatie\Permission\Models\Role;
 
 class DepartmentController extends Controller
 {
@@ -13,15 +15,7 @@ class DepartmentController extends Controller
     public function index()
     {
         $departments = Department::all();
-        return view('roleuser.department.user.index', compact('departments'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return view('roleuser.department.index', compact('departments'));
     }
 
     /**
@@ -29,31 +23,29 @@ class DepartmentController extends Controller
      */
     public function store(Request $request)
     {
-        //
-    }
+        $request->validate([
+            'department_name' => 'required',
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Department $department)
-    {
-        //
+        $department = new Department();
+        $department->department_name = $request->department_name;
+        $department->save();
+        Alert::toast('Department created successfully!', 'success');
+        return redirect()->route('department.index');
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Department $department)
-    {
-        //
-    }
-
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, Department $department)
     {
-        //
+
+        $request->validate([
+            'department_name' => 'required',
+        ]);
+
+        $department->update($request->all());
+        Alert::toast('Department Updated successfully!','success');
+        return redirect()->route('department.index');
     }
 
     /**
@@ -61,6 +53,10 @@ class DepartmentController extends Controller
      */
     public function destroy(Department $department)
     {
-        //
+        $department->delete();
+        // alert()->success('Department deleted successfully!', 'Department has been deleted.');
+        Alert::toast('Department deleted successfully!','success');
+
+        return redirect()->route('department.index');
     }
 }

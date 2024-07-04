@@ -100,6 +100,22 @@
                     </div>
                 </button>
             </form>
+            <form method="POST" action="{{ route('get.employees') }}">
+                @csrf
+                <button type="submit" class="box pull-up bg-pink-800 p-4">
+                    <div class="box-body">
+                        <div class="flex justify-between items-center">
+                            <div class="bs-5 ps-10">
+                                <h4 class="text-white mb-10">Master Employees</h4>
+                                <h2 class="my-0 fw-700 text-3xl">Get</h2>
+                            </div>
+                            <div class="icon">
+                                <i class="fa-solid fa-user-check me-0 fs-24 rounded-3"></i>
+                            </div>
+                        </div>
+                    </div>
+                </button>
+            </form>
         </div>
     </div>
     </section>

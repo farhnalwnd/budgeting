@@ -28,8 +28,7 @@
                         <h2 class="my-0 fw-700 text-3xl">{{ $totalItem }}</h2>
                     </div>
                     <div class="icon">
-                        <i
-                            class="fa-solid fa-hand-holding-dollar bg-info-light me-0 fs-24 rounded-3"></i>
+                        <i class="fa-solid fa-hand-holding-dollar bg-info-light me-0 fs-24 rounded-3"></i>
                     </div>
                 </div>
             </div>
@@ -44,8 +43,7 @@
                         <h2 class="my-0 fw-700 text-3xl">{{ $totalSupplier }}</h2>
                     </div>
                     <div class="icon">
-                        <i
-                            class="fa-sack-dollar bg-danger-light me-0 fs-24 rounded-3"></i>
+                        <i class="fa-sack-dollar bg-danger-light me-0 fs-24 rounded-3"></i>
                     </div>
                 </div>
 
@@ -61,8 +59,7 @@
                         <h2 class="my-0 fw-700 text-3xl">{{ $totalRequisitionMaster }}</h2>
                     </div>
                     <div class="icon">
-                        <i
-                            class="fa-solid fa-file-invoice bg-warning-light me-0 fs-24 rounded-3"></i>
+                        <i class="fa-solid fa-file-invoice bg-warning-light me-0 fs-24 rounded-3"></i>
                     </div>
                 </div>
 
@@ -70,5 +67,48 @@
         </div>
     </div>
 </div>
+<div class="box">
+    <div class="box-header with-header">
+        <div class="text-xl font-medium">Data PR </div>
+    </div>
+    <div class="box-body">
+        <div id="chart"></div>
+    </div>
+</div>
 
 
+
+@push('scripts')
+    <script>
+        var chart = c3.generate({
+            bindto: '#chart',
+            data: {
+                x: 'x',
+                columns: [
+                    ['x', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    ['Jumlah Dibuat', 30, 200, 100, 400, 150, 250, 30, 200, 100, 400, 150, 250],
+                    ['Jumlah Approved', 130, 100, 140, 200, 250, 150, 230, 200, 300, 250, 350, 250],
+                    ['Jumlah Unapproved', 50, 80, 120, 180, 100, 200, 50, 80, 120, 180, 100, 200]
+                ],
+                type: 'bar',
+                types: {
+                    'Jumlah Approved': 'line',
+                    'Jumlah Unapproved': 'line'
+                },
+                groups: [
+                    ['Jumlah Dibuat', 'Jumlah Approved', 'Jumlah Unapproved']
+                ]
+            },
+            axis: {
+                x: {
+                    type: 'category'
+                }
+            },
+            bar: {
+                width: {
+                    ratio: 0.5
+                }
+            }
+        });
+    </script>
+@endpush

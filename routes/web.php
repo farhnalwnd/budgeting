@@ -5,17 +5,20 @@ use App\Http\Controllers\ApproverController;
 use App\Http\Controllers\CostCenterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RequisitionMasterController;
 use App\Http\Controllers\Role\PermissionController;
 use App\Http\Controllers\Role\RoleController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WSA\RQMController;
-use App\Models\CostCenter;
+use Artesaos\SEOTools\Facades\SEOMeta;
 use Illuminate\Support\Facades\Route;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -29,6 +32,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
+    SEOMeta::setTitle('Intra SMII - Dashboard');
     return view('welcome');
 });
 
@@ -71,12 +75,20 @@ Route::middleware('auth')->group(function () {
 
     /* getapprover */
     Route::post('/getapprover', [ApproverController::class, 'getApproverAndStoreMaster'])->name('get.approver');
+
+    /* getEmployees */
+    Route::post('/getEmployees', [EmployeeController::class, 'getEmployees'])->name('get.employees');
 });
 Route::get('/get-approver', [ApproverController::class, 'getApprover']);
 Route::get('/getSupplier', [SupplierController::class, 'getSupplierAjax'])->name('get.suppliers.ajax');
 Route::get('/getitems', [ItemController::class, 'getItemAjax'])->name('get.items.ajax');
 Route::get('/getaccount', [AccountController::class, 'getAccountAjax'])->name('get.account.ajax');
 Route::post('/delete-line', [RQMController::class, 'deleteLine'])->name('rqm.deleteLine');
+Route::post('rqm/bulk-delete', [RQMController::class, 'bulkDelete'])->name('rqm.bulk-delete');
+Route::delete('/notifications/clear', [RequisitionMasterController::class, 'clearAll'])->name('notifications.clear');
+Route::post('rqm/checkCurr', [RQMController::class, 'checkCurr'])->name('check.curr');
+
+
 
 
 
@@ -96,28 +108,25 @@ Route::group(['middleware' => ['role:super-admin|admin']], function () {
     Route::get('users/{userId}/delete', [UserController::class, 'destroy']);
 
     Route::get('departments', [DepartmentController::class, 'index'])->name('department.index');
-    Route::get('departments/create', [DepartmentController::class, 'create'])->name('department.create');
     Route::post('departments', [DepartmentController::class, 'store'])->name('department.store');
-    Route::get('departments/{department:slug}/delete', [DepartmentController::class, 'destroy'])->name('department.destroy');
-    Route::get('departments/{department:slug}/edit', [DepartmentController::class, 'edit'])->name('department.edit');
-    Route::put('departments/{department:slug}/edit', [DepartmentController::class, 'update'])->name('department.update');
+    Route::delete('departments/{department:department_slug}/delete', [DepartmentController::class, 'destroy'])->name('department.destroy');
+    Route::put('departments/{department:department_slug}/update', [DepartmentController::class, 'update'])->name('department.update');
 
     Route::get('positions', [PositionController::class, 'index'])->name('position.index');
-    Route::get('positions/create', [PositionController::class, 'create'])->name('position.create');
-    Route::get('positions/{position:slug}', [PositionController::class, 'show'])->name('position.show');
-    Route::get('positions/{position:slug}/delete', [PositionController::class, 'destroy']);
-    Route::get('positions/{position:slug}/edit', [PositionController::class, 'edit']);
-    Route::put('positions/{position:slug}/edit', [PositionController::class, 'update']);
+    Route::delete('positions/{position:position_slug}/delete', [PositionController::class, 'destroy'])->name('positions.destroy');
+    Route::put('positions/{position:position_slug}/update', [PositionController::class, 'update'])->name('positions.update');
     Route::post('positions', [PositionController::class, 'store'])->name('position.store');
 
     Route::get('levels', [LevelController::class, 'index'])->name('level.index');
-    Route::get('levels/create', [LevelController::class, 'create'])->name('level.create');
-    Route::get('levels/{level:slug}', [LevelController::class, 'show'])->name('level.show');
-    Route::get('levels/{level:slug}/delete', [LevelController::class, 'destroy']);
-    Route::get('levels/{level:slug}/edit', [LevelController::class, 'edit']);
-    Route::put('levels/{level:slug}/edit', [LevelController::class, 'update']);
+    Route::put('levels/{level:level_slug}/update', [LevelController::class, 'update'])->name('level.update');
     Route::post('levels', [LevelController::class, 'store'])->name('level.store');
+    Route::delete('levels/{level:level_slug}/delete', [LevelController::class, 'destroy'])->name('level.destroy');
 });
+
+Route::patch('/notifications/{notification}',[RequisitionMasterController::class,'markAsRead']);
+
+
+
 
 
 

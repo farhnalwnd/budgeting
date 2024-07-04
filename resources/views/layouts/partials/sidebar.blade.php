@@ -8,7 +8,7 @@
 
     <!-- Sample menu definition -->
     <ul id="main-menu" class="sm sm-blue">
-        <li><a href="{{ route('dashboard') }}"><i data-feather="home"><span class="path1"></span><span
+        <li><a href="{{ route('dashboard') }}" style="font-size: 18px;"><i data-feather="home"style="width: 18px; height: 18px;"><span class="path1"></span><span
                         class="path2"></span></i>Dashboard</a>
             {{-- <ul>
                 <li><a href="index.html"><i class="icon-Commit"><span class="path1"></span><span
@@ -19,23 +19,21 @@
                                 class="path2"></span></i>Dashboard 3</a></li>
             </ul> --}}
         </li>
-        <li><a href="#"><i data-feather="users"></i>User Management</a>
+        <li>
+            <a href="#" style="font-size: 18px;">
+                <i data-feather="users" style="width: 18px; height: 18px;"></i>
+                User Management
+            </a>
             <ul>
-                <li><a href="{{ route('users.index') }}"><i class="icon-Commit"><span class="path1"></span><span
-                                class="path2"></span></i>Users</a></li>
-                <li><a href="{{ route('department.index') }}"><i class="icon-Commit"><span class="path1"></span><span
-                                class="path2"></span></i>Departments</a></li>
-                <li><a href="{{ route('position.index') }}"><i class="icon-Commit"><span class="path1"></span><span
-                                class="path2"></span></i>Positions</a></li>
-                <li><a href="{{ route('level.index') }}"><i class="icon-Commit"><span class="path1"></span><span
-                                class="path2"></span></i>Levels</a></li>
-                <li><a href="{{ route('roles.index') }}"><i class="icon-Commit"><span class="path1"></span><span
-                                class="path2"></span></i>Roles</a></li>
-                <li><a href="{{ route('permissions.index') }}"><i class="icon-Commit"><span class="path1"></span><span
-                                class="path2"></span></i>Permission</a></li>
+                <li><a href="{{ route('users.index') }}"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Users</a></li>
+                <li><a href="{{ route('department.index') }}"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Departments</a></li>
+                <li><a href="{{ route('position.index') }}"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Positions</a></li>
+                <li><a href="{{ route('level.index') }}"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Levels</a></li>
+                <li><a href="{{ route('roles.index') }}"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Roles</a></li>
+                <li><a href="{{ route('permissions.index') }}"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Permission</a></li>
             </ul>
         </li>
-        <li><a href="#"><i data-feather="printer"></i>Requisition</a>
+        <li><a href="#"style="font-size: 18px;"><i data-feather="printer"style="width: 18px; height: 18px;"></i>Requisition</a>
             <ul>
                 <li><a href="{{ route('rqm.index') }}"><i class="icon-Commit"><span class="path1"></span><span
                                 class="path2"></span></i>Requisition Maintenance</a></li>

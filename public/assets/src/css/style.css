@@ -28536,10 +28536,10 @@ body .main-header .navbar .nav>li.search-box>a:focus {
 #loader {
   position: fixed;
   width: 100%;
-  height: 100vh;
+  height: 100%;
   z-index: 999999;
   overflow: visible;
-  background: #fff url("../../images/preloaders/sinar.gif") no-repeat center center;
+  background: #fff url("../../images/preloaders/preload.gif") no-repeat center center;
 }
 
 .skin-toggle .switch {
@@ -46298,7 +46298,7 @@ button.btn.dropdown-toggle:after {
 @media (min-width: 576px) {
   .card-columns {
     column-count: 3;
-    column-gap: calc($default-gutter-width / 2);
+    column-gap: calc(default-gutter-width / 2);
     orphans: 1;
     widows: 1;
   }

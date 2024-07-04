@@ -100,7 +100,7 @@ class SupplierController extends Controller
 
     public function getSupplierAjax()
     {
-        $suppliers = Supplier::all(); // Misalnya, mengambil semua supplier dari database
+        $suppliers = Supplier::select('vd_addr', 'vd_taxable', 'vd_sort', 'ad_name', 'ad_line1', 'ad_city')->get();
         return response()->json(['data' => $suppliers]);
     }
 }

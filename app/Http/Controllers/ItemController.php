@@ -143,9 +143,24 @@ class ItemController extends Controller
         return redirect()->back();
     }
 
-    public function getItemAjax()
-    {
-        $items = Item::where('pt_status', '0001')->get();
-        return response()->json(['data' => $items]);
+    public function getItemAjax(Request $request)
+{
+    $pt_prod_line = $request->input('pt_prod_line');
+    $pt_taxable = $request->input('pt_taxable');
+
+    $query = Item::where('pt_status', '0001')
+        ->select('pt_part', 'pt_desc1', 'pt_desc2', 'pt_status', 'pt_um', 'pt_taxable', 'pt_net_wt_um', 'pt_prod_line', 'pt_part_type', 'pt_draw', 'pt_added', 'pt_buyer', 'pt_userid', 'pt_mod_date');
+
+    if ($pt_prod_line) {
+        $query->whereIn('pt_prod_line', $pt_prod_line);
     }
+
+    if ($pt_taxable) {
+        $query->where('pt_taxable', $pt_taxable);
+    }
+
+    $items = $query->get();
+
+    return response()->json(['data' => $items]);
+}
 }

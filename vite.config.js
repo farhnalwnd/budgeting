@@ -6,7 +6,7 @@ export default defineConfig({
         laravel({
             input: [
                 'resources/css/app.css',
-                'resources/js/app.js',
+                'resources/js/app.js','public/assets/src/css/tailwind.min.css',
                 'public/frontend/assets/js/main.js',
                 'public/frontend/assets/css/style.css',
                 'public/assets/src/js/menus.js',
@@ -22,7 +22,6 @@ export default defineConfig({
                 'public/assets/src/css/skin_color.css',
                 'public/assets/src/css/style_rtl.css',
                 'public/assets/src/css/style.css',
-                'public/assets/src/css/tailwind.min.css',
                 'public/assets/src/css/vendors_css.css',
             ],
             refresh: true,

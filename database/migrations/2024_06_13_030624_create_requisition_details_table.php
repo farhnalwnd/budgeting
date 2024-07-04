@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('rqdNbr');
             $table->foreign('rqdNbr')->references('rqmNbr')->on('requisition_masters')->onDelete('cascade');
+            $table->string('rqdLine')->nullable();
             $table->string('rqdPart')->nullable();
             $table->string('rqdVend')->nullable();
             $table->string('rqdReqQty')->nullable();

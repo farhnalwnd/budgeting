@@ -1,4 +1,7 @@
 <x-app-layout>
+    @section('title')
+        Requisition Maintenance
+    @endsection
     <div class="content-header">
         <div class="flex items-center justify-between">
 
@@ -31,13 +34,13 @@
                     <!-- Step 1 -->
                     <h6>PR Information</h6>
                     <section>
-                        <div class="grid xl:grid-cols-3 lg:grid-cols-3 md:grid-cols-3 sm:grid-cols-1 gap-x-4">
+                        <div class="grid xl:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 gap-x-4">
                             <div class="mb-1">
                                 @csrf
                                 <label for="prNumber" class="block mb-2 text-md font-medium">Req Number: <span
                                         class="text-danger">*</span></label>
                                 <input type="text" id="prNumberInput" name="prNumber" readonly
-                                    class="bg-gray-200 border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 required"
+                                    class="bg-gray-200 border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
                                     placeholder="Tekan Enter untuk mendapatkan Nomor PR">
                             </div>
 
@@ -45,7 +48,7 @@
                                 <label for="supplier" class="block mb-2 text-md font-medium">Supplier:</label>
                                 <div class="relative">
                                     <input type="text" name="rqmVend"
-                                        class="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-3 pr-10 p-2.5 "
+                                        class="bg-gray-200 border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-3 pr-10 p-2.5 "
                                         id="supplier">
                                     <a data-modal-target="large-modal" data-modal-toggle="large-modal"
                                         class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer">
@@ -53,11 +56,11 @@
                                     </a>
                                 </div>
                             </div>
-                            <div class="mb-1">
-                                <label for="site" class="block mb-2 text-md font-medium ">Users:</label>
+                            <div class="mb-1" style="display: none;">
+                                <label for="enterby" class="block mb-2 text-md font-medium ">Users:</label>
                                 <input type="text" value="{{ Auth::user()->name }}" name="enterby"
-                                    class="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                                    id="site" readonly>
+                                    class="bg-gray-200 border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                                    id="enterby" readonly>
                             </div>
                             <div class="mb-1">
                                 <input type="hidden" value="1000" id="site" name="rqmSite">
@@ -70,40 +73,40 @@
                             <!-- Kolom Kiri -->
                             <div>
                                 <div class="mb-1">
-                                    <label for="requestdate" class="block mb-2 text-sm font-medium">Request
+                                    <label for="requestdate" class="block mb-2 text-md font-medium">Request
                                         Date: <span class="text-danger">*</span></label>
                                     <input type="date" id="requestdate" value="{{ now()->format('Y-m-d') }}"
-                                        name="rqmReqDate" readonly required
-                                        class="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 required">
+                                        name="rqmReqDate" readonly
+                                        class="bg-gray-200 border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
                                 </div>
                                 <div class="mb-1">
-                                    <label for="needdate" class="block mb-2 text-sm font-medium">Need Date: <span
+                                    <label for="needdate" class="block mb-2 text-md font-medium">Need Date: <span
                                             class="text-danger">*</span></label>
                                     <input type="date" id="needdate" value="{{ now()->format('Y-m-d') }}"
                                         name="rqmNeedDate"
-                                        class="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 required">
+                                        class="bg-gray-200 border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
                                 </div>
                                 <div class="mb-1">
-                                    <label for="duedate" class="block mb-2 text-sm font-medium">Due Date: <span
+                                    <label for="duedate" class="block mb-2 text-md font-medium">Due Date: <span
                                             class="text-danger">*</span></label>
                                     <input type="date" id="duedate" value="{{ now()->format('Y-m-d') }}"
                                         name="rqmDueDate"
-                                        class="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 required">
+                                        class="bg-gray-200 border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
                                 </div>
                                 <div class="mb-1">
                                     <input type="hidden" id="enterby" value="mfg" name="rqmRqbyUserid"
-                                        class="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
+                                        class="bg-gray-200 border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
                                 </div>
                                 <div class="mb-1">
                                     <input type="hidden" id="requestby" value="mfg"
-                                        class="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                        class="bg-gray-200 border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                                 </div>
                                 <div class="form-group relative mb-1">
-                                    <label for="costcenter" class="block mb-2 text-sm font-medium">Cost
+                                    <label for="costcenter" class="block mb-2 text-md font-medium">Cost
                                         Center: <span class="text-danger">*</span></label>
                                     <div class="relative">
                                         <input type="text" name="rqmCc"
-                                            class="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-3 pr-10 p-2.5 required"
+                                            class="bg-gray-200 border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-3 pr-10 p-2.5 "
                                             id="costcenter">
                                         <a data-modal-target="large-modal-cost" data-modal-toggle="large-modal-cost"
                                             class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer">
@@ -111,41 +114,48 @@
                                         </a>
                                     </div>
                                 </div>
-                                <div class="mb-1">
-                                    <label for="enduser" class="block mb-2 text-sm font-medium">End User: <span
+
+                                <div class="form-group relative mb-1">
+                                    <label for="enduser" class="block mb-2 text-md font-medium">End User: <span
                                             class="text-danger">*</span></label>
-                                    <input type="text" id="enduser" name='rqmEndUserid' readonly
-                                        class="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
+                                    <div class="relative">
+                                        <input type="text" name="rqmEndUserid"
+                                            class="bg-gray-200 border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-3 pr-10 p-2.5 "
+                                            id="enduser">
+                                        <a data-modal-target="large-modal-enduser"
+                                            data-modal-toggle="large-modal-enduser"
+                                            class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer">
+                                            <i class="fa fa-search text-gray-500 text-2xl"></i>
+                                        </a>
+                                    </div>
                                 </div>
 
                             </div>
                             <!-- Kolom Kanan -->
                             <div>
                                 <div class="mb-1">
-                                    <label for="reason" class="block mb-2 text-sm font-medium">Reason:</label>
+                                    <label for="reason" class="block mb-2 text-md font-medium">Reason: </label>
                                     <input type="text" id="reason" name="rqmReason"
-                                        class="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                        class="bg-gray-200 border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                                 </div>
                                 <div class="mb-1">
-                                    <label for="remarks" class="block mb-2 text-sm font-medium">Remarks:</label>
+                                    <label for="remarks" class="block mb-2 text-md font-medium">Remarks: <span
+                                        class="text-danger">*</span></label>
                                     <input type="text" id="remarks" name="rqmRmks"
-                                        class="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                        class="bg-gray-200 border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                                 </div>
 
                                 <div class="mb-1">
-                                    <label for="currency" class="block mb-2 text-sm font-medium">Currency:</label>
+                                    <label for="currency" class="block mb-2 text-md font-medium">Currency: <span
+                                        class="text-danger">*</span></label>
                                     <select id="currency" name="rqmCurr"
-                                        class="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 required">
-                                        <option value="IDR">INDONESIAN RUPIAH</option>
-                                        <option value="USD">US DOLLAR</option>
-                                        <option value="AUD">AUSTRALIAN DOLLAR</option>
-                                        <option value="EUR">EURO</option>
-                                        <option value="GBP">GB POUNDSTERLING</option>
-                                        <option value="JPY">JAPAN YEN</option>
-                                        <option value="SGD">SINGAPORE DOLLAR</option>
-                                        <option value="THB">THAILAND BATH</option>
+                                        class="bg-gray-200 border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 required">
+                                        @foreach ($currency as $curr)
+                                            <option value="{{ $curr->code }}">{{ $curr->name }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
+                                <div id="messageContainer" class="mt-2"></div>
                                 <div class="mb-1">
                                     <input type="hidden" value="US" id="lang" name="rqmLang">
                                 </div>
@@ -156,51 +166,54 @@
                                 <div class="mb-1">
                                     <input type="hidden" id="entity" value="SMII" name="rqmEntity">
                                 </div>
-                                <div class="mb-1">
-                                    <input type="hidden" id="entity" name="rqmDirect">
-                                </div>
 
                                 <div class="mb-1">
-                                    <label for="appstatus" class="block mb-2 text-sm font-medium">Approval
+                                    <label for="appstatus" class="block mb-2 text-md font-medium">Approval
                                         Status:</label>
                                     <input type="text" id="appstatus" name="rqmAprvStat"
-                                        class="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                                        class="bg-gray-200 border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                         readonly>
                                 </div>
                                 <div class="mt-4 flex items-center">
                                     <input type="checkbox" id="directCheckbox" class="rounded" name="rqmDirect">
-                                    <label for="directCheckbox" class="text-sm font-medium ml-2 text-black">Direct
+                                    <label for="directCheckbox" class="text-md font-medium ml-2 text-black">Direct
                                         Material</label>
+                                    <input type="hidden" id="directCheckboxHidden" name="rqmDirect" value="false">
                                 </div>
                                 <div class="mt-4 flex items-center">
                                     <input type="checkbox" id="nonPOCheckbox" class="rounded" name="rqm__log01">
-                                    <label for="nonPOCheckbox" class="text-sm font-medium ml-2 text-black">PR Non
+                                    <label for="nonPOCheckbox" class="text-md font-medium ml-2 text-black">PR Non
                                         PO</label>
+                                    <input type="hidden" id="nonPOCheckboxHidden" name="rqm__log01" value="false">
+
                                 </div>
                             </div>
                     </section>
                     <!-- Step 2 -->
-                    <h6 class="text-sm font-semibold mb-4">Product Detail</h6>
+                    <h6 class="text-md font-semibold mb-4">Product Detail</h6>
                     <section>
                         <div id="lineItemsContainer">
                             <div class="text-md p-5 font-bold">Line 1</div>
-                            <div class="lineItem" data-row-id="row-1">
+
+                            <div class="lineItem" data-row-id="1">
+
                                 <div class="grid grid-cols-2 md:grid-cols-5 gap-4 ">
                                     <div class="form-group relative mb-1">
-                                        <label for="itemnumber" class="block text-sm font-medium">Item
+                                        <label for="itemnumber" class="block text-md font-medium">Item
                                             Number: <span class="text-danger">*</span></label>
                                         <div class="relative">
                                             <input type="text" id="itemnumber" name="rqdPart[]"
-                                                class="itemnumber bg-gray-200 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 itemnumber required">
+                                                class="itemnumber bg-gray-200 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 itemnumber ">
                                             <a data-modal-target="modal-item"
                                                 class="modal-trigger absolute inset-y-0 right-0 flex items-center pr-3 top-1/2 transform -translate-y-1/2 cursor-pointer">
                                                 <i class="fa fa-search text-gray-500 text-2xl"></i>
                                             </a>
                                         </div>
+                                        <input type="hidden" class="rqdLine" id="rqdLine" name="rqdLine[]">
                                         <input type="hidden" class="rqdDesc" id="rqdDesc" name="rqdDesc[]">
                                     </div>
                                     <div class="form-group relative mb-1">
-                                        <label for="supplieritem" class="block text-sm font-medium">Supplier:</label>
+                                        <label for="supplieritem" class="block text-md font-medium">Supplier:</label>
                                         <div class="relative">
                                             <input type="text" id="supplieritem" name="rqdVend[]"
                                                 class="supplieritem bg-gray-200 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
@@ -213,19 +226,19 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label for="reqQty" class="block text-sm font-medium">Req Qty: <span
+                                        <label for="reqQty" class="block text-md font-medium">Req Qty: <span
                                                 class="text-danger">*</span></label>
                                         <input type="number" id="reqQty" value="" name="rqdReqQty[]"
                                             placeholder="0"
                                             class="bg-gray-200 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 reqQty required">
                                     </div>
                                     <div class="form-group">
-                                        <label for="um" class="block text-sm font-medium">UM:</label>
-                                        <input type="text" id="rqdUm" name="rqdUm[]" readonly
+                                        <label for="um" class="block text-md font-medium">UM:</label>
+                                        <input type="text" id="rqdUm" name="rqdUm[]"
                                             class="rqdUm bg-gray-200 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                                     </div>
                                     <div class="form-group">
-                                        <label for="unitCost" class="block text-sm font-medium">Unit Cost: <span
+                                        <label for="unitCost" class="block text-md font-medium">Unit Cost: <span
                                                 class="text-danger">*</span></label>
                                         <input type="number" id="unitCost" name="rqdPurCost[]" placeholder="0"
                                             class="bg-gray-200 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 unitCost required">
@@ -239,64 +252,65 @@
 
                                 <div class="grid grid-cols-3 gap-4 mt-6 ">
                                     <div class="form-group relative mb-1">
-                                        <label for="dueDate" class="block text-sm font-medium">Due Date: <span
+                                        <label for="dueDate" class="block text-md font-medium">Due Date: <span
                                                 class="text-danger">*</span></label>
                                         <input type="date" id="dueDate" name="rqdDueDate[]"
-                                            value="{{ now()->format('Y-m-d') }}"
-                                            class="bg-gray-200 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 required">
+                                            value="{{ old('rqdDueDate.0', now()->format('Y-m-d')) }}"
+                                            class="rqdDueDate bg-gray-200 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 required">
 
-                                        <label for="needDate" class="block text-sm font-medium mt-4">Need
+                                        <label for="needDate" class="block text-md font-medium mt-4">Need
                                             Date: <span class="text-danger">*</span></label>
                                         <input type="date" id="needDate" name="rqdNeedDate[]"
-                                            value="{{ now()->format('Y-m-d') }}"
-                                            class="bg-gray-200 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 required">
+                                            value="{{ old('rqdNeedDate.0', now()->format('Y-m-d')) }}"
+                                            class="rqdNeedDate bg-gray-200 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 required">
 
                                         <div class="form-group relative mb-1">
-                                            <label for="purracct" class="block text-sm font-medium">Purr
+                                            <label for="purracct" class="block text-md font-medium">Purr
                                                 Acct: <span class="text-danger">*</span></label>
                                             <div class="relative">
-                                                <input type="text" id="purracct" name="rqdAcct[]" value="5516"
+                                                <input type="text" id="purracct" name="rqdAcct[]"
+                                                    value="{{ old('rqdAcct.0', '5516') }}"
                                                     class="purracct bg-gray-200 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 required">
                                                 <a data-modal-target="modal-purracct"
-                                                    class="modal-trigger absolute inset-y-0 right-0 flex items-center pr-3 top-1/2 transform -translate-y-1/2 cursor-pointer">
+                                                    class="rqdAcct modal-trigger absolute inset-y-0 right-0 flex items-center pr-3 top-1/2 transform -translate-y-1/2 cursor-pointer">
                                                     <i class="fa fa-search text-gray-500 text-2xl"></i>
                                                 </a>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="form-group relative mb-1">
-                                        <label for="stockUMQty" class="block text-sm font-medium">Stock UM
+                                        <label for="stockUMQty" class="block text-md font-medium">Stock UM
                                             Qty:</label>
                                         <input type="number" id="stockUMQty" value="0" name="rqdUmConv[]"
                                             readonly
                                             class="bg-gray-200 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 stockUMQty">
-                                        <label for="maxUnitCost" class="block text-sm font-medium mt-4">Maximum
+                                        <label for="maxUnitCost" class="block text-md font-medium mt-4">Maximum
                                             Unit
                                             Cost:</label>
                                         <input type="number" id="maxUnitCost" value="0" name="rqdMaxCost[]"
                                             class="bg-gray-200 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 maxUnitCost">
                                         <div class="target-insert-point">
 
-                                        </div class='target-insert-point'>
+                                        </div>
                                         <div class="mt-4 flex items-center">
                                             <input type="checkbox" id="commentsCheckbox-row-1"
                                                 class="rounded commentsCheckbox" name="lineCmmts[]"
                                                 data-row-id="row-1" data-toggle="modal"
                                                 data-target="#commentsModal-row-1" value="false">
                                             <label for="commentsCheckbox-row-1"
-                                                class="text-sm font-medium ml-2">Comments</label>
+                                                class="text-md font-medium ml-2">Comments</label>
                                         </div>
 
                                     </div>
                                     <div class="form-group">
                                         <div class="form-group">
-                                            <label for="maxExtCost" class="block text-sm font-medium">Max Extended
+                                            <label for="maxExtCost" class="block text-md font-medium">Max Extended
                                                 Cost:</label>
                                             <input type="number" id="maxExtCost" value="0"
                                                 class="bg-gray-200 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 maxExtCost"
                                                 readonly>
 
-                                            <label for="extCost" class="block text-sm font-medium mt-4">Extended
+                                            <label for="extCost" class="block text-md font-medium mt-4">Extended
                                                 Cost:</label>
                                             <input type="number" id="extCost" value="0"
                                                 class="bg-gray-200 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 extCost"
@@ -320,48 +334,50 @@
                     <section>
                         <div class="grid grid-cols-1">
                             <div class="">
-                                <div class="form-group">
-                                    <label class="block mb-2 text-sm font-medium text-gray-900 ">
-                                        Product Details:</label>
-                                    <table class="min-w-full border-collapse block md:table">
-                                        <thead>
-                                            <tr>
-                                                <th
-                                                    class="border-b dark:border-slate-600 font-medium p-4 text-slate-500  text-left">
-                                                    Item Number</th>
-                                                <th
-                                                    class="border-b dark:border-slate-600 font-medium p-4 text-slate-500  text-left">
-                                                    Qty</th>
-                                                <th
-                                                    class="border-b dark:border-slate-600 font-medium p-4 text-slate-500  text-left">
-                                                    Price</th>
-                                                <th
-                                                    class="border-b dark:border-slate-600 font-medium p-4 text-slate-500  text-left">
-                                                    Max Extended Cost</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="overviewTableBody">
-
-                                        </tbody>
-                                    </table>
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title text-xl font-medium">Product Details:</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="relative overflow-x-auto">
+                                            <table class="w-full text-base text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                                <thead class="text-base text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                                    <tr>
+                                                        <th scope="col" class="px-6 py-3">
+                                                            Item Number
+                                                        </th>
+                                                        <th scope="col" class="px-6 py-3">
+                                                            Qty
+                                                        </th>
+                                                        <th scope="col" class="px-6 py-3">
+                                                            Price
+                                                        </th>
+                                                        <th scope="col" class="px-6 py-3">
+                                                            Max Extended Cost
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="overviewTableBody">
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div class="form-group">
-                                        <label for="routeto"
-                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                                            Route To:<span class="text-danger">*</span></label></label>
-                                        <input type="text" class="form-input w-full required" id="routeto"
-                                            name="routeToApr" aria-invalid="true" readonly>
-
+                                        <label class="form-label">Route To: <span class="text-danger">*</span></label>
+                                        <div class="controls">
+                                            <input type="text" name="text" class="form-control w-full required"
+                                                id="routeto" name="routeToApr" aria-invalid="true" readonly>
+                                            <div class="help-block"></div>
+                                        </div>
                                     </div>
                                     <div class="form-group">
-                                        <label for="buyer"
-                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                        <label for="buyer" class="block mb-2 text-md font-medium">
                                             Buyer:<span class="text-danger">*</span></label></label>
                                         <select class="form-select w-full required" id="buyer"
                                             name="routeToBuyer" aria-invalid="true">
                                             <option value="">Please select a buyer</option>
-                                            <option value="mfg">mfg</option>
                                             <option value="linda">Linda</option>
                                             <option value="rahman">Rahman</option>
                                         </select>
@@ -374,16 +390,18 @@
                                             name="allInfoCorrect">
                                         <label for="allInfoCorrectCheckbox" class="d-block">All Data is
                                             Correct? <span class="text-danger">*</span></label></label>
+                                        <input type="hidden" id="allInfoCorrectCheckboxHidden" name="allInfoCorrect"
+                                            value="false">
+
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </section>
                     <div class="modalcomment">
-
                         {{-- Modal Comment Template --}}
                         <div id="commentsModal-template"
-                            class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto bg-opacity-50 modal hidden"
+                            class="commentsModal-template fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto bg-opacity-50 modal hidden"
                             aria-hidden="true">
                             <div class="relative w-full max-w-4xl max-h-full bg-white rounded-lg shadow-lg">
                                 <!-- Modal Content -->
@@ -394,11 +412,11 @@
                                         <label class="text-xl font-medium text-gray-900">Comment</label>
                                         <label class="modal-close text-medium font-medium text-gray-900 cursor-pointer"
                                             data-target="#commentsModal-template">
-                                            Close Modal
+                                            <i class="modal-close fa fa-times" aria-hidden="true"></i>
                                         </label>
                                     </div>
-                                    <div class="p-2 md:p-3 space-y-4">
-                                        <textarea class="commentText" cols="30" rows="10" style="border: none; width: 100%;"></textarea>
+                                    <div class="p-2 md:p-3 space-y-4 controls">
+                                        <textarea class="commentText form-control" cols="30" rows="10" style="border: none; width: 100%;"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -436,6 +454,8 @@
                                     $('#prNumberInput').val(
                                         formattedNumber
                                     ); // Menetapkan nomor PR yang diformat ke input
+                                    $('#enduser').val(
+                                        '{{ Auth::user()->name }}'); // Menetapkan nilai end user
                                 } else {
                                     alert('Error: Nomor PR tidak ditemukan');
                                 }
@@ -454,7 +474,12 @@
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 const addLineItemButton = document.getElementById('addLineItem');
-                addLineItemButton.disabled = true; // Atur disabled pada awalnya
+                addLineItemButton.disabled = true; // Disable button initially
+
+                const rqdLineInput = document.querySelector('.rqdLine');
+                if (rqdLineInput) {
+                    rqdLineInput.value = 1;
+                }
 
                 const itemNumberInput = document.querySelector('.itemnumber');
                 const qtyInput = document.querySelector('.reqQty');
@@ -464,7 +489,6 @@
                 const maxExtCostInput = document.querySelector('.maxExtCost');
                 const ExtCostInput = document.querySelector('.extCost');
 
-                // Cek apakah semua input sudah terisi saat awal
                 if (itemNumberInput.value.trim() !== '' &&
                     qtyInput.value.trim() !== '' &&
                     unitCostInput.value.trim() !== '') {
@@ -473,36 +497,32 @@
 
                 [itemNumberInput, qtyInput, unitCostInput].forEach(input => {
                     input.addEventListener('input', function() {
-                        // Cek apakah semua input sudah terisi
                         if (itemNumberInput.value.trim() !== '' &&
                             qtyInput.value.trim() !== '' &&
                             unitCostInput.value.trim() !== '') {
                             addLineItemButton.disabled = false;
 
-                            // Auto-fill stockQty and maxUnitCost fields
                             stockUMQtyInput.value = qtyInput.value;
                             maxUnitCostInput.value = unitCostInput.value;
                             ExtCostInput.value = unitCostInput.value;
 
-                            // Auto-fill maxExtendedCost field
                             const reqQty = parseFloat(qtyInput.value) || 0;
                             const unitCost = parseFloat(unitCostInput.value) || 0;
                             const maxExtendedCost = (reqQty * unitCost).toFixed(2);
                             maxExtCostInput.value = maxExtendedCost;
                             ExtCostInput.value = maxExtendedCost;
-                            // Update generateOverviewTable
+
                             generateOverviewTable();
                         } else {
                             addLineItemButton.disabled = true;
                         }
                     });
                 });
-                // Event listener for adding a line item
+
                 document.getElementById('addLineItem').addEventListener('click', function() {
                     addLineItem();
                 });
 
-                // Event delegation for remove buttons, modal triggers, and modal actions
                 document.addEventListener('click', function(event) {
                     if (event.target.classList.contains('removeLineItem')) {
                         removeLineItem(event.target);
@@ -519,16 +539,15 @@
                     const lineItemContainer = document.getElementById('lineItemsContainer');
                     if (!lineItemContainer) {
                         console.error('Container for line items not found');
-                        return; // Stop execution if container is not found
+                        return;
                     }
 
                     const lineItemTemplate = document.querySelector('.lineItem').cloneNode(true);
                     if (!lineItemTemplate) {
                         console.error('Template for line items not found');
-                        return; // Stop execution if template is not found
+                        return;
                     }
 
-                    // Reset all input values and update IDs
                     lineItemTemplate.querySelectorAll('input').forEach(input => {
                         input.value = '';
                         if (input.id) {
@@ -547,32 +566,32 @@
                         commentText.value = '';
                     }
 
-                    // Unhide the remove button
                     const removeButton = lineItemTemplate.querySelector('.removeLineItem');
                     if (removeButton) {
                         removeButton.classList.remove('hidden');
                     }
 
-                    // Update the data-row-id attribute
                     const newLineIndex = lineItemContainer.querySelectorAll('.lineItem').length + 1;
                     lineItemTemplate.setAttribute('data-row-id', newLineIndex);
 
-                    // Add the new line number
                     const newLineNumber = document.createElement('div');
                     newLineNumber.classList.add('line-number');
                     newLineNumber.innerHTML = `
-                                <div class="text-md p-5 font-bold">Line ${newLineIndex}</div>
-                                <div class="grid grid-cols-2 md:grid-cols-5 gap-4"></div>
-                            `;
+                        <div class="text-md p-5 font-bold">Line ${newLineIndex}</div>
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-4"></div>
+                    `;
                     lineItemTemplate.prepend(newLineNumber);
 
-                    // Remove existing comments checkbox and label
+                    const rqdLineInput = lineItemTemplate.querySelector('.rqdLine');
+                    if (rqdLineInput) {
+                        rqdLineInput.value = newLineIndex;
+                    }
+
                     const existingCheckboxContainer = lineItemTemplate.querySelector('.commentsCheckbox')?.parentNode;
                     if (existingCheckboxContainer) {
                         existingCheckboxContainer.remove();
                     }
 
-                    // Add event listeners for quantity and cost inputs
                     lineItemTemplate.querySelector('.reqQty')?.addEventListener('input', function() {
                         updateRealTimeValues.call(this);
                         generateOverviewTable();
@@ -585,7 +604,6 @@
                         generateOverviewTable();
                     });
 
-                    // Handle comment checkbox creation
                     const commentsCheckbox = document.createElement('input');
                     commentsCheckbox.type = 'checkbox';
                     commentsCheckbox.id = `commentsCheckbox-row-${newLineIndex}`;
@@ -594,9 +612,9 @@
                     commentsCheckbox.setAttribute('data-row-id', newLineIndex);
                     commentsCheckbox.setAttribute('data-toggle', 'modal');
                     commentsCheckbox.setAttribute('data-target', `#commentsModal-row-${newLineIndex}`);
-                    commentsCheckbox.value = 'false'; // Set default value to false
+                    commentsCheckbox.value = 'false';
+                    commentsCheckbox.checked = false;
 
-                    // Create a hidden input that mimics the checkbox
                     const hiddenCheckbox = document.createElement('input');
                     hiddenCheckbox.type = 'hidden';
                     hiddenCheckbox.name = 'lineCmmts[]';
@@ -607,25 +625,23 @@
                         toggleModal(event.target);
                         commentsCheckbox.value = event.target.checked ? 'true' : 'false';
                         hiddenCheckbox.disabled = event.target
-                        .checked; // Disable hidden input when checkbox is checked
+                            .checked; // Disable hidden input when checkbox is checked
                         updateCommentTextarea(event.target.checked,
-                        newLineIndex); // Call function to update comment textarea based on checkbox status
+                            newLineIndex
+                        ); // Call function to update comment textarea based on checkbox status
                     });
 
-                    // Create a label for the comments checkbox
                     const commentsLabel = document.createElement('label');
                     commentsLabel.setAttribute('for', `commentsCheckbox-row-${newLineIndex}`);
                     commentsLabel.textContent = 'Comments';
-                    commentsLabel.classList.add('text-sm', 'font-medium', 'ml-2');
+                    commentsLabel.classList.add('text-md', 'font-medium', 'ml-2');
 
-                    // Create a container for checkbox and label
                     const checkboxContainer = document.createElement('div');
                     checkboxContainer.classList.add('mt-4', 'flex', 'items-center');
                     checkboxContainer.appendChild(commentsCheckbox);
                     checkboxContainer.appendChild(commentsLabel);
-                    checkboxContainer.appendChild(hiddenCheckbox); // Append the hidden input
+                    checkboxContainer.appendChild(hiddenCheckbox);
 
-                    // Find the target insert point or fallback to appending to template
                     const targetInsertPoint = lineItemTemplate.querySelector('.target-insert-point');
                     if (targetInsertPoint) {
                         targetInsertPoint.appendChild(checkboxContainer);
@@ -633,27 +649,39 @@
                         lineItemTemplate.appendChild(checkboxContainer);
                     }
 
-                    // Function to update comment textarea based on checkbox status
                     function updateCommentTextarea(checked, rowIndex) {
                         const commentTextarea = document.getElementById(`commentText-${rowIndex}`);
                         if (commentTextarea) {
                             if (checked) {
-                                // Enable textarea and set initial value if necessary
                                 commentTextarea.removeAttribute('disabled');
                                 if (commentTextarea.value.trim() === '') {
-                                    commentTextarea.value =
-                                    'Initial comment'; // Set your initial comment text here if needed
+                                    commentTextarea.value = '';
                                 }
                             } else {
-                                // Disable textarea and clear value
                                 commentTextarea.setAttribute('disabled', true);
                                 commentTextarea.value = '';
                             }
                         }
                     }
+                    const dueDateInput = lineItemTemplate.querySelector('.rqdDueDate');
+                    dueDateInput.value = new Date().toISOString().split('T')[
+                        0]; // Sesuaikan dengan tanggal saat ini dalam format Y-m-d
 
-                    // Append the new line item to the container
+                    // Set nilai default pada elemen input dengan class 'rqdNeedDate'
+                    const needDateInput = lineItemTemplate.querySelector('.rqdNeedDate');
+                    needDateInput.value = new Date().toISOString().split('T')[
+                        0]; // Sesuaikan dengan tanggal saat ini dalam format Y-m-d
+
+                    // Set nilai default pada elemen input dengan class 'purracct'
+                    const purracctInput = lineItemTemplate.querySelector('.purracct');
+                    purracctInput.value = '5516'; // Sesuaikan dengan nilai yang Anda inginkan
+
                     lineItemContainer.appendChild(lineItemTemplate);
+
+                    // Create and append the comment modal for the new line item
+                    const modalContainer = document.querySelector('.modalcomment');
+                    const newCommentModal = createCommentModal(newLineIndex);
+                    modalContainer.appendChild(newCommentModal);
 
                     updateCosts();
                     generateOverviewTable();
@@ -665,34 +693,26 @@
                     generateOverviewTable();
                 }
 
-                // Initialize array cmtCmmt
                 let cmtCmmt = [];
 
-                // Function to add event listener to a textarea
                 function addCommentEventListener(textArea) {
                     textArea.addEventListener('input', function() {
-                        const commentIndex = textArea.getAttribute(
-                            'data-row-id'); // Ambil indeks komentar dari data-row-id
-                        cmtCmmt[commentIndex] = textArea.value; // Simpan nilai komentar ke dalam objek cmtCmmt
+                        const commentIndex = textArea.getAttribute('data-row-id');
+                        cmtCmmt[commentIndex] = textArea.value;
                         console.log(`Comment ${commentIndex}: ${textArea.value}`);
                     });
                 }
 
-                // Function to create a new comment modal
                 function createCommentModal(rowId) {
-                    const modalTemplate = document.querySelector('#commentsModal-template').cloneNode(true);
+                    const modalTemplate = document.querySelector('.commentsModal-template').cloneNode(true);
                     const modalId = `commentsModal-row-${rowId}`;
                     modalTemplate.id = modalId;
 
-                    // Update ID for commentText textarea
                     const commentTextarea = modalTemplate.querySelector('.commentText');
-                    const commentTextareaId = `commentText-${rowId}`; // Update ID to remove 'row-' prefix
+                    const commentTextareaId = `commentText-${rowId}`;
                     commentTextarea.id = commentTextareaId;
-
-                    // Update name attribute for commentText textarea
                     commentTextarea.setAttribute('name', `cmtCmmt[]`);
 
-                    // Update data-target for close modal button
                     const modalCloseButton = modalTemplate.querySelector('.modal-close');
                     modalCloseButton.setAttribute('data-target', `#${modalId}`);
 
@@ -725,6 +745,7 @@
                         modal.classList.add('hidden');
                     }
                 }
+
                 document.addEventListener('click', function(event) {
                     if (event.target.classList.contains('modal-close')) {
                         const targetModalId = event.target.getAttribute('data-target');
@@ -736,36 +757,51 @@
                             const commentIndex = commentTextarea.id.split('-')[1];
                             cmtCmmt[commentIndex] = commentTextarea.value;
                             console.log(`Saved comment ${commentIndex}: ${commentTextarea.value}`);
-                        } else {
-                            console.error(`Modal with ID ${targetModalId} not found.`);
                         }
                     }
                 });
+
                 document.querySelectorAll('.commentsCheckbox').forEach(checkbox => {
                     checkbox.addEventListener('change', function(event) {
                         toggleModal(event.target);
                     });
                 });
+
+
                 // Function to initialize DataTables
                 function initializeDataTable(table) {
                     if ($.fn.DataTable.isDataTable(table)) {
-                        table.DataTable().clear().destroy(); // Clear and destroy if table is already initialized
+                        table.DataTable().clear().destroy(); // Bersihkan dan hancurkan jika tabel sudah diinisialisasi
                     }
                     table.DataTable({
-                        "pageLength": 5,
+                        processing: true,
+                        serverSide: false,
+                        "pageLength": 10,
                         "lengthChange": false,
                         "pagingType": "simple_numbers"
                     });
                 }
 
+                document.getElementById('directCheckbox').addEventListener('change', function() {
+                    const isChecked = this.checked;
+                    const itemnumberInput = document.querySelector(
+                    '.lineItem .itemnumber'); // Adjust this selector based on your HTML structure
+
+                    if (itemnumberInput) {
+                        itemnumberInput.readOnly = isChecked;
+                    }
+                });
+
                 // Function to open a modal and load its content dynamically
                 function openModal(trigger) {
                     const target = trigger.getAttribute('data-modal-target');
                     const modal = document.getElementById(target);
+
                     if (!modal) {
                         console.error(`Modal with ID '${target}' not found.`);
                         return;
                     }
+
                     const modalTitle = modal.querySelector('.modal-title');
                     const tableBody = modal.querySelector('.dynamicTableBody');
                     const rowToFill = trigger.closest('.lineItem'); // Identify the row that triggered the modal
@@ -781,14 +817,36 @@
                     let ajaxUrl = '';
                     let ajaxData = {};
 
+                    // Check if the direct checkbox is checked
+                    const directCheckbox = document.getElementById('directCheckbox');
+                    if (directCheckbox && directCheckbox.checked) {
+                        // Make itemnumber input readonly
+                        const itemnumberInput = rowToFill.querySelector('.itemnumber');
+                        if (itemnumberInput) {
+                            itemnumberInput.setAttribute('readonly', 'readonly');
+                        }
+                    }
+
                     if (target === 'modal-item') {
                         if (modalTitle) {
                             modalTitle.innerText = 'Items';
                         }
                         ajaxUrl = '{{ route('get.items.ajax') }}';
                         ajaxData = {
-                            type: 'item'
+                            type: 'items'
                         };
+
+                        // Check if the direct checkbox is checked
+                        const directCheckbox = document.getElementById('directCheckbox');
+                        if (directCheckbox && directCheckbox.checked) {
+                            ajaxData.pt_prod_line = ['0110', '0111', '0112', '0113', '0114', '0115', '0120', '0201',
+                                '0202', '0203', '0204', '0205', '0206', '0207', '0208', '0209', '0210', '0212',
+                                '0213', '0214', '0215', '0216', '0217', '0218', '0220', '0221', '0222', '0309',
+                                '0310', '0311', '0312', '0313', '0314', '0315', '0316', '0317', '0401', '0402',
+                                '0403'
+                            ];
+                            ajaxData.pt_taxable = 'true';
+                        }
                     } else if (target === 'modal-supplieritem') {
                         if (modalTitle) {
                             modalTitle.innerText = 'Supplier';
@@ -812,39 +870,48 @@
                         type: 'GET',
                         data: ajaxData,
                         success: function(response) {
+                            console.log("Response received successfully:",
+                                response); // Check response in console log
                             let tableBodyHtml = '';
 
                             if (target === 'modal-item') {
                                 response.data.forEach(item => {
                                     tableBodyHtml += `
-                            <tr class="cursor-pointer" data-supplier-code="${item.pt_part}" data-um="${item.pt_um}" data-desc1="${item.pt_desc1}">
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">${item.pt_part}</td>
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">${item.pt_desc1}</td>
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">${item.pt_um}</td>
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">${item.pt_part_type}</td>
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">${item.pt_status === '0002' ? 'Non Active' : 'Active'}</td>
-                            </tr>`;
+                        <tr class="cursor-pointer" data-supplier-code="${item.pt_part}" data-um="${item.pt_um}" data-desc1="${item.pt_desc1}">
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">${item.pt_part}</td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">${item.pt_desc1}</td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">${item.pt_um}</td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">${item.pt_part_type}</td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">${item.pt_status === '0002' ? 'Non Active' : 'Active'}</td>
+                        </tr>`;
                                 });
+                                // If direct checkbox is checked, itemnumber input should be readonly
+                                if (directCheckbox && directCheckbox.checked) {
+                                    const itemnumberInput = rowToFill.querySelector('.itemnumber');
+                                    if (itemnumberInput) {
+                                        itemnumberInput.setAttribute('readonly', 'readonly');
+                                    }
+                                }
                             } else if (target === 'modal-supplieritem') {
                                 response.data.forEach(supplier => {
                                     tableBodyHtml += `
-                            <tr class="cursor-pointer" data-supplier-code="${supplier.vd_addr}">
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">${supplier.vd_addr}</td>
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">${supplier.vd_sort}</td>
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">${supplier.ad_name}</td>
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">${supplier.ad_line1}</td>
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">${supplier.ad_city}</td>
-                            </tr>`;
+                        <tr class="cursor-pointer" data-supplier-code="${supplier.vd_addr}">
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">${supplier.vd_addr}</td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">${supplier.vd_sort}</td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">${supplier.ad_name}</td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">${supplier.ad_line1}</td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">${supplier.ad_city}</td>
+                        </tr>`;
                                 });
                             } else if (target === 'modal-purracct') {
                                 response.data.forEach(account => {
                                     tableBodyHtml += `
-                            <tr class="cursor-pointer" data-supplier-code="${account.ac_code}">
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">${account.ac_code}</td>
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">${account.ac_desc}</td>
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">${account.ac_curr}</td>
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">${account.ac_gl_type}</td>
-                            </tr>`;
+                        <tr class="cursor-pointer" data-supplier-code="${account.ac_code}">
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">${account.ac_code}</td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">${account.ac_desc}</td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">${account.ac_curr}</td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">${account.ac_gl_type}</td>
+                        </tr>`;
                                 });
                             }
 
@@ -880,7 +947,7 @@
                                                         '.itemnumber').value;
                                                 updateRealTimeValues.call(rowToFill
                                                     .querySelector('.rqdDesc')
-                                                ); // Memperbarui nilai secara realtime dengan konteks yang benar
+                                                ); // Update real-time values appropriately
                                             }
                                         } else if (target === 'modal-supplieritem') {
                                             if (rowToFill.querySelector('.supplieritem')) {
@@ -956,13 +1023,13 @@
                         );
 
                         const row = document.createElement('tr');
-                        row.classList.add('bg-white', 'border-b', 'dark:bg-slate-800', 'dark:border-slate-700');
+                        row.classList.add('border-b');
 
                         row.innerHTML = `
-                                        <td class="p-4 border-b dark:border-slate-700 text-slate-700 dark:text-slate-400">${itemNumber}</td>
-                                        <td class="p-4 border-b dark:border-slate-700 text-slate-700 dark:text-slate-400">${reqQty}</td>
-                                        <td class="p-4 border-b dark:border-slate-700 text-slate-700 dark:text-slate-400">${unitCost}</td>
-                                        <td class="p-4 border-b dark:border-slate-700 text-slate-700 dark:text-slate-400">${maxExtendedCost}</td>
+                                        <td class="px-6 py-4">${itemNumber}</td>
+                                        <td class="px-6 py-4">${reqQty}</td>
+                                        <td class="px-6 py-4">${unitCost}</td>
+                                        <td class="px-6 py-4">${maxExtendedCost}</td>
                                     `;
 
                         // Check if data is not null or undefined before appending to the table body
@@ -1057,37 +1124,36 @@
                 const directCheckbox = document.getElementById('directCheckbox');
                 const nonPOCheckbox = document.getElementById('nonPOCheckbox');
                 const allInfoCorrectCheckbox = document.getElementById('allInfoCorrectCheckbox');
-                const lineCmmtsCheckboxes = document.querySelectorAll('input[name="lineCmmts[]"]');
+                const lineCmmtsCheckboxes = document.querySelectorAll('.commentsCheckbox-row-1');
 
                 // Set initial values
                 appstatusSelect.value = appstatusSelect.value === '2' ? 'Approved' : 'Unapproved';
-                directCheckbox.value = directCheckbox.checked ? 'true' : 'false';
-                nonPOCheckbox.value = nonPOCheckbox.checked ? 'yes' : 'no';
-                allInfoCorrectCheckbox.value = allInfoCorrectCheckbox.checked ? 'true' : 'false';
 
-                // Mengatur nilai awal untuk lineCmmtsCheckboxes
-                lineCmmtsCheckboxes.forEach(checkbox => {
-                    checkbox.value = checkbox.checked ? 'true' : 'false';
-                });
+                function updateHiddenInput(checkbox, hiddenInput) {
+                    hiddenInput.value = checkbox.checked ? 'true' : 'false';
+                }
+
+                // Initial update for hidden inputs
+                updateHiddenInput(directCheckbox, document.getElementById('directCheckboxHidden'));
+                updateHiddenInput(nonPOCheckbox, document.getElementById('nonPOCheckboxHidden'));
+                if (allInfoCorrectCheckbox) {
+                    updateHiddenInput(allInfoCorrectCheckbox, document.getElementById('allInfoCorrectCheckboxHidden'));
+                }
 
                 // Add event listeners
                 directCheckbox.addEventListener('change', function() {
-                    this.value = this.checked ? 'true' : 'false';
+                    updateHiddenInput(this, document.getElementById('directCheckboxHidden'));
                 });
 
                 nonPOCheckbox.addEventListener('change', function() {
-                    this.value = this.checked ? 'yes' : 'no';
+                    updateHiddenInput(this, document.getElementById('nonPOCheckboxHidden'));
                 });
 
-                allInfoCorrectCheckbox.addEventListener('change', function() {
-                    this.value = this.checked ? 'true' : 'false';
-                });
-
-                lineCmmtsCheckboxes.forEach(checkbox => {
-                    checkbox.addEventListener('change', function() {
-                        this.value = this.checked ? 'true' : 'false';
+                if (allInfoCorrectCheckbox) {
+                    allInfoCorrectCheckbox.addEventListener('change', function() {
+                        updateHiddenInput(this, document.getElementById('allInfoCorrectCheckboxHidden'));
                     });
-                });
+                }
 
                 appstatusSelect.addEventListener('change', function() {
                     this.value = this.value === '1' ? 'Unapproved' : 'Approved';
@@ -1127,7 +1193,7 @@
 
             $(document).ready(function() {
                 $('#supplierTable').DataTable({
-                    "pageLength": 5,
+                    "pageLength": 10,
                     "lengthChange": false,
                     "pagingType": "simple_numbers" // Ubah sesuai kebutuhan: simple, simple_numbers, full, atau full_numbers
                 });
@@ -1190,18 +1256,14 @@
                             success: function(data) {
                                 console.log('Response data:', data);
                                 if (data && data.rqa_apr) {
-                                    const enduserInput = document.getElementById('enduser');
                                     const routetoInput = document.getElementById('routeto');
 
                                     // Capitalize the first letter of rqa_apr
                                     const rqaApr = data.rqa_apr.charAt(0).toUpperCase() + data
                                         .rqa_apr.slice(1);
-                                    enduserInput.value = rqaApr;
                                     routetoInput.value = rqaApr;
                                 } else {
-                                    const enduserInput = document.getElementById('enduser');
                                     const routetoInput = document.getElementById('routeto');
-                                    enduserInput.value = '';
                                     routetoInput.value = '';
                                     alert('Approver not found for this cost center.');
                                 }
@@ -1219,12 +1281,109 @@
 
             $(document).ready(function() {
                 $('#costTable').DataTable({
-                    "pageLength": 5,
+                    "pageLength": 10,
                     "lengthChange": false,
                     "pagingType": "simple_numbers"
                 });
             });
         </script>
+
+
+        {{-- end user --}}
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+
+                // Toggle modal visibility
+                document.querySelectorAll('[data-modal-toggle]').forEach(a => {
+                    a.addEventListener('click', () => {
+                        const modalId = a.getAttribute('data-modal-target');
+                        const modal = document.getElementById(modalId);
+                        if (modal) {
+                            modal.classList.toggle('hidden');
+                        }
+                    });
+                });
+
+                // Hide modal
+                document.querySelectorAll('[data-modal-hide]').forEach(a => {
+                    a.addEventListener('click', () => {
+                        const modalId = a.getAttribute('data-modal-hide');
+                        const modal = document.getElementById(modalId);
+                        if (modal) {
+                            modal.classList.add('hidden');
+                        }
+                    });
+                });
+
+                // Set input value and close modal on row click
+                document.querySelectorAll('#large-modal-enduser tbody tr').forEach(row => {
+                    row.addEventListener('click', () => {
+                        const endUser = row.getAttribute('data-supplier-code');
+                        const endUserInput = document.getElementById('enduser');
+                        endUserInput.value = endUser;
+                        document.getElementById('modal-close-a-enduser').click();
+
+                        // Manually trigger change event
+                        const event = new Event('change');
+                        endUserInput.dispatchEvent(event);
+                    });
+                });
+            });
+
+            $(document).ready(function() {
+                $('#endUserTable').DataTable({
+                    "pageLength": 10,
+                    "lengthChange": false,
+                    "pagingType": "simple_numbers"
+                });
+            });
+        </script>
+
+        {{-- checkCurr --}}
+        <script>
+            // Add JavaScript to handle real-time validation and required field logic
+            document.getElementById('currency').addEventListener('change', function(event) {
+                var selectedCurrency = this.value;
+
+                // Reset message container
+                var messageContainer = document.getElementById('messageContainer');
+                messageContainer.innerHTML = '';
+
+
+
+                // Check if selected currency is IDR (123295)
+                if (selectedCurrency === '123295') {
+                    messageContainer.innerHTML = '<span class="text-green-600">Currency is available!</span>';
+
+                } else {
+                    // Call the backend API to check currency availability
+                    fetch('{{ route('check.curr') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-Token': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ rqmCurr: selectedCurrency })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error === 'true') {
+                            messageContainer.innerHTML = '<span class="text-green-600">Currency is available!</span>';
+
+                        } else {
+                            messageContainer.innerHTML = '<span class="text-red-600">Currency not available right now, please choose another currency.</span>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        messageContainer.innerHTML = '<span class="text-red-600">An error occurred while checking currency.</span>';
+
+                    });
+                }
+
+            });
+        </script>
+
     @endpush
 
 
@@ -1235,14 +1394,14 @@
     <div id="large-modal" tabindex="-1"
         class="fixed inset-0 z-50 flex items-start justify-center p-4 overflow-y-auto  bg-opacity-50 modal hidden"
         aria-hidden="true">
-        <div class="relative w-full max-w-4xl max-h-full">
-            <!-- Modal content -->
-            <div class="relative bg-white rounded-lg">
-                <!-- Modal header -->
-                <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-                    <label class="text-xl font-medium text-gray-600">Supplier</label>
+        <div class="relative w-full max-w-4xl max-h-full bg-white rounded-lg shadow-lg">
+        <!-- Modal content -->
+        <div class="relative">
+            <!-- Modal header -->
+            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                <label class="text-xl font-medium text-gray-900">Supplier</label>
                     <a type="a"
-                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-md w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
                         data-modal-hide="large-modal" id="modal-close-a">
                         <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
                             viewBox="0 0 14 14">
@@ -1253,7 +1412,7 @@
                     </a>
                 </div>
                 <!-- Modal body -->
-                <div class="p-4 md:p-5 space-y-4">
+                <div class="p-4 md:p-5 space-y-4 text-md overflow-y-auto max-h-[calc(100vh-8rem)]">
                     <table class="min-w-full leading-normal" id="supplierTable">
                         <thead>
                             <tr>
@@ -1278,20 +1437,20 @@
                             @foreach ($suppliers as $item)
                                 <tr class="cursor-pointer" data-supplier-code="{{ $item->vd_addr }}">
                                     <td
-                                        class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">
+                                        class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">
                                         {{ $item->vd_addr }}</td>
                                     <td
-                                        class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">
+                                        class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">
                                         {{ $item->vd_sort }}
                                     </td>
                                     <td
-                                        class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">
+                                        class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">
                                         {{ $item->ad_name }}</td>
                                     <td
-                                        class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">
+                                        class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">
                                         {{ $item->ad_line1 }}</td>
                                     <td
-                                        class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">
+                                        class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">
                                         {{ $item->ad_city }}</td>
                                 </tr>
                             @endforeach
@@ -1314,7 +1473,7 @@
                 <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                     <label class="text-xl font-medium text-gray-900">Cost Center</label>
                     <a type="a"
-                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-md w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
                         data-modal-hide="large-modal-cost" id="modal-close-a-cost">
                         <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
                             viewBox="0 0 14 14">
@@ -1345,15 +1504,98 @@
                             @foreach ($cost as $item)
                                 <tr class="cursor-pointer" data-supplier-code="{{ $item->cc_ctr }}">
                                     <td
-                                        class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">
+                                        class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">
                                         {{ $item->cc_ctr }}</td>
                                     <td
-                                        class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">
+                                        class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">
                                         {{ $item->cc_desc }}
                                     </td>
                                     <td
-                                        class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">
+                                        class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">
                                         {{ $item->cc_active ? 'Active' : 'Non Active' }}
+                                    </td>
+                                </tr>
+                            @endforeach
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- modal employee --}}
+    <div id="large-modal-enduser" tabindex="-1"
+        class="fixed inset-0 z-50 flex items-start justify-center p-4 overflow-y-auto  bg-opacity-50 modal hidden"
+        aria-hidden="true">
+        <div class="relative w-full max-w-4xl max-h-full">
+            <!-- Modal content -->
+            <div class="relative bg-white rounded-lg">
+                <!-- Modal header -->
+                <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                    <label class="text-xl font-medium text-gray-900">Employee</label>
+                    <a type="a"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-md w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                        data-modal-hide="large-modal-enduser" id="modal-close-a-enduser">
+                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"></path>
+                        </svg>
+                        <span class="sr-only">Close modal</span>
+                    </a>
+                </div>
+                <!-- Modal body -->
+                <div class="p-4 md:p-5 space-y-4">
+                    <table class="min-w-full leading-normal" id="endUserTable">
+                        <thead>
+                            <tr>
+                                <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Employee</th>
+                                <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Sort Name</th>
+                                <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    City</th>
+                                <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Country</th>
+                                <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Active</th>
+                                <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Employee Date</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($employees as $item)
+                                <tr class="cursor-pointer" data-supplier-code="{{ $item->emp_addr }}">
+                                    <td
+                                        class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">
+                                        {{ $item->emp_addr }}</td>
+                                    <td
+                                        class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">
+                                        {{ $item->emp_sort }}
+                                    </td>
+                                    <td
+                                        class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">
+                                        {{ $item->emp_city }}
+                                    </td>
+                                    <td
+                                        class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">
+                                        {{ $item->emp_country }}
+                                    </td>
+                                    <td
+                                        class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">
+                                        {{ $item->emp_emp_date }}
+                                    </td>
+                                    <td
+                                        class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">
+                                        {{ $item->emp_active ? 'Active' : 'Non Active' }}
                                     </td>
                                 </tr>
                             @endforeach
@@ -1376,10 +1618,10 @@
                 <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                     <label class="text-xl font-medium text-gray-900">Purchase Account</label>
                     <button type="button"
-                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white modal-close"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-md w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white modal-close"
                         data-modal-hide="large-modal" id="modal-close-a">
-                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                            viewBox="0 0 14 14">
+                        <svg class="w-5 h-5 pointer-events-none" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                 stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"></path>
                         </svg>
@@ -1387,7 +1629,7 @@
                     </button>
                 </div>
                 <!-- Modal body -->
-                <div class="p-4 md:p-5 space-y-4 text-sm overflow-y-auto max-h-[calc(100vh-8rem)]">
+                <div class="p-4 md:p-5 space-y-4 text-md overflow-y-auto max-h-[calc(100vh-8rem)]">
                     <table id="dataModalTable-account" class="min-w-full display dataModalTable">
                         <thead class="dynamicTableHead">
                             <tr>
@@ -1424,10 +1666,10 @@
                 <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                     <label class="text-xl font-medium text-gray-900">Supplier</label>
                     <button type="button"
-                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white modal-close"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-md w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white modal-close"
                         data-modal-hide="large-modal" id="modal-close-supplier">
-                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                            viewBox="0 0 14 14">
+                        <svg class="w-5 h-5 pointer-events-none" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                 stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"></path>
                         </svg>
@@ -1435,7 +1677,7 @@
                     </button>
                 </div>
                 <!-- Modal body -->
-                <div class="p-4 md:p-5 space-y-4 text-sm overflow-y-auto max-h-[calc(100vh-8rem)]">
+                <div class="p-4 md:p-5 space-y-4 text-md overflow-y-auto max-h-[calc(100vh-8rem)]">
                     <table id="dataModalTable-supplier" class="min-w-full leading-normal display dataModalTable">
                         <thead class="dynamicTableHead">
                             <tr>
@@ -1475,10 +1717,10 @@
                 <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                     <label class="text-xl font-medium text-gray-900">Items</label>
                     <button type="button"
-                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white modal-close"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-md w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white modal-close"
                         data-modal-hide="large-modal" id="modal-close-item">
-                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                            viewBox="0 0 14 14">
+                        <svg class="w-5 h-5 pointer-events-none" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                 stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"></path>
                         </svg>
@@ -1486,7 +1728,7 @@
                     </button>
                 </div>
                 <!-- Modal body -->
-                <div class="p-4 md:p-5 space-y-4 text-sm overflow-y-auto max-h-[calc(100vh-8rem)]">
+                <div class="p-4 md:p-5 space-y-4 text-md overflow-y-auto max-h-[calc(100vh-8rem)]">
                     <table id="dataModalTable-item" class="min-w-full leading-normal display dataModalTable">
                         <thead class="dynamicTableHead">
                             <tr>

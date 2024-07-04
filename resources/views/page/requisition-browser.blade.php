@@ -1,4 +1,14 @@
 <x-app-layout>
+    @section('title')
+        Requisition Browser
+    @endsection
+    @push('css')
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.jqueryui.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/searchpanes/2.3.1/css/searchPanes.jqueryui.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/select/2.0.3/css/select.jqueryui.css">
+    @endpush
+
     <div class="content-header">
         <div class="flex items-center justify-between">
             <h4 class="page-title text-2xl font-medium">Requisition Browse</h4>
@@ -25,62 +35,103 @@
             <div class="col-12">
                 <div class="box">
                     <div class="box-body">
-                        <table id="browserTable" class=" row-border hover">
-                            <thead>
-                                <tr class="text-dark" role="row">
-                                    <th>Requisition Number</th>
-                                    <th>Requested By</th>
-                                    <th>Entered Date</th>
-                                    <th>Need Date</th>
-                                    <th>Due Date</th>
-                                    <th>Route To</th>
-                                    <th>Supplier</th>
-                                    <th>Buyer</th>
-                                    <th>Close Date</th>
-                                    <th>Approval Status</th>
-                                    <th>Approved Date</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($rqmbrowsers as $item)
-                                    <tr data-modal-target="modal-{{ $item->rqmNbr }}" class="open-modal">
-                                        <td>{{ $item->rqmNbr }}</td>
-                                        <td>{{ $item->enterby }}</td>
-                                        <td>{{ $item->rqmReqDate }}</td>
-                                        <td>{{ $item->rqmNeedDate }}</td>
-                                        <td>{{ $item->rqmDueDate }}</td>
-                                        <td>{{ $item->routeToApr }}</td>
-                                        <td>{{ $item->rqmVend }}</td>
-                                        <td>{{ $item->routeToBuyer }}</td>
-                                        <td>{{ $item->rqmClsDate }}</td>
-                                        <td>{{ $item->rqmAprvStat }}</td>
-                                        <td>{{ $item->approved_date }}</td>
-                                        <td>
-                                            <div class="flex flex-nowrap">
-                                                <a href="{{ route('rqm.edit', ['rqmNbr' => $item->rqmNbr]) }}"
-                                                    class="btn btn-sm btn-primary edit-btn">
-                                                    <i class="fa fa-pencil"></i> Edit
-                                                </a>
-                                                <form action="{{ route('rqm.delete', $item->rqmNbr) }}" method="POST"
-                                                    class="inline-block" id="deleteForm{{ $item->rqmNbr }}">
-                                                    @csrf
-                                                    <input type="hidden" name="rqmNbr" value="{{ $item->rqmNbr }}">
-                                                    <button type="button"
-                                                        onclick="confirmDelete('{{ $item->rqmNbr }}')"
-                                                        class="btn btn-sm btn-danger delete-btn ml-2">
-                                                        <i class="fa fa-trash"></i> Delete
-                                                    </button>
-                                                </form>
+                        <button id="bulkDeleteBtn" class="btn btn-danger mb-3">Bulk Delete</button>
+                        <div class="table-responsive">
+                            <table id="tableBrowse"
+                                class="!border-separate table text-fade table-bordered w-full display nowrap">
+                                <thead>
+                                    <tr class="text-dark" role="row">
+                                        <th>
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="filled-in chk-col-danger"
+                                                    id="checkAllMaster">
+                                                <label class="custom-control-label" for="checkAllMaster"></label>
                                             </div>
-                                        </td>
+                                        </th>
+                                        <th>PR Number</th>
+                                        <th>Req By</th>
+                                        <th>Entered Date</th>
+                                        <th>Need Date</th>
+                                        <th>Due Date</th>
+                                        <th>Route To</th>
+                                        <th>Supplier</th>
+                                        <th>Buyer</th>
+                                        <th>Close Date</th>
+                                        <th>Appr Status</th>
+                                        <th>Appr Date</th>
+                                        <th>Action</th>
                                     </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($rqmbrowsers as $item)
+                                        <tr data-modal-target="modal-{{ $item->rqmNbr }}" class="open-modal">
+                                            <td>
+                                                <input type="checkbox" id="md_checkbox_{{ $loop->iteration }}"
+                                                    class="filled-in chk-col-danger bulk-delete-checkbox"
+                                                    data-rqmNbr="{{ $item->rqmNbr }}">
+                                                <label for="md_checkbox_{{ $loop->iteration }}"></label>
+                                            </td>
+                                            <td>{{ $item->rqmNbr }}</td>
+                                            <td>{{ $item->enterby }}</td>
+                                            <td>{{ $item->rqmReqDate }}</td>
+                                            <td>{{ $item->rqmNeedDate }}</td>
+                                            <td>{{ $item->rqmDueDate }}</td>
+                                            <td>{{ $item->routeToApr }}</td>
+                                            <td>{{ $item->rqmVend }}</td>
+                                            <td>{{ $item->routeToBuyer }}</td>
+                                            <td>{{ $item->rqmClsDate }}</td>
+                                            <td>{{ $item->rqmAprvStat }}</td>
+                                            <td>{{ $item->approved_date }}</td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    <button id="dropdownMenuIconButton{{ $item->rqmNbr }}"
+                                                        data-dropdown-toggle="dropdownDots{{ $item->rqmNbr }}"
+                                                        class="dropdownMenuIconButton inline-flex items-center p-2 text-sm font-medium text-center text-gray-900 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+                                                        type="button">
+                                                        <svg class="w-5 h-5" aria-hidden="true"
+                                                            xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                                                            viewbox="0 0 4 15">
+                                                            <path
+                                                                d="M3.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6.041a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 5.959a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z">
+                                                            </path>
+                                                        </svg>
+                                                    </button>
 
-                                    <!-- Modal -->
-                                @endforeach
-                            </tbody>
-                        </table>
-
+                                                    <!-- Dropdown menu -->
+                                                    <div id="dropdownDots{{ $item->rqmNbr }}"
+                                                        class="dropdownDots z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-22 dark:bg-gray-700 dark:divide-gray-600">
+                                                        <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
+                                                            aria-labelledby="dropdownMenuIconButton{{ $item->rqmNbr }}">
+                                                            <li>
+                                                                <a href="{{ route('rqm.edit', ['rqmNbr' => $item->rqmNbr]) }}"
+                                                                    class="edit-btn block px-4 py-2 hover:bg-gray-100">
+                                                                    <i class="fa fa-pencil fa-2x text-warning"></i>
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <form action="{{ route('rqm.delete', $item->rqmNbr) }}"
+                                                                    method="POST" class="inline-block"
+                                                                    id="deleteForm{{ $item->rqmNbr }}">
+                                                                    @csrf
+                                                                    <input type="hidden" name="rqmNbr"
+                                                                        value="{{ $item->rqmNbr }}">
+                                                                    <button type="button"
+                                                                        onclick="confirmDelete('{{ $item->rqmNbr }}')"
+                                                                        class="delete-btn block px-4 py-2 hover:bg-gray-100">
+                                                                        <i class="fa fa-trash fa-2x text-danger"></i>
+                                                                    </button>
+                                                                </form>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <!-- Modal -->
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -88,12 +139,11 @@
     </section>
     @foreach ($rqmbrowsers as $item)
         <div id="modal-{{ $item->rqmNbr }}" tabindex="-1"
-            class="fixed inset-0 m-auto z-50 p-4 overflow-x-hidden overflow-y-auto bg-black bg-opacity-50 flex items-center justify-center hidden"
+            class="fixed inset-0 m-auto z-50 p-4 overflow-x-hidden overflow-y-auto bg-black bg-opacity-50 flex items-start justify-center hidden"
             aria-modal="true" role="dialog">
             <div class="relative w-full max-w-7xl max-h-full overflow-y-auto">
                 <!-- Modal content -->
-                <div class="relative bg-white dark:bg-gray-800 text-black dark:text-white rounded-lg shadow"
-                    style="margin-top: 10%;">
+                <div class="relative bg-white dark:bg-gray-200 text-black rounded-lg shadow" style="margin-top: 5%;">
                     <!-- Modal header -->
                     <div
                         class="flex items-center justify-between p-2 md:p-3 border-b border-gray-200 dark:border-gray-600 rounded-t">
@@ -161,7 +211,6 @@
                                 </div>
                                 <div>
                                     <p class="text-sm font-medium">Entered By: {{ $item->enterby }}</p>
-                                    <p class="text-sm font-medium">Requested By: {{ $item->rqmRqbyUserid }}</p>
                                     <p class="text-sm font-medium">End User: {{ $item->rqmEndUserid }}</p>
                                 </div>
                                 <div>
@@ -214,7 +263,7 @@
                                         @endphp
                                         <tr>
                                             <td class="border-b border-gray-200 dark:border-gray-600 px-2 py-1">
-                                                {{ $loop->iteration }}</td>
+                                                {{ $detail->rqdLine }}</td>
                                             <td class="border-b border-gray-200 dark:border-gray-600 px-2 py-1">
                                                 {{ $item->rqmSite }}</td>
                                             <td class="border-b border-gray-200 dark:border-gray-600 px-2 py-1">
@@ -269,8 +318,28 @@
         </div>
     @endforeach
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+    <script type="text/javascript" src="{{ asset('assets') }}/ajax/libs/jQuery-slimScroll/1.3.8/jquery-3.7.1.min.js">
+    </script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.js">
+        < /> <
+        script src = "https://cdn.datatables.net/2.0.8/js/dataTables.jqueryui.js" >
+    </script>
+    <script src="https://cdn.datatables.net/searchpanes/2.3.1/js/dataTables.searchPanes.js"></script>
+    <script src="https://cdn.datatables.net/searchpanes/2.3.1/js/searchPanes.jqueryui.js"></script>
+    <script src="https://cdn.datatables.net/select/2.0.3/js/dataTables.select.js"></script>
+    <script src="https://cdn.datatables.net/select/2.0.3/js/select.jqueryui.js"></script>
+
     <script>
+        // Fungsi untuk mencetak requisition
+        function printRequisition(rqmNbr) {
+            var url = '{{ route('rqm.print', ':rqmNbr') }}'.replace(':rqmNbr', rqmNbr);
+            window.open(url, '_blank');
+        }
+
+        // Fungsi untuk mengkonfirmasi penghapusan
         function confirmDelete(rqmNbr) {
             Swal.fire({
                 title: 'Apakah Anda yakin?',
@@ -288,34 +357,61 @@
                 }
             });
         }
-    </script>
 
-    {{-- <script>
-        @if (session('success'))
-            swal("Success", "{{ session('success') }}", "success");
-        @endif
+        document.addEventListener('DOMContentLoaded', function() {
+            new DataTable('#tableBrowse', {
+                layout: {
+                    top1: {
+                        searchPanes: {
+                            layout: 'columns-12'
+                        }
+                    },
+                },
+                columnDefs: [{
+                    searchPanes: {
+                        show: true,
+                        initCollapsed: true
+                    },
+                    targets: [1, 2, 3, 4, 5, 6, 7, 8, 10]
+                }, {
+                    orderable: false,
+                    targets: [0, 12]
+                }]
+            });
 
-        @if (session('error'))
-            swal("Error", "{{ session('error') }}", "error");
-        @endif
-    </script> --}}
-    @push('scripts')
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                var table = $('#browserTable').DataTable({
-                    responsive: false,
-                    deferRender: true,
-                    pagingType: 'simple_numbers',
+            $('#tableBrowse').css('width', '100%');
+
+            $(document).ready(function() {
+                // Dropdown toggle functionality
+                $('[id^=dropdownMenuIconButton]').on('click', function(e) {
+                    e.stopPropagation(); // Prevent click from propagating to the row
+                    var dropdownId = $(this).data('dropdown-toggle');
+                    $('#' + dropdownId).toggleClass('hidden');
                 });
 
-                $('#browserTable').css('width', '100%');
+                // Close dropdown when clicking outside
+                $(document).on('click', function(e) {
+                    if (!$(e.target).closest('[id^=dropdownMenuIconButton]').length && !$(e.target)
+                        .closest('.dropdownDots').length) {
+                        $('.dropdownDots').addClass('hidden');
+                    }
+                });
 
-                $('#browserTable tbody').on('click', 'tr', function(e) {
-                    if ($(e.target).is('.edit-btn, .delete-btn, .edit-btn *, .delete-btn *')) {
+                // Event handler for table row clicks
+                $('#tableBrowse tbody').on('click', 'tr', function(e) {
+                    // Prevent modal from opening when clicking on edit/delete buttons, their children, checkboxes, labels, the dropdown button, dropdown menu, or its children
+                    if ($(e.target).is(
+                            '.edit-btn, .delete-btn, .edit-btn *, .delete-btn *, :checkbox, label, .dropdownMenuIconButton *, .dropdownDots, .dropdownDots *'
+                        )) {
                         return;
                     }
                     var modalId = $(this).data('modal-target');
                     $('#' + modalId).removeClass('hidden').addClass('flex');
+                });
+
+                // Event handler untuk checkbox di dalam tbody
+                $('#tableBrowse tbody').on('click', ':checkbox', function(e) {
+                    e.stopPropagation(); // Mencegah penyebaran event ke atas saat checkbox diklik
                 });
 
                 $('button[data-modal-hide]').on('click', function() {
@@ -323,24 +419,111 @@
                     $('#' + modalId).removeClass('flex').addClass('hidden');
                 });
 
-                $('#browserTable tbody').on('show.bs.modal', 'tr', function() {
+                $('#tableBrowse tbody').on('show.bs.modal', 'tr', function() {
                     var itemNbr = $(this).find('td:first').text().trim();
                     var modalId = $(this).data('modal-target');
 
                     $.ajax({
                         type: 'GET',
-                        url: '{{ route('rqm.edit', ':rqmNbr') }}'.replace(':rqmNbr', itemNbr),
+                        url: '{{ route('rqm.edit', ':rqmNbr') }}'.replace(':rqmNbr',
+                            itemNbr),
                         success: function(data) {
                             $('#' + modalId).find('#show-data' + itemNbr).html(data);
                         }
                     });
                 });
-            });
 
-            function printRequisition(rqmNbr) {
-                var url = '{{ route('rqm.print', ':rqmNbr') }}'.replace(':rqmNbr', rqmNbr);
-                window.open(url, '_blank');
-            }
-        </script>
-    @endpush
+                $('#checkAllMaster').on('change', function() {
+                    if ($(this).is(':checked')) {
+                        $('.bulk-delete-checkbox').each(function() {
+                            var rqmAprvStat = $(this).closest('tr').find('td:eq(10)').text()
+                                .trim();
+                            if (rqmAprvStat !== 'Approved') {
+                                $(this).prop('checked', true);
+                            }
+                        });
+                    } else {
+                        $('.bulk-delete-checkbox').prop('checked', false);
+                    }
+                });
+
+                $('#bulkDeleteBtn').on('click', function() {
+                    var selectedItems = [];
+                    $('.bulk-delete-checkbox:checked').each(function() {
+                        var rqmNbr = $(this).data('rqmnbr');
+                        selectedItems.push(rqmNbr);
+                        console.log(`Item yang dipilih: ${rqmNbr}`);
+                    });
+
+                    var countSelected = selectedItems.length;
+
+                    if (countSelected === 0) {
+                        alert('Silakan pilih setidaknya satu item untuk dihapus.');
+                        return;
+                    }
+                    // Console log untuk semua item yang dipilih
+                    console.log('Data yang dipilih:', selectedItems);
+
+                    Swal.fire({
+                        title: 'Apakah Anda yakin?',
+                        html: `Anda akan menghapus <strong>${countSelected}</strong> item.<br><br> Anda tidak akan dapat mengembalikan ini!`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Ya, hapus!',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Kirim permintaan hapus jika dikonfirmasi
+                            $.ajax({
+                                type: 'POST',
+                                url: '{{ route('rqm.bulk-delete') }}', // Sesuaikan dengan route untuk bulk delete
+                                data: {
+                                    rqmNbrs: selectedItems
+                                },
+                                headers: {
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                                success: function(response) {
+                                    // Handle success, misalnya refresh tabel
+                                    Swal.fire(
+                                        'Deleted!',
+                                        'Item terpilih telah dihapus.',
+                                        'success'
+                                    ).then((result) => {
+                                        // Redirect to previous page
+                                        window.location.reload();
+                                    });
+                                },
+                                error: function(xhr, status, error) {
+                                    // Handle error
+                                    console.error(xhr.responseText);
+                                    Swal.fire(
+                                        'Error!',
+                                        'Terjadi kesalahan saat menghapus item.',
+                                        'error'
+                                    );
+                                }
+                            });
+                        }
+                    });
+                });
+
+                // Disable action untuk rqmAprvStat = Approved
+                $('#tableBrowse tbody tr').each(function() {
+                    var rqmAprvStat = $(this).find('td:eq(10)').text()
+                        .trim(); // Sesuaikan dengan kolom yang berisi status approval
+                    if (rqmAprvStat === 'Approved') {
+                        $(this).find('.edit-btn, .delete-btn, .dropdownMenuIconButton').prop(
+                            'disabled', true);
+                        $(this).find(':checkbox').prop('disabled', true);
+                    }
+                });
+            });
+        });
+    </script>
+
+
+
 </x-app-layout>

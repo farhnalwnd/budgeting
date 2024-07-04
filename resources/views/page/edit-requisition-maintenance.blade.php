@@ -1,4 +1,7 @@
 <x-app-layout>
+    @section('title')
+        Edit {{ $editRqm->rqmNbr }}
+    @endsection
     <div class="content-header">
         <div class="flex items-center justify-between">
 
@@ -16,9 +19,6 @@
 
         </div>
     </div>
-
-
-
     <!-- Main content -->
     <section class="content">
         <!-- Step wizard -->
@@ -118,12 +118,19 @@
                                         </a>
                                     </div>
                                 </div>
-                                <div class="mb-1">
-                                    <label for="enduser" class="block mb-2 text-sm font-medium">End User: <span
+                                <div class="form-group relative mb-1">
+                                    <label for="enduser" class="block mb-2 text-md font-medium">End User: <span
                                             class="text-danger">*</span></label>
-                                    <input type="text" id="enduser" name='rqmEndUserid' readonly
-                                        value="{{ $editRqm->rqmEndUserid }}"
-                                        class="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
+                                    <div class="relative">
+                                        <input type="text" name="rqmEndUserid"
+                                            class="bg-gray-200 border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-3 pr-10 p-2.5 "
+                                            id="enduser" value="{{ $editRqm->rqmEndUserid }}">
+                                        <a data-modal-target="large-modal-enduser"
+                                            data-modal-toggle="large-modal-enduser"
+                                            class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer">
+                                            <i class="fa fa-search text-gray-500 text-2xl"></i>
+                                        </a>
+                                    </div>
                                 </div>
 
                             </div>
@@ -143,19 +150,16 @@
                                 </div>
 
                                 <div class="mb-1">
-                                    <label for="currency" class="block mb-2 text-sm font-medium">Currency:</label>
+                                    <label for="currency" class="block mb-2 text-md font-medium">Currency: <span
+                                            class="text-danger">*</span></label>
                                     <select id="currency" name="rqmCurr"
-                                        class="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 required">
-                                        <option value="IDR" @selected($editRqm->rqmCurr == 'IDR')>INDONESIAN RUPIAH</option>
-                                        <option value="USD" @selected($editRqm->rqmCurr == 'USD')>US DOLLAR</option>
-                                        <option value="AUD" @selected($editRqm->rqmCurr == 'AUD')>AUSTRALIAN DOLLAR</option>
-                                        <option value="EUR" @selected($editRqm->rqmCurr == 'EUR')>EURO</option>
-                                        <option value="GBP" @selected($editRqm->rqmCurr == 'GBP')>GB POUNDSTERLING</option>
-                                        <option value="JPY" @selected($editRqm->rqmCurr == 'JPY')>JAPAN YEN</option>
-                                        <option value="SGD" @selected($editRqm->rqmCurr == 'SGD')>SINGAPORE DOLLAR</option>
-                                        <option value="THB" @selected($editRqm->rqmCurr == 'THB')>THAILAND BATH</option>
+                                        class="bg-gray-200 border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 required">
+                                        @foreach ($currency as $curr)
+                                            <option value="{{ $curr->code }}">{{ $curr->name }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
+                                <div id="messageContainer" class="mt-2"></div>
                                 <div class="mb-1">
                                     <input type="hidden" value="US" id="lang" name="rqmLang"
                                         value="{{ $editRqm->rqmLang }}">
@@ -168,10 +172,6 @@
                                 <div class="mb-1">
                                     <input type="hidden" id="entity" value="SMII" name="rqmEntity"
                                         value="{{ $editRqm->rqmEntity }}">
-                                </div>
-                                <div class="mb-1">
-                                    <input type="hidden" id="entity" name="rqmDirect"
-                                        value="{{ $editRqm->rqmDirect }}">
                                 </div>
 
                                 <div class="mb-1">
@@ -190,7 +190,7 @@
                                 </div>
                                 <div class="mt-4 flex items-center">
                                     <input type="checkbox" id="nonPOCheckbox" class="rounded" name="rqm__log01"
-                                        @checked($editRqm->rqm__log01 == 'yes')>
+                                        @checked($editRqm->rqm__log01 == 'true')>
                                     <label for="nonPOCheckbox" class="text-sm font-medium ml-2 text-black">PR Non
                                         PO</label>
                                 </div>
@@ -203,6 +203,7 @@
                             @foreach ($editRqm->rqdDets as $rqdDet)
                                 <div class="text-md p-5 font-bold">Line {{ $loop->iteration }}</div>
                                 <div class="lineItem" data-row-id="row-{{ $loop->iteration }}">
+
                                     <div class="grid grid-cols-2 md:grid-cols-5 gap-4 ">
                                         <div class="form-group relative mb-1">
                                             <label for="itemnumber" class="block text-sm font-medium">Item
@@ -222,6 +223,9 @@
                                                 value="{{ $rqdDet->rqdDesc }}">
                                             <input type="hidden" class="rqdId" id="rqdId-{{ $loop->iteration }}"
                                                 name="rqdId[]" value="{{ $rqdDet->id }}">
+                                            <input type="hidden" class="rqdLine"
+                                                id="rqdLine-{{ $loop->iteration }}" name="rqdLine[]"
+                                                value="{{ $rqdDet->rqdLine }}">
                                         </div>
                                         <div class="form-group relative mb-1">
                                             <label for="supplieritem"
@@ -273,13 +277,13 @@
                                                     class="text-danger">*</span></label>
                                             <input type="date" id="dueDate-{{ $loop->iteration }}"
                                                 name="rqdDueDate[]" value="{{ $rqdDet->rqdDueDate }}"
-                                                class="bg-gray-200 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 required">
+                                                class="rqdDueDate bg-gray-200 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 required">
 
                                             <label for="needDate" class="block text-sm font-medium mt-4">Need
                                                 Date: <span class="text-danger">*</span></label>
                                             <input type="date" id="needDate-{{ $loop->iteration }}"
                                                 name="rqdNeedDate[]" value="{{ $rqdDet->rqdNeedDate }}"
-                                                class="bg-gray-200 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 required">
+                                                class="rqdNeedDate bg-gray-200 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 required">
 
                                             <div class="form-group relative mb-1">
                                                 <label for="purracct" class="block text-sm font-medium">Purr
@@ -309,14 +313,14 @@
                                                 class="bg-gray-200 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 maxUnitCost">
                                             <div class="target-insert-point">
 
-                                            </div class='target-insert-point'>
+                                            </div>
                                             <div class="mt-4 flex items-center">
                                                 <input type="checkbox"
                                                     id="commentsCheckbox-row-{{ $loop->iteration }}"
                                                     class="rounded commentsCheckbox" name="lineCmmts[]"
                                                     data-row-id="row-{{ $loop->iteration }}" data-toggle="modal"
                                                     data-target="#commentsModal-row-{{ $loop->iteration }}"
-                                                    value="true" @checked($rqdDet->lineCmmts == 'true') checked>
+                                                    value="true" @if($rqdDet->lineCmmts == 'true') checked @endif>
                                                 <label for="commentsCheckbox-row-{{ $loop->iteration }}"
                                                     class="text-sm font-medium ml-2">Comments</label>
                                             </div>
@@ -340,11 +344,9 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <input type="hidden" id="deletedLineNumbersInput" name="deletedLineNumbers">
                                     <div class="modalcomment">
-
                                         {{-- Modal Comment Template --}}
-                                        <div id="commentsModal-template"
+                                        <div id="commentsModal-row-{{ $loop->iteration }}"
                                             class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto bg-opacity-50 modal hidden"
                                             aria-hidden="true">
                                             <div
@@ -358,12 +360,13 @@
                                                             class="text-xl font-medium text-gray-900">Comment</label>
                                                         <label
                                                             class="modal-close text-medium font-medium text-gray-900 cursor-pointer"
-                                                            data-target="#commentsModal-template">
-                                                            Close Modal
+                                                            data-target="#commentsModal-row-{{ $loop->iteration }}">
+                                                            <i class="modal-close fa fa-times" aria-hidden="true"></i>
                                                         </label>
                                                     </div>
-                                                    <div class="p-2 md:p-3 space-y-4">
-                                                        <textarea class="commentText" name="cmtCmmt[]" cols="30" rows="10" style="border: none; width: 100%;">{{ $rqdDet->rqdCmt }}</textarea>
+                                                    <div class="p-2 md:p-3 space-y-4 controls">
+                                                        <textarea id="cmtCmmt-{{ $loop->iteration }}" name="cmtCmmt[]" class="commentText form-control" cols="30"
+                                                            rows="10" style="border: none; width: 100%;">{{ $rqdDet->rqdCmt }}</textarea>
                                                     </div>
                                                 </div>
                                             </div>
@@ -412,22 +415,21 @@
                                     </table>
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div class="form-group">
-                                        <label for="routeto"
-                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                                            Route To:<span class="text-danger">*</span></label></label>
-                                        <input type="text" class="form-input w-full required" id="routeto"
-                                            name="routeToApr" aria-invalid="true" readonly checked
-                                            value="{{ $editRqm->routeToApr }}">
 
+                                    <div class="form-group">
+                                        <label class="form-label">Route To: <span class="text-danger">*</span></label>
+                                        <div class="controls">
+                                            <input type="text" name="text" class="form-control w-full required"
+                                                id="routeto" name="routeToApr" aria-invalid="true" readonly
+                                                value="{{ $editRqm->routeToApr }}">
+                                            <div class="help-block"></div>
+                                        </div>
                                     </div>
                                     <div class="form-group">
-                                        <label for="buyer"
-                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                        <label for="buyer" class="block mb-2 text-sm font-medium ">
                                             Buyer:<span class="text-danger">*</span></label></label>
                                         <select class="form-select w-full required" id="buyer"
                                             name="routeToBuyer" aria-invalid="true">
-                                            <option value="mfg" @selected($editRqm->routeToBuyer == 'mfg')>mfg</option>
                                             <option value="linda" @selected($editRqm->routeToBuyer == 'linda')>Linda</option>
                                             <option value="rahman" @selected($editRqm->routeToBuyer == 'rahman')>Rahman</option>
                                         </select>
@@ -437,8 +439,7 @@
                                 <div class="form-group">
                                     <div class="c-inputs-stacked">
                                         <input type="checkbox" id="allInfoCorrectCheckbox" class="rounded required"
-                                            name="allInfoCorrect" value="true" @checked($editRqm->allInfoCorrect == 'true')
-                                            checked>
+                                            name="allInfoCorrect" value="true" @checked($editRqm->allInfoCorrect == 'true') checked>
                                         <label for="allInfoCorrectCheckbox" class="d-block">All Data is
                                             Correct? <span class="text-danger">*</span></label></label>
                                     </div>
@@ -446,6 +447,7 @@
                             </div>
                         </div>
                     </section>
+                   
                 </form>
             </div>
         </div>
@@ -508,18 +510,15 @@
 
                 [itemNumberInput, qtyInput, unitCostInput].forEach(input => {
                     input.addEventListener('input', function() {
-                        // Auto-fill stockQty and maxUnitCost fields
                         stockUMQtyInput.value = qtyInput.value;
                         maxUnitCostInput.value = unitCostInput.value;
                         ExtCostInput.value = unitCostInput.value;
 
-                        // Auto-fill maxExtendedCost field
                         const reqQty = parseFloat(qtyInput.value) || 0;
                         const unitCost = parseFloat(unitCostInput.value) || 0;
                         const maxExtendedCost = (reqQty * unitCost).toFixed(2);
                         maxExtCostInput.value = maxExtendedCost;
                         ExtCostInput.value = maxExtendedCost;
-                        // Update generateOverviewTable
                         generateOverviewTable();
                     });
                 });
@@ -544,6 +543,8 @@
                 });
                 let lineItemsData = [];
                 let deletedLineNumbers = [];
+                let modalContainer = document.querySelector('.modalcomment');
+
 
                 function addLineItem() {
                     const lineItemContainer = document.getElementById('lineItemsContainer');
@@ -552,6 +553,18 @@
                         return;
                     }
 
+                    // Find the highest rqdLine value in existing line items
+                    const rqdLineInputs = lineItemContainer.querySelectorAll('.rqdLine');
+                    let maxRqdLine = 0;
+                    rqdLineInputs.forEach(input => {
+                        const value = parseInt(input.value, 10);
+                        if (!isNaN(value) && value > maxRqdLine) {
+                            maxRqdLine = value;
+                        }
+                    });
+
+                    const newRqdLineValue = maxRqdLine + 1;
+
                     const lineItemTemplate = document.querySelector('.lineItem').cloneNode(true);
                     if (!lineItemTemplate) {
                         console.error('Template for line items not found');
@@ -559,11 +572,11 @@
                     }
 
                     // Reset all input values and update IDs
-                    lineItemTemplate.querySelectorAll('input').forEach(input => {
-                        input.value = '';
+                    lineItemTemplate.querySelectorAll('input, textarea, select').forEach(input => {
+                        input.value = ''; // Reset input values
                         if (input.id) {
                             const originalId = input.id;
-                            const newId = `${originalId}-${lineItemContainer.children.length + 1}`;
+                            const newId = `${originalId}-${newRqdLineValue}`;
                             input.id = newId;
                             const label = lineItemTemplate.querySelector(`label[for="${originalId}"]`);
                             if (label) {
@@ -571,23 +584,42 @@
                             }
                         }
                     });
-                    lineItemTemplate.querySelector('.commentText').value = '';
+
+                    const commentText = lineItemTemplate.querySelector('.commentText');
+                    if (commentText) {
+                        commentText.value = '';
+                    }
 
                     // Unhide the remove button
-                    lineItemTemplate.querySelector('.removeLineItem').classList.remove('hidden');
+                    const removeButton = lineItemTemplate.querySelector('.removeLineItem');
+                    if (removeButton) {
+                        removeButton.classList.remove('hidden');
+                    }
 
                     // Update the data-row-id attribute
-                    const newLineIndex = lineItemContainer.querySelectorAll('.lineItem').length + 1;
-                    lineItemTemplate.setAttribute('data-row-id', newLineIndex);
+                    lineItemTemplate.setAttribute('data-row-id', newRqdLineValue);
 
                     // Add the new line number
                     const newLineNumber = document.createElement('div');
                     newLineNumber.classList.add('line-number');
                     newLineNumber.innerHTML = `
-        <div class="text-md p-5 font-bold">Line ${newLineIndex}</div>
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-4"></div>
-    `;
+                            <div class="text-md p-5 font-bold">Line ${newRqdLineValue}</div>
+                            <div class="grid grid-cols-2 md:grid-cols-5 gap-4"></div>
+                        `;
                     lineItemTemplate.prepend(newLineNumber);
+
+                    // Set rqdLine value
+                    const rqdLineInput = lineItemTemplate.querySelector('.rqdLine');
+                    if (rqdLineInput) {
+                        rqdLineInput.value = newRqdLineValue;
+                    } else {
+                        const newRqdLineInput = document.createElement('input');
+                        newRqdLineInput.type = 'hidden';
+                        newRqdLineInput.classList.add('rqdLine');
+                        newRqdLineInput.name = 'rqdLine[]';
+                        newRqdLineInput.value = newRqdLineValue;
+                        lineItemTemplate.appendChild(newRqdLineInput);
+                    }
 
                     // Remove existing comments checkbox and label
                     const existingCheckboxContainer = lineItemTemplate.querySelector('.commentsCheckbox')?.parentNode;
@@ -596,40 +628,49 @@
                     }
 
                     // Add event listeners for quantity and cost inputs
-                    lineItemTemplate.querySelector('.reqQty').addEventListener('input', function() {
+                    lineItemTemplate.querySelector('.reqQty')?.addEventListener('input', function() {
                         updateRealTimeValues.call(this);
                         generateOverviewTable();
                     });
-                    lineItemTemplate.querySelector('.unitCost').addEventListener('input', function() {
+                    lineItemTemplate.querySelector('.unitCost')?.addEventListener('input', function() {
                         updateRealTimeValues.call(this);
                         generateOverviewTable();
                     });
-                    lineItemTemplate.querySelector('.itemnumber').addEventListener('input', function() {
+                    lineItemTemplate.querySelector('.itemnumber')?.addEventListener('input', function() {
                         generateOverviewTable();
                     });
 
                     // Handle comment checkbox creation
                     const commentsCheckbox = document.createElement('input');
                     commentsCheckbox.type = 'checkbox';
-                    commentsCheckbox.id = `commentsCheckbox-row-${newLineIndex}`;
+                    commentsCheckbox.id = `commentsCheckbox-row-${newRqdLineValue}`;
                     commentsCheckbox.classList.add('rounded', 'commentsCheckbox');
                     commentsCheckbox.name = 'lineCmmts[]';
-                    commentsCheckbox.setAttribute('data-row-id', newLineIndex);
+                    commentsCheckbox.setAttribute('data-row-id', newRqdLineValue);
                     commentsCheckbox.setAttribute('data-toggle', 'modal');
-                    commentsCheckbox.setAttribute('data-target', `#commentsModal-row-${newLineIndex}`);
+                    commentsCheckbox.setAttribute('data-target', `#commentsModal-row-${newRqdLineValue}`);
                     commentsCheckbox.value = 'false'; // Set default value to false
+
+                    // Create a hidden input that mimics the checkbox
+                    const hiddenCheckbox = document.createElement('input');
+                    hiddenCheckbox.type = 'hidden';
+                    hiddenCheckbox.name = 'lineCmmts[]';
+                    hiddenCheckbox.value = 'false';
 
                     // Event listener to toggle modal and update checkbox value
                     commentsCheckbox.addEventListener('change', function(event) {
                         toggleModal(event.target);
                         commentsCheckbox.value = event.target.checked ? 'true' : 'false';
+                        hiddenCheckbox.disabled = event.target
+                            .checked; // Disable hidden input when checkbox is checked
                         updateCommentTextarea(event.target.checked,
-                            newLineIndex); // Call function to update comment textarea based on checkbox status
+                            newRqdLineValue
+                        ); // Call function to update comment textarea based on checkbox status
                     });
 
                     // Create a label for the comments checkbox
                     const commentsLabel = document.createElement('label');
-                    commentsLabel.setAttribute('for', `commentsCheckbox-row-${newLineIndex}`);
+                    commentsLabel.setAttribute('for', `commentsCheckbox-row-${newRqdLineValue}`);
                     commentsLabel.textContent = 'Comments';
                     commentsLabel.classList.add('text-sm', 'font-medium', 'ml-2');
 
@@ -638,6 +679,7 @@
                     checkboxContainer.classList.add('mt-4', 'flex', 'items-center');
                     checkboxContainer.appendChild(commentsCheckbox);
                     checkboxContainer.appendChild(commentsLabel);
+                    checkboxContainer.appendChild(hiddenCheckbox); // Append the hidden input
 
                     // Find the target insert point or fallback to appending to template
                     const targetInsertPoint = lineItemTemplate.querySelector('.target-insert-point');
@@ -652,73 +694,92 @@
                         const commentTextarea = document.getElementById(`commentText-${rowIndex}`);
                         if (commentTextarea) {
                             if (checked) {
+                                // Enable textarea and set initial value if necessary
                                 commentTextarea.removeAttribute('disabled');
                                 if (commentTextarea.value.trim() === '') {
-                                    commentTextarea.value =
-                                        'Initial comment'; // Set your initial comment text here if needed
+                                    commentTextarea.value = ' '; // Set your initial comment text here if needed
                                 }
                             } else {
+                                // Disable textarea and clear value
                                 commentTextarea.setAttribute('disabled', true);
                                 commentTextarea.value = '';
                             }
                         }
                     }
+                    // Trigger input events for itemnumber, reqQty, supplier, unitCost, purAcct
+                    lineItemTemplate.querySelector('.itemnumber')?.dispatchEvent(new Event('input'));
+                    lineItemTemplate.querySelector('.reqQty')?.dispatchEvent(new Event('input'));
+                    lineItemTemplate.querySelector('.supplier')?.dispatchEvent(new Event('input'));
+                    lineItemTemplate.querySelector('.unitCost')?.dispatchEvent(new Event('input'));
+                    lineItemTemplate.querySelector('.purracct')?.dispatchEvent(new Event('input'));
 
+                    const dueDateInput = lineItemTemplate.querySelector('.rqdDueDate');
+                    dueDateInput.value = new Date().toISOString().split('T')[
+                        0]; // Sesuaikan dengan tanggal saat ini dalam format Y-m-d
+
+                    // Set nilai default pada elemen input dengan class 'rqdNeedDate'
+                    const needDateInput = lineItemTemplate.querySelector('.rqdNeedDate');
+                    needDateInput.value = new Date().toISOString().split('T')[
+                        0]; // Sesuaikan dengan tanggal saat ini dalam format Y-m-d
+
+                    // Set nilai default pada elemen input dengan class 'purracct'
+                    const purracctInput = lineItemTemplate.querySelector('.purracct');
+                    purracctInput.value = '5516'; // Sesuaikan dengan nilai yang Anda inginkan
+
+                    updateRowIndices(); // Assuming this function updates all row indices and rqdLines
+                    const newRqdLine = document.querySelectorAll('.rqdLine')
+                        .length; // Get the latest rqdLine count or value
+                    const modalTemplate = createCommentModal(newRqdLine); // Create modal with the new modalId
+                    modalContainer.appendChild(modalTemplate); // Append modal to modalContainer
                     // Append the new line item to the container
                     lineItemContainer.appendChild(lineItemTemplate);
-
-                    // Push data to lineItemsData
-                    lineItemsData.push({
-                        /* data line item baru */
-                    });
 
                     updateCosts();
                     generateOverviewTable();
                 }
 
+
                 function removeLineItem(button) {
+                    // Mendapatkan elemen baris yang terdekat dari tombol yang diklik
                     const lineItem = button.closest('.lineItem');
+
                     if (lineItem) {
-                        const rowId = lineItem.getAttribute('data-row-id');
-                        const lineNumber = parseInt(rowId.split('-')[1]);
-
-                        // Check if line number exists in deletedLineNumbers array
-                        if (!deletedLineNumbers.includes(lineNumber)) {
-                            // If not, add it to deletedLineNumbers array
-                            deletedLineNumbers.push(lineNumber);
+                        // Mencari elemen di atasnya dengan kelas tertentu
+                        const lineHeader = lineItem.previousElementSibling;
+                        if (lineHeader && lineHeader.classList.contains('text-md')) {
+                            lineHeader.remove(); // Menghapus elemen header jika ada
                         }
-                        console.log('Deleted line numbers:', deletedLineNumbers);
 
-                        // Remove line from view
+                        // Mengecek apakah baris memiliki kelas 'newLine'
+                        const isNewLine = lineItem.classList.contains('newLine');
+
+                        // Menghapus baris dari tampilan
                         lineItem.remove();
 
-                        // Update the hidden input value
-                        updateDeletedLineNumbersInput();
-
-                        // Perform AJAX call only if line number exists in database (lineNumber > 0)
-                        if (lineNumber > 0) {
-                            const rqmNbr = '{{ $editRqm->rqmNbr }}'; // Replace with the appropriate PR number value
-                            deleteLineItemViaAjax(rqmNbr, [lineNumber]);
+                        if (isNewLine) {
+                            // Memperbarui biaya dan tabel tampilan untuk baris baru
+                            updateCosts(); // Contoh: fungsi lain yang diperlukan untuk baris baru
+                            generateOverviewTable(); // Contoh: fungsi lain yang diperlukan untuk baris baru
                         } else {
-                            // No need to perform AJAX for new lines (lineNumber <= 0)
-                            updateCosts(); // Example: other functions needed for new lines
-                            generateOverviewTable(); // Example: other functions needed for new lines
+                            // Mengambil nomor PR yang sesuai
+                            const rqmNbr = '{{ $editRqm->rqmNbr }}'; // Ganti dengan nilai PR yang sesuai
+                            const rqdLineInput = lineItem.querySelector('.rqdLine');
+                            const rqdLine = rqdLineInput ? rqdLineInput.value : null;
+
+                            // Jika rqdLine ada, panggil fungsi untuk menghapus baris dari database via AJAX
+                            if (rqdLine) {
+                                deleteLineItemViaAjax(rqmNbr, rqdLine);
+                            }
                         }
                     }
                 }
 
-                function updateDeletedLineNumbersInput() {
-                    const input = document.getElementById('deletedLineNumbersInput');
-                    if (input) {
-                        input.value = JSON.stringify(deletedLineNumbers);
-                    }
-                }
 
-                function deleteLineItemViaAjax(rqmNbr, deletedLineNumbers) {
+                function deleteLineItemViaAjax(rqmNbr, rqdLine) {
                     const url = "{{ route('rqm.deleteLine') }}";
                     const formData = new FormData();
                     formData.append('rqmNbr', rqmNbr);
-                    formData.append('deletedLineNumbers', JSON.stringify(deletedLineNumbers));
+                    formData.append('rqdLine', rqdLine);
 
                     // Get CSRF token from meta tag
                     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
@@ -742,6 +803,10 @@
                                 data: formData,
                                 processData: false,
                                 contentType: false,
+                                dataType: 'json',
+                                headers: {
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
                                 success: function(data) {
                                     if (data.success) {
                                         Swal.fire({
@@ -749,38 +814,34 @@
                                             text: "Your file has been deleted.",
                                             icon: "success"
                                         }).then(() => {
-                                            updateCosts
-                                        (); // Example: other functions needed after deletion
-                                            generateOverviewTable
-                                        (); // Example: other functions needed after deletion
-                                        });
-                                    } else {
-                                        Swal.fire({
-                                            title: "Error",
-                                            text: "Failed to delete line item",
-                                            icon: "error"
+                                            // Update UI to reflect deletion of line item
+                                            const lineItemElement = document.querySelector(
+                                                `[data-rqd-line="${rqdLine}"]`);
+                                            if (lineItemElement) {
+                                                lineItemElement.remove();
+                                                // Update overview table
+                                                generateOverviewTable();
+                                            }
                                         });
                                     }
                                 },
-                                error: function(error) {
-                                    Swal.fire({
-                                        title: "Error",
-                                        text: "An error occurred while deleting the line item",
-                                        icon: "error"
-                                    });
-                                    console.error('Error:', error);
+                                error: function(xhr, status, error) {
+                                    // No error handling message here
                                 }
+                            }).catch(() => {
+                                // No catch block here
                             });
                         } else if (result.dismiss === Swal.DismissReason.cancel) {
                             // User cancelled, do nothing
                             Swal.fire({
                                 title: "Cancelled",
-                                text: "Line item deletion cancelled",
+                                text: "Line item deletion cancelled.",
                                 icon: "info"
                             });
                         }
                     });
                 }
+
 
 
                 function updateRowIndices() {
@@ -823,45 +884,50 @@
                 // Function to add event listener to a textarea
                 function addCommentEventListener(textArea) {
                     textArea.addEventListener('input', function() {
-                        const commentIndex = textArea.getAttribute(
-                            'data-row-id'); // Ambil indeks komentar dari data-row-id
-                        cmtCmmt[commentIndex] = textArea.value; // Simpan nilai komentar ke dalam objek cmtCmmt
+                        const commentIndex = textArea.getAttribute('data-row-id');
+                        cmtCmmt[commentIndex] = textArea.value.trim(); // Save trimmed comment
                         console.log(`Comment ${commentIndex}: ${textArea.value}`);
                     });
                 }
 
                 // Function to create a new comment modal
-                function createCommentModal(rowId) {
+                function createCommentModal(newRqdLine) {
                     const modalTemplate = document.querySelector('#commentsModal-template').cloneNode(true);
-                    const modalId = `commentsModal-row-${rowId}`;
-                    modalTemplate.id = modalId;
+                    modalTemplate.id = `commentsModal-row-${newRqdLine}`;;
 
-                    // Update ID for commentText textarea
                     const commentTextarea = modalTemplate.querySelector('.commentText');
-                    const commentTextareaId = `commentText-${rowId}`; // Update ID to remove 'row-' prefix
-                    commentTextarea.id = commentTextareaId;
+                    commentTextarea.id = `commentText-${newRqdLine}`;
 
                     // Update name attribute for commentText textarea
                     commentTextarea.setAttribute('name', `cmtCmmt[]`);
 
+
                     // Update data-target for close modal button
                     const modalCloseButton = modalTemplate.querySelector('.modal-close');
-                    modalCloseButton.setAttribute('data-target', `#${modalId}`);
+                    modalCloseButton.setAttribute('data-target', `#${newRqdLine}`);
+
+                    // Check if rqdId exists and set cmtCmmt content accordingly
+                    if (cmtCmmt[newRqdLine]) {
+                        commentTextarea.value = cmtCmmt[newRqdLine]; // Menampilkan nilai cmtCmmt sesuai rqdId
+                    } else {
+                        commentTextarea.value = ''; // Atau nilai default yang diinginkan jika tidak ada
+                    }
+
+                    // Update other modal content as needed
 
                     return modalTemplate;
                 }
 
+                // Function to toggle modal visibility
                 function toggleModal(checkbox) {
                     const modalContainer = document.querySelector('.modalcomment');
-
                     if (!modalContainer) {
-                        console.error('Container modal tidak ditemukan.');
+                        console.error('Modal container not found.');
                         return;
                     }
 
                     const rowId = checkbox.getAttribute('data-row-id');
                     const modalId = `commentsModal-row-${rowId}`;
-
                     let modal = modalContainer.querySelector(`#${modalId}`);
 
                     if (!modal) {
@@ -870,13 +936,12 @@
                     }
 
                     if (checkbox.checked) {
-                        checkbox.value = 'true';
                         modal.classList.remove('hidden');
                     } else {
-                        checkbox.value = 'false';
                         modal.classList.add('hidden');
                     }
                 }
+                // Event listener for modal close buttons
                 document.addEventListener('click', function(event) {
                     if (event.target.classList.contains('modal-close')) {
                         const targetModalId = event.target.getAttribute('data-target');
@@ -886,13 +951,14 @@
                             targetModal.classList.add('hidden');
                             const commentTextarea = targetModal.querySelector('.commentText');
                             const commentIndex = commentTextarea.id.split('-')[1];
-                            cmtCmmt[commentIndex] = commentTextarea.value;
+                            cmtCmmt[commentIndex] = commentTextarea.value.trim(); // Save trimmed comment
                             console.log(`Saved comment ${commentIndex}: ${commentTextarea.value}`);
                         } else {
                             console.error(`Modal with ID ${targetModalId} not found.`);
                         }
                     }
                 });
+                // Initialize event listeners for comment checkboxes
                 document.querySelectorAll('.commentsCheckbox').forEach(checkbox => {
                     checkbox.addEventListener('change', function(event) {
                         toggleModal(event.target);
@@ -904,7 +970,7 @@
                         table.DataTable().clear().destroy(); // Clear and destroy if table is already initialized
                     }
                     table.DataTable({
-                        "pageLength": 5,
+                        "pageLength": 10,
                         "lengthChange": false,
                         "pagingType": "simple_numbers"
                     });
@@ -914,10 +980,12 @@
                 function openModal(trigger) {
                     const target = trigger.getAttribute('data-modal-target');
                     const modal = document.getElementById(target);
+
                     if (!modal) {
                         console.error(`Modal with ID '${target}' not found.`);
                         return;
                     }
+
                     const modalTitle = modal.querySelector('.modal-title');
                     const tableBody = modal.querySelector('.dynamicTableBody');
                     const rowToFill = trigger.closest('.lineItem'); // Identify the row that triggered the modal
@@ -933,14 +1001,36 @@
                     let ajaxUrl = '';
                     let ajaxData = {};
 
+                    // Check if the direct checkbox is checked
+                    const directCheckbox = document.getElementById('directCheckbox');
+                    if (directCheckbox && directCheckbox.checked) {
+                        // Make itemnumber input readonly
+                        const itemnumberInput = rowToFill.querySelector('.itemnumber');
+                        if (itemnumberInput) {
+                            itemnumberInput.setAttribute('readonly', 'readonly');
+                        }
+                    }
+
                     if (target === 'modal-item') {
                         if (modalTitle) {
                             modalTitle.innerText = 'Items';
                         }
                         ajaxUrl = '{{ route('get.items.ajax') }}';
                         ajaxData = {
-                            type: 'item'
+                            type: 'items'
                         };
+
+                        // Check if the direct checkbox is checked
+                        const directCheckbox = document.getElementById('directCheckbox');
+                        if (directCheckbox && directCheckbox.checked) {
+                            ajaxData.pt_prod_line = ['0110', '0111', '0112', '0113', '0114', '0115', '0120', '0201',
+                                '0202', '0203', '0204', '0205', '0206', '0207', '0208', '0209', '0210', '0212',
+                                '0213', '0214', '0215', '0216', '0217', '0218', '0220', '0221', '0222', '0309',
+                                '0310', '0311', '0312', '0313', '0314', '0315', '0316', '0317', '0401', '0402',
+                                '0403'
+                            ];
+                            ajaxData.pt_taxable = 'true';
+                        }
                     } else if (target === 'modal-supplieritem') {
                         if (modalTitle) {
                             modalTitle.innerText = 'Supplier';
@@ -964,39 +1054,48 @@
                         type: 'GET',
                         data: ajaxData,
                         success: function(response) {
+                            console.log("Response received successfully:",
+                                response); // Check response in console log
                             let tableBodyHtml = '';
 
                             if (target === 'modal-item') {
                                 response.data.forEach(item => {
                                     tableBodyHtml += `
-                            <tr class="cursor-pointer" data-supplier-code="${item.pt_part}" data-um="${item.pt_um}" data-desc1="${item.pt_desc1}">
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">${item.pt_part}</td>
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">${item.pt_desc1}</td>
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">${item.pt_um}</td>
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">${item.pt_part_type}</td>
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">${item.pt_status === '0002' ? 'Non Active' : 'Active'}</td>
-                            </tr>`;
+                        <tr class="cursor-pointer" data-supplier-code="${item.pt_part}" data-um="${item.pt_um}" data-desc1="${item.pt_desc1}">
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">${item.pt_part}</td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">${item.pt_desc1}</td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">${item.pt_um}</td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">${item.pt_part_type}</td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">${item.pt_status === '0002' ? 'Non Active' : 'Active'}</td>
+                        </tr>`;
                                 });
+                                // If direct checkbox is checked, itemnumber input should be readonly
+                                if (directCheckbox && directCheckbox.checked) {
+                                    const itemnumberInput = rowToFill.querySelector('.itemnumber');
+                                    if (itemnumberInput) {
+                                        itemnumberInput.setAttribute('readonly', 'readonly');
+                                    }
+                                }
                             } else if (target === 'modal-supplieritem') {
                                 response.data.forEach(supplier => {
                                     tableBodyHtml += `
-                            <tr class="cursor-pointer" data-supplier-code="${supplier.vd_addr}">
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">${supplier.vd_addr}</td>
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">${supplier.vd_sort}</td>
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">${supplier.ad_name}</td>
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">${supplier.ad_line1}</td>
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">${supplier.ad_city}</td>
-                            </tr>`;
+                        <tr class="cursor-pointer" data-supplier-code="${supplier.vd_addr}">
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">${supplier.vd_addr}</td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">${supplier.vd_sort}</td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">${supplier.ad_name}</td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">${supplier.ad_line1}</td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">${supplier.ad_city}</td>
+                        </tr>`;
                                 });
                             } else if (target === 'modal-purracct') {
                                 response.data.forEach(account => {
                                     tableBodyHtml += `
-                            <tr class="cursor-pointer" data-supplier-code="${account.ac_code}">
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">${account.ac_code}</td>
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">${account.ac_desc}</td>
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">${account.ac_curr}</td>
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">${account.ac_gl_type}</td>
-                            </tr>`;
+                        <tr class="cursor-pointer" data-supplier-code="${account.ac_code}">
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">${account.ac_code}</td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">${account.ac_desc}</td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">${account.ac_curr}</td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-md text-gray-600 uppercase tracking-wider">${account.ac_gl_type}</td>
+                        </tr>`;
                                 });
                             }
 
@@ -1032,7 +1131,7 @@
                                                         '.itemnumber').value;
                                                 updateRealTimeValues.call(rowToFill
                                                     .querySelector('.rqdDesc')
-                                                ); // Memperbarui nilai secara realtime dengan konteks yang benar
+                                                ); // Update real-time values appropriately
                                             }
                                         } else if (target === 'modal-supplieritem') {
                                             if (rowToFill.querySelector('.supplieritem')) {
@@ -1108,13 +1207,13 @@
                         );
 
                         const row = document.createElement('tr');
-                        row.classList.add('bg-white', 'border-b', 'dark:bg-slate-800', 'dark:border-slate-700');
+                        row.classList.add('border-b', 'hover:bg-gray-50');
 
                         row.innerHTML = `
-                                        <td class="p-4 border-b dark:border-slate-700 text-slate-700 dark:text-slate-400">${itemNumber}</td>
-                                        <td class="p-4 border-b dark:border-slate-700 text-slate-700 dark:text-slate-400">${reqQty}</td>
-                                        <td class="p-4 border-b dark:border-slate-700 text-slate-700 dark:text-slate-400">${unitCost}</td>
-                                        <td class="p-4 border-b dark:border-slate-700 text-slate-700 dark:text-slate-400">${maxExtendedCost}</td>
+                                        <td class="px-6 py-4">${itemNumber}</td>
+                                        <td class="px-6 py-4">${reqQty}</td>
+                                        <td class="px-6 py-4">${unitCost}</td>
+                                        <td class="px-6 py-4">${maxExtendedCost}</td>
                                     `;
 
                         // Check if data is not null or undefined before appending to the table body
@@ -1214,7 +1313,7 @@
                 // Set initial values
                 appstatusSelect.value = appstatusSelect.value === '2' ? 'Approved' : 'Unapproved';
                 directCheckbox.value = directCheckbox.checked ? 'true' : 'false';
-                nonPOCheckbox.value = nonPOCheckbox.checked ? 'yes' : 'no';
+                nonPOCheckbox.value = nonPOCheckbox.checked ? 'true' : 'false';
                 allInfoCorrectCheckbox.value = allInfoCorrectCheckbox.checked ? 'true' : 'false';
 
                 // Mengatur nilai awal untuk lineCmmtsCheckboxes
@@ -1228,7 +1327,7 @@
                 });
 
                 nonPOCheckbox.addEventListener('change', function() {
-                    this.value = this.checked ? 'yes' : 'no';
+                    this.value = this.checked ? 'true' : 'false';
                 });
 
                 allInfoCorrectCheckbox.addEventListener('change', function() {
@@ -1279,7 +1378,7 @@
 
             $(document).ready(function() {
                 $('#supplierTable').DataTable({
-                    "pageLength": 5,
+                    "pageLength": 10,
                     "lengthChange": false,
                     "pagingType": "simple_numbers" // Ubah sesuai kebutuhan: simple, simple_numbers, full, atau full_numbers
                 });
@@ -1371,10 +1470,110 @@
 
             $(document).ready(function() {
                 $('#costTable').DataTable({
-                    "pageLength": 5,
+                    "pageLength": 10,
                     "lengthChange": false,
                     "pagingType": "simple_numbers"
                 });
+            });
+        </script>
+
+        {{-- end user --}}
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+
+                // Toggle modal visibility
+                document.querySelectorAll('[data-modal-toggle]').forEach(a => {
+                    a.addEventListener('click', () => {
+                        const modalId = a.getAttribute('data-modal-target');
+                        const modal = document.getElementById(modalId);
+                        if (modal) {
+                            modal.classList.toggle('hidden');
+                        }
+                    });
+                });
+
+                // Hide modal
+                document.querySelectorAll('[data-modal-hide]').forEach(a => {
+                    a.addEventListener('click', () => {
+                        const modalId = a.getAttribute('data-modal-hide');
+                        const modal = document.getElementById(modalId);
+                        if (modal) {
+                            modal.classList.add('hidden');
+                        }
+                    });
+                });
+
+                // Set input value and close modal on row click
+                document.querySelectorAll('#large-modal-enduser tbody tr').forEach(row => {
+                    row.addEventListener('click', () => {
+                        const endUser = row.getAttribute('data-supplier-code');
+                        const endUserInput = document.getElementById('enduser');
+                        endUserInput.value = endUser;
+                        document.getElementById('modal-close-a-enduser').click();
+
+                        // Manually trigger change event
+                        const event = new Event('change');
+                        endUserInput.dispatchEvent(event);
+                    });
+                });
+            });
+
+            $(document).ready(function() {
+                $('#endUserTable').DataTable({
+                    "pageLength": 10,
+                    "lengthChange": false,
+                    "pagingType": "simple_numbers"
+                });
+            });
+        </script>
+
+        {{-- checkCurr --}}
+        <script>
+            // Add JavaScript to handle real-time validation and required field logic
+            document.getElementById('currency').addEventListener('change', function(event) {
+                var selectedCurrency = this.value;
+
+                // Reset message container
+                var messageContainer = document.getElementById('messageContainer');
+                messageContainer.innerHTML = '';
+
+
+
+                // Check if selected currency is IDR (123295)
+                if (selectedCurrency === '123295') {
+                    messageContainer.innerHTML = '<span class="text-green-600">Currency is available!</span>';
+
+                } else {
+                    // Call the backend API to check currency availability
+                    fetch('{{ route('check.curr') }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-Token': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({
+                                rqmCurr: selectedCurrency
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.error === 'true') {
+                                messageContainer.innerHTML =
+                                    '<span class="text-green-600">Currency is available!</span>';
+
+                            } else {
+                                messageContainer.innerHTML =
+                                    '<span class="text-red-600">Currency not available right now, please choose another currency.</span>';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            messageContainer.innerHTML =
+                                '<span class="text-red-600">An error occurred while checking currency.</span>';
+
+                        });
+                }
+
             });
         </script>
     @endpush
@@ -1384,14 +1583,14 @@
     <div id="large-modal" tabindex="-1"
         class="fixed inset-0 z-50 flex items-start justify-center p-4 overflow-y-auto  bg-opacity-50 modal hidden"
         aria-hidden="true">
-        <div class="relative w-full max-w-4xl max-h-full">
+        <div class="relative w-full max-w-4xl max-h-full bg-white rounded-lg shadow-lg">
             <!-- Modal content -->
-            <div class="relative bg-white rounded-lg">
+            <div class="relative">
                 <!-- Modal header -->
                 <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-                    <label class="text-xl font-medium text-gray-600">Supplier</label>
+                    <label class="text-xl font-medium text-gray-900">Supplier</label>
                     <a type="a"
-                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-md w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
                         data-modal-hide="large-modal" id="modal-close-a">
                         <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
                             viewBox="0 0 14 14">
@@ -1402,7 +1601,7 @@
                     </a>
                 </div>
                 <!-- Modal body -->
-                <div class="p-4 md:p-5 space-y-4">
+                <div class="p-4 md:p-5 space-y-4 text-md overflow-y-auto max-h-[calc(100vh-8rem)]">
                     <table class="min-w-full leading-normal" id="supplierTable">
                         <thead>
                             <tr>
@@ -1514,6 +1713,88 @@
         </div>
     </div>
 
+    {{-- modal employee --}}
+    <div id="large-modal-enduser" tabindex="-1"
+        class="fixed inset-0 z-50 flex items-start justify-center p-4 overflow-y-auto  bg-opacity-50 modal hidden"
+        aria-hidden="true">
+        <div class="relative w-full max-w-4xl max-h-full">
+            <!-- Modal content -->
+            <div class="relative bg-white rounded-lg">
+                <!-- Modal header -->
+                <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                    <label class="text-xl font-medium text-gray-900">Employee</label>
+                    <a type="a"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-md w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                        data-modal-hide="large-modal-enduser" id="modal-close-a-enduser">
+                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"></path>
+                        </svg>
+                        <span class="sr-only">Close modal</span>
+                    </a>
+                </div>
+                <!-- Modal body -->
+                <div class="p-4 md:p-5 space-y-4">
+                    <table class="min-w-full leading-normal" id="endUserTable">
+                        <thead>
+                            <tr>
+                                <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Employee</th>
+                                <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Sort Name</th>
+                                <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    City</th>
+                                <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Country</th>
+                                <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Active</th>
+                                <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Employee Date</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($employees as $item)
+                                <tr class="cursor-pointer" data-supplier-code="{{ $item->emp_addr }}">
+                                    <td
+                                        class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">
+                                        {{ $item->emp_addr }}</td>
+                                    <td
+                                        class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">
+                                        {{ $item->emp_sort }}
+                                    </td>
+                                    <td
+                                        class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">
+                                        {{ $item->emp_city }}
+                                    </td>
+                                    <td
+                                        class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">
+                                        {{ $item->emp_country }}
+                                    </td>
+                                    <td
+                                        class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">
+                                        {{ $item->emp_active ? 'Active' : 'Non Active' }}
+                                    </td>
+                                    <td
+                                        class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600 uppercase tracking-wider">
+                                        {{ $item->emp_emp_date }}
+                                    </td>
+                                </tr>
+                            @endforeach
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div id="modal-purracct" tabindex="-1"
         class="fixed inset-0 z-50 flex items-start justify-center p-4 overflow-y-auto  bg-opacity-50 modal hidden"
@@ -1525,10 +1806,10 @@
                 <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                     <label class="text-xl font-medium text-gray-900">Purchase Account</label>
                     <button type="button"
-                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white modal-close"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-md w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white modal-close"
                         data-modal-hide="large-modal" id="modal-close-a">
-                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                            viewBox="0 0 14 14">
+                        <svg class="w-5 h-5 pointer-events-none" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                 stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"></path>
                         </svg>
@@ -1536,7 +1817,7 @@
                     </button>
                 </div>
                 <!-- Modal body -->
-                <div class="p-4 md:p-5 space-y-4 text-sm overflow-y-auto max-h-[calc(100vh-8rem)]">
+                <div class="p-4 md:p-5 space-y-4 text-md overflow-y-auto max-h-[calc(100vh-8rem)]">
                     <table id="dataModalTable-account" class="min-w-full display dataModalTable">
                         <thead class="dynamicTableHead">
                             <tr>
@@ -1573,10 +1854,10 @@
                 <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                     <label class="text-xl font-medium text-gray-900">Supplier</label>
                     <button type="button"
-                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white modal-close"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-md w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white modal-close"
                         data-modal-hide="large-modal" id="modal-close-supplier">
-                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                            viewBox="0 0 14 14">
+                        <svg class="w-5 h-5 pointer-events-none" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                 stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"></path>
                         </svg>
@@ -1584,7 +1865,7 @@
                     </button>
                 </div>
                 <!-- Modal body -->
-                <div class="p-4 md:p-5 space-y-4 text-sm overflow-y-auto max-h-[calc(100vh-8rem)]">
+                <div class="p-4 md:p-5 space-y-4 text-md overflow-y-auto max-h-[calc(100vh-8rem)]">
                     <table id="dataModalTable-supplier" class="min-w-full leading-normal display dataModalTable">
                         <thead class="dynamicTableHead">
                             <tr>
@@ -1624,10 +1905,10 @@
                 <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                     <label class="text-xl font-medium text-gray-900">Items</label>
                     <button type="button"
-                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white modal-close"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-md w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white modal-close"
                         data-modal-hide="large-modal" id="modal-close-item">
-                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                            viewBox="0 0 14 14">
+                        <svg class="w-5 h-5 pointer-events-none" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                 stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"></path>
                         </svg>
@@ -1635,7 +1916,7 @@
                     </button>
                 </div>
                 <!-- Modal body -->
-                <div class="p-4 md:p-5 space-y-4 text-sm overflow-y-auto max-h-[calc(100vh-8rem)]">
+                <div class="p-4 md:p-5 space-y-4 text-md overflow-y-auto max-h-[calc(100vh-8rem)]">
                     <table id="dataModalTable-item" class="min-w-full leading-normal display dataModalTable">
                         <thead class="dynamicTableHead">
                             <tr>

@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'Intra SMII'),
 
     /*
     |--------------------------------------------------------------------------
@@ -169,6 +169,10 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         Ladumor\LaravelPwa\PWAServiceProvider::class,
+        Artesaos\SEOTools\Providers\SEOToolsServiceProvider::class,
+        RealRashid\SweetAlert\SweetAlertServiceProvider::class,
+
+
 
     ])->toArray(),
 
@@ -186,6 +190,10 @@ return [
     'aliases' => Facade::defaultAliases()->merge([
         // 'Example' => App\Facades\Example::class,
         'LaravelPwa' => \Ladumor\LaravelPwa\LaravelPwa::class,
+        'SEOMeta' => Artesaos\SEOTools\Facades\SEOMeta::class,
+        'Alert' => RealRashid\SweetAlert\Facades\Alert::class,
+
+
 
     ])->toArray(),
 

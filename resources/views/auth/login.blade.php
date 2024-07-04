@@ -41,7 +41,7 @@
                             </div>
                             <div class="checkbox p-0">
 
-                                <a class="link text-blue-500" href="{{route('password.request')}}">Forgot password?</a>
+                                <a class="link" href="{{route('password.request')}}">Forgot password?</a>
                             </div>
                             <div class="text-end mt-6">
                                 <button class="btn btn-primary btn-block rounded-md text-white w-full"

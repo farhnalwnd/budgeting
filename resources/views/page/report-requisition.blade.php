@@ -10,13 +10,65 @@
         @media print {
             @page {
                 margin: 0;
+                size: auto;
+                /* Gunakan ukuran kertas default */
             }
 
             body {
                 margin: 0;
+                padding: 0;
+                font-family: Arial, sans-serif;
+                /* Ganti dengan font yang Anda inginkan */
+                background-color: #ffffff;
+                /* Warna latar belakang untuk cetak */
+                color: #000000;
+                /* Warna teks untuk cetak */
+            }
+
+            .printable {
+                width: 100%;
+                margin: 0;
+                padding: 0;
+                page-break-inside: avoid;
+                /* Hindari pemotongan elemen di tengah halaman */
+            }
+
+            /* Penyesuaian untuk menghapus margin antar bagian */
+            .section {
+                margin-top: 0;
+                margin-bottom: 0;
+                padding-top: 0;
+                padding-bottom: 0;
+            }
+
+            /* Styling tambahan untuk header dan footer jika diperlukan */
+            .header {
+                /* Gaya header cetak */
+            }
+
+            .footer {
+                /* Gaya footer cetak */
             }
         }
+
+        /* Gaya untuk tampilan layar normal */
+        .bg-gray-100 {
+            background-color: #f3f4f6;
+        }
+
+        .text-gray-900 {
+            color: #1f2937;
+        }
+
+        .dark:bg-gray-800 {
+            background-color: #1f2937;
+        }
+
+        .dark:text-gray-100 {
+            color: #ffffff;
+        }
     </style>
+
 </head>
 
 <body class="bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100">
@@ -27,33 +79,33 @@
             <div
                 class="grid grid-cols-3 items-center justify-between p-4 border-b border-gray-200 dark:border-gray-600">
                 <div class="col-span-1 flex items-center">
-                    <img src="https://via.placeholder.com/64" alt="QAD Logo" class="w-16 h-16" />
+                    <img src="{{ asset('assets/images/logo/logo.png') }}" alt="QAD Logo" class="w-25 h-16 ml-10" />
                 </div>
                 <div class="col-span-1 text-center">
                     <p class="text-lg font-bold">Requisition Report</p>
                     <p class="text-lg font-bold">SMII</p>
                 </div>
-                <div class="col-span-1 text-sm font-medium text-right">
-                    <p>{{ $item->rqmReqDate }}</p>
+                <div class="col-span-1 text-sm font-medium text-right mr-10">
+                    <p>{{ now()->format('Y-m-d H:i:s') }}</p>
                 </div>
             </div>
 
             <!-- Body -->
             <div class="p-4 space-y-4 text-sm">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
+                <div class="grid grid-cols-3 md:grid-cols-3 gap-4 mb-2">
                     <div>
                         <p class="text-sm font-medium">Req Nbr: {{ $item->rqmNbr }}</p>
                     </div>
                     <div>
-                        @if($item->supplier)
-                            <p class="text-sm font-medium">Supplier: {{ $item->supplier->vd_addr}}</p>
-                            <p class="text-sm font-medium">{{ $item->supplier->ad_name}}</p>
-                            <p class="text-sm font-medium">{{ $item->supplier->ad_line1}}</p>
-                            <p class="text-sm font-medium">{{ $item->supplier->ad_line2}}</p>
-                            <p class="text-sm font-medium">{{ $item->supplier->ad_city}}</p>
+                        @if ($item->supplier)
+                            <p class="text-sm font-medium">Supplier: {{ $item->supplier->vd_addr }}</p>
+                            <p class="text-sm font-medium">{{ $item->supplier->ad_name }}</p>
+                            <p class="text-sm font-medium">{{ $item->supplier->ad_line1 }}</p>
+                            <p class="text-sm font-medium">{{ $item->supplier->ad_line2 }}</p>
+                            <p class="text-sm font-medium">{{ $item->supplier->ad_city }}</p>
                             <p class="text-sm font-medium">INDONESIA</p>
                         @else
-                            <p class="text-sm font-medium">Supplier: -</p>
+                            <p class="text-sm font-medium">Supplier: </p>
                         @endif
                     </div>
                     <div>
@@ -66,7 +118,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="grid grid-cols-3 md:grid-cols-3 gap-4">
                     <div>
                         <p class="text-sm font-medium">Rqstn Date: {{ $item->rqmReqDate }}</p>
                         <p class="text-sm font-medium">Need Date: {{ $item->rqmNeedDate }}</p>
@@ -74,7 +126,6 @@
                     </div>
                     <div>
                         <p class="text-sm font-medium">Entered By: {{ $item->enterby }}</p>
-                        <p class="text-sm font-medium">Requested By: {{ $item->rqmRqbyUserid }}</p>
                         <p class="text-sm font-medium">End User: {{ $item->rqmEndUserid }}</p>
                     </div>
                     <div>
@@ -88,7 +139,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="grid grid-cols-3 md:grid-cols-3 gap-4">
                     <div class="text-sm font-medium">
                         <p>Disc Pct: 0.00%</p>
                     </div>
@@ -100,77 +151,67 @@
                 <table class="w-full text-sm font-medium">
                     <thead>
                         <tr>
-                            <th class="border-b border-gray-200 dark:border-gray-600 px-2 py-1">Line</th>
-                            <th class="border-b border-gray-200 dark:border-gray-600 px-2 py-1">Site</th>
-                            <th class="border-b border-gray-200 dark:border-gray-600 px-2 py-1">Item Number
-                            </th>
-                            <th class="border-b border-gray-200 dark:border-gray-600 px-2 py-1">Supplier
-                            </th>
-                            <th class="border-b border-gray-200 dark:border-gray-600 px-2 py-1">Req Qty UM
-                            </th>
-                            <th class="border-b border-gray-200 dark:border-gray-600 px-2 py-1">Unit Cost
-                            </th>
-                            <th class="border-b border-gray-200 dark:border-gray-600 px-2 py-1">Disc%</th>
+                            <th class="border-b border-gray-200 dark:border-gray-600 px-2 py-1 text-center">Line</th>
+                            <th class="border-b border-gray-200 dark:border-gray-600 px-2 py-1 text-center">Site</th>
+                            <th class="border-b border-gray-200 dark:border-gray-600 px-2 py-1 text-center">Item Number</th>
+                            <th class="border-b border-gray-200 dark:border-gray-600 px-2 py-1 text-center">Supplier</th>
+                            <th class="border-b border-gray-200 dark:border-gray-600 px-2 py-1 text-center">Req Qty UM</th>
+                            <th class="border-b border-gray-200 dark:border-gray-600 px-2 py-1 text-center">Unit Cost</th>
+                            <th class="border-b border-gray-200 dark:border-gray-600 px-2 py-1 text-center">Disc%</th>
                         </tr>
                     </thead>
-                    @php
-                                        $extCostTotal = 0;
-                                        $maxExtCostTotal = 0;
-                                    @endphp
-                                    @foreach ($item->rqdDets as $detail)
-                                        @php
-                                            $extCost = $detail->rqdReqQty * $detail->rqdPurCost;
-                                            $maxExtCost = $detail->rqdReqQty * $detail->rqdPurCost;
-                                            $extCostTotal += $extCost;
-                                            $maxExtCostTotal += $maxExtCost;
-                                        @endphp
-                        <tr>
-                            <td class="border-b border-gray-200 dark:border-gray-600 px-2 py-1">
-                                {{ $loop->iteration }}</td>
-                            <td class="border-b border-gray-200 dark:border-gray-600 px-2 py-1">
-                                {{ $item->rqmSite }}</td>
-                            <td class="border-b border-gray-200 dark:border-gray-600 px-2 py-1">
-                                {{ $detail->rqdPart }}</td>
-                            <td class="border-b border-gray-200 dark:border-gray-600 px-2 py-1">
-                                {{ $detail->rqdVend }}</td>
-                            <td class="border-b border-gray-200 dark:border-gray-600 px-2 py-1">
-                                {{ $detail->rqdReqQty }} {{ $detail->rqdUm }} </td>
-                            <td class="border-b border-gray-200 dark:border-gray-600 px-2 py-1">
-                                {{ number_format($detail->rqdPurCost, 2, ',', '.') }}</td>
-                            <td class="border-b border-gray-200 dark:border-gray-600 px-2 py-1">0.00%
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="7">
-                                @if (strlen($detail->rqdCmt) > 50)
-                                    <p class="text-xs">{{ substr($detail->rqdCmt, 0, 50) }}</p>
-                                    <p class="text-xs">{{ substr($detail->rqdCmt, 50) }}</p>
-                                @else
-                                    <p class="text-xs">{{ $detail->rqdCmt }}</p>
-                                @endif
-                            </td>
-                        </tr>
+                    <tbody>
+                        @php
+                            $extCostTotal = 0;
+                            $maxExtCostTotal = 0;
+                        @endphp
+                        @foreach ($item->rqdDets as $detail)
+                            @php
+                                $extCost = $detail->rqdReqQty * $detail->rqdPurCost;
+                                $maxExtCost = $detail->rqdReqQty * $detail->rqdPurCost;
+                                $extCostTotal += $extCost;
+                                $maxExtCostTotal += $maxExtCost;
+                            @endphp
+                            <tr>
+                                <td class="border-b border-gray-200 dark:border-gray-600 px-2 py-1 text-center">{{ $detail->rqdLine }}</td>
+                                <td class="border-b border-gray-200 dark:border-gray-600 px-2 py-1 text-center">{{ $item->rqmSite }}</td>
+                                <td class="border-b border-gray-200 dark:border-gray-600 px-2 py-1 text-center">{{ $detail->rqdPart }}</td>
+                                <td class="border-b border-gray-200 dark:border-gray-600 px-2 py-1 text-center">{{ $detail->supplier ? $detail->supplier->ad_name : '' }}</td>
+                                <td class="border-b border-gray-200 dark:border-gray-600 px-2 py-1 text-center">{{ $detail->rqdReqQty ? $detail->rqdReqQty : '' }} {{ $detail->rqdUm ? $detail->rqdUm : '' }}</td>
+                                <td class="border-b border-gray-200 dark:border-gray-600 px-2 py-1 text-center">{{ number_format($detail->rqdPurCost, 2, ',', '.') }}</td>
+                                <td class="border-b border-gray-200 dark:border-gray-600 px-2 py-1 text-center">0.00%</td>
+                            </tr>
+                            <tr>
+                                <td colspan="7" class="border-b border-gray-200 dark:border-gray-600 px-2 py-1">
+                                    @if (strlen($detail->rqdCmt) > 50)
+                                        <p class="text-xs">{{ substr($detail->rqdCmt, 0, 50) }}</p>
+                                        <p class="text-xs">{{ substr($detail->rqdCmt, 50) }}</p>
+                                    @else
+                                        <p class="text-xs">{{ $detail->rqdCmt }}</p>
+                                    @endif
+                                </td>
+                            </tr>
                         @endforeach
                     </tbody>
                 </table>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                
+                <div class="grid grid-cols-3 md:grid-cols-2 gap-4">
                     <div class="text-sm font-medium">
                         <p>Requisition Totals</p>
-                        <p>Ext Cost Total: {{ number_format($extCostTotal, 2, ',', '.') }} IDR</p>
-                        <p>Max Ext Cost Total: {{ number_format($maxExtCostTotal, 2, ',', '.') }} IDR</p>
+                        <p>Ext Cost Total: {{ number_format($extCostTotal, 2, ',', '.') }} {{ $item->rqmCurr }}</p>
+                        <p>Max Ext Cost Total: {{ number_format($maxExtCostTotal, 2, ',', '.') }} {{ $item->rqmCurr }}</p>
                     </div>
                     <div class="text-sm font-medium">
-                        <p>{{ number_format($maxExtCostTotal, 2, ',', '.') }} IDR</p>
-                        <p>{{ number_format($maxExtCostTotal, 2, ',', '.') }} IDR</p>
+                        <p>{{ number_format($maxExtCostTotal, 2, ',', '.') }} {{ $item->rqmCurr }}</p>
+                        <p>{{ number_format($maxExtCostTotal, 2, ',', '.') }} {{ $item->rqmCurr }}</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            setTimeout(function () {
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
                 window.print();
             }, 1000); // Menunggu 1 detik setelah DOMContentLoaded
         });
@@ -178,4 +219,3 @@
 </body>
 
 </html>
-

@@ -86,7 +86,7 @@ class RoleController extends Controller
                                 ->pluck('role_has_permissions.permission_id','role_has_permissions.permission_id')
                                 ->all();
 
-        return view('roleuser.role.add-permissions', [
+        return view('roleuser.role.add', [
             'role' => $role,
             'permissions' => $permissions,
             'rolePermissions' => $rolePermissions

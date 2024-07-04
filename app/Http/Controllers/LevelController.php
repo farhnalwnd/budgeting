@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Level;
 use Illuminate\Http\Request;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class LevelController extends Controller
 {
@@ -13,47 +14,41 @@ class LevelController extends Controller
     public function index()
     {
         $levels = Level::all();
-        return \view('roleuser.level.user.index',\compact('levels'));
+        return \view('roleuser.level.index',\compact('levels'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'level_name' => 'required',
+        ]);
+
+
+        $level = new Level();
+        $level->level_name = $request->level_name;
+        $level->save();
+        Alert::toast('Level created successfully!', 'success');
+        return redirect()->route('level.index');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Level $level)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Level $level)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, Level $level)
     {
-        //
+        $request->validate([
+            'level_name' => 'required',
+        ]);
+
+        $level->update($request->all());
+        Alert::toast('Level updated successfully!', 'success');
+        return redirect()->route('level.index');
     }
 
     /**
@@ -61,6 +56,8 @@ class LevelController extends Controller
      */
     public function destroy(Level $level)
     {
-        //
+        $level->delete();
+        Alert::toast('Level deleted successfully!', 'success');
+        return redirect()->route('level.index');
     }
 }

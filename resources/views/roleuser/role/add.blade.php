@@ -35,7 +35,7 @@
                                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         @foreach($permissions as $permission)
                                             <div class="permission-item p-2 text-black">
-                                                <input type="checkbox" id="permissionCheckbox{{ $permission->id }}" class="rounded" name="permission[]" value="{{ $permission->name }}">
+                                                <input type="checkbox" id="permissionCheckbox{{ $permission->id }}" class="rounded" name="permission[]" value="{{ $permission->name }}" {{ in_array($permission->name, $role->permissions->pluck('name')->toArray()) ? 'checked' : '' }}>
                                                 <label for="permissionCheckbox{{ $permission->id }}" class="text-sm font-medium ml-2">{{ $permission->name }}</label>
                                             </div>
                                         @endforeach

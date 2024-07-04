@@ -28,15 +28,44 @@
         .link {
             width: 300px;
             height: 300px;
-        transition: transform 0.5s ease;
-        transform: scale(1);
-        &:hover {
-            transform: scale(1.05);
+            transition: transform 0.5s ease;
+            transform: scale(1);
+
+            &:hover {
+                transform: scale(1.05);
+            }
         }
-        }
+
         .website {
             width: 600px;
             height: 600px;
+        }
+
+        .single-services {
+            width: 600px;
+            height: 400px;
+        }
+
+        .icon-hover svg {
+            fill: currentColor;
+            /* Warna default */
+            transition: fill 0.3s ease;
+            /* Transisi halus */
+        }
+
+        .icon-hover:hover svg {
+            color: #c0a01f;
+            /* Warna gold saat di-hover */
+        }
+
+        .services-titles a {
+            color: black; /* Warna default dari elemen teks */
+            text-decoration: none; /* Menghapus garis bawah default pada link */
+            transition: color 0.3s ease; /* Transisi halus untuk warna */
+        }
+
+        .services-titles a:hover {
+            color: #c0a01f; /* Warna emas saat di-hover */
         }
     </style>
 
@@ -88,44 +117,48 @@
                                     <li class="nav-item">
                                         <a class="page-scroll" href="#features">Website</a>
                                     </li>
+                                    @if (Route::has('login'))
+                                        <div class="navbar-btn d-none d-sm-inline-block">
+                                            @auth
+                                                <a class="main-btn" data-scroll-nav="0" href="{{ url('/dashboard') }}"
+                                                    rel="nofollow">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="inline me-1"
+                                                        width="1.2rem" height="1.2rem" fill="currentColor"
+                                                        viewBox="0 0 576 512">
+                                                        <circle cx="176" cy="416" r="16"
+                                                            style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px">
+                                                        </circle>
+                                                        <circle cx="400" cy="416" r="16"
+                                                            style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px">
+                                                        </circle>
+                                                        <path
+                                                            d="M280.4 148.3L96 300.1V464a16 16 0 0 0 16 16l112.1-.3a16 16 0 0 0 15.9-16V368a16 16 0 0 1 16-16h64a16 16 0 0 1 16 16v95.6a16 16 0 0 0 16 16.1L464 480a16 16 0 0 0 16-16V300L295.7 148.3a12.2 12.2 0 0 0 -15.3 0zM571.6 251.5L488 182.6V44.1a12 12 0 0 0 -12-12h-56a12 12 0 0 0 -12 12v72.6L318.5 43a48 48 0 0 0 -61 0L4.3 251.5a12 12 0 0 0 -1.6 16.9l25.5 31A12 12 0 0 0 45.2 301l235.2-193.7a12.2 12.2 0 0 1 15.3 0L530.9 301a12 12 0 0 0 16.9-1.6l25.5-31a12 12 0 0 0 -1.7-16.9z" />
+
+                                                    </svg>
+                                                    Dashboard
+                                                </a>
+                                            @else
+                                                <a class="main-btn" data-scroll-nav="0" href="{{ route('login') }}"
+                                                    rel="nofollow">
+                                                    <svg xmlns="http://www.w3.org/2000/svg"class="inline me-1"
+                                                        width="1.2rem" height="1.2rem" fill="currentColor"
+                                                        viewBox="0 0 448 512">
+                                                        <circle cx="176" cy="416" r="16"
+                                                            style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px">
+                                                        </circle>
+                                                        <circle cx="400" cy="416" r="16"
+                                                            style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px">
+                                                        </circle>
+                                                        <path
+                                                            d="M304 128a80 80 0 1 0 -160 0 80 80 0 1 0 160 0zM96 128a128 128 0 1 1 256 0A128 128 0 1 1 96 128zM49.3 464H398.7c-8.9-63.3-63.3-112-129-112H178.3c-65.7 0-120.1 48.7-129 112zM0 482.3C0 383.8 79.8 304 178.3 304h91.4C368.2 304 448 383.8 448 482.3c0 16.4-13.3 29.7-29.7 29.7H29.7C13.3 512 0 498.7 0 482.3z" />
+                                                    </svg> Login
+                                                </a>
+                                            </div>
+                                        @endif
+                                    @endauth
                                 </ul>
                             </div>
-                            @if (Route::has('login'))
-                                <div class="navbar-btn d-none d-sm-inline-block">
-                                    @auth
-                                        <a class="main-btn" data-scroll-nav="0" href="{{ url('/dashboard') }}"
-                                            rel="nofollow">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="inline me-1" width="1.2rem"
-                                                height="1.2rem" fill="currentColor" viewBox="0 0 576 512">
-                                                <circle cx="176" cy="416" r="16"
-                                                    style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px">
-                                                </circle>
-                                                <circle cx="400" cy="416" r="16"
-                                                    style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px">
-                                                </circle>
-                                                <path
-                                                    d="M280.4 148.3L96 300.1V464a16 16 0 0 0 16 16l112.1-.3a16 16 0 0 0 15.9-16V368a16 16 0 0 1 16-16h64a16 16 0 0 1 16 16v95.6a16 16 0 0 0 16 16.1L464 480a16 16 0 0 0 16-16V300L295.7 148.3a12.2 12.2 0 0 0 -15.3 0zM571.6 251.5L488 182.6V44.1a12 12 0 0 0 -12-12h-56a12 12 0 0 0 -12 12v72.6L318.5 43a48 48 0 0 0 -61 0L4.3 251.5a12 12 0 0 0 -1.6 16.9l25.5 31A12 12 0 0 0 45.2 301l235.2-193.7a12.2 12.2 0 0 1 15.3 0L530.9 301a12 12 0 0 0 16.9-1.6l25.5-31a12 12 0 0 0 -1.7-16.9z" />
 
-                                            </svg>
-                                            Dashboard
-                                        </a>
-                                    @else
-                                        <a class="main-btn" data-scroll-nav="0" href="{{ route('login') }}" rel="nofollow">
-                                            <svg xmlns="http://www.w3.org/2000/svg"class="inline me-1" width="1.2rem"
-                                                height="1.2rem" fill="currentColor" viewBox="0 0 448 512">
-                                                <circle cx="176" cy="416" r="16"
-                                                    style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px">
-                                                </circle>
-                                                <circle cx="400" cy="416" r="16"
-                                                    style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px">
-                                                </circle>
-                                                <path
-                                                    d="M304 128a80 80 0 1 0 -160 0 80 80 0 1 0 160 0zM96 128a128 128 0 1 1 256 0A128 128 0 1 1 96 128zM49.3 464H398.7c-8.9-63.3-63.3-112-129-112H178.3c-65.7 0-120.1 48.7-129 112zM0 482.3C0 383.8 79.8 304 178.3 304h91.4C368.2 304 448 383.8 448 482.3c0 16.4-13.3 29.7-29.7 29.7H29.7C13.3 512 0 498.7 0 482.3z" />
-                                            </svg> Login
-                                        </a>
-                                    </div>
-                                @endif
-                            @endauth
                         </nav>
                     </div>
                 </div>
@@ -141,7 +174,8 @@
                             <h3 class="header-sub-title wow fadeInUp" data-wow-duration="1.3s" data-wow-delay="0.2s">
                                 Welcome to <br>
                             </h3>
-                            <h2 class="header-title wow fadeInUp" data-wow-duration="1.3s" data-wow-delay="0.5s">
+                            <h2 class="header-title wow fadeInUp" data-wow-duration="1.3s" data-wow-delay="0.5s"
+                                style="color: #c0a01f">
                                 Intra SMII </h2>
                             <p class="text wow fadeInUp" data-wow-duration="1.3s" data-wow-delay="0.8s">
                                 Website Internal PT . Sinar Meadow International Indonesia
@@ -219,10 +253,10 @@
                                 alt="link" />
                         </div>
                         <div class="services-content">
-                            <h4 class="services-title">
+                            <h4 class="services-titles">
                                 <a href="https://sinarmeadow.com" target="_blank">Sinar Meadow Official</a>
                             </h4>
-                            <p class="text text-xs">
+                            {{-- <p class="text text-xs">
                                 Official Website PT . Sinar Meadow International Indonesia
                             </p>
                             <a class="more" href="https://sinarmeadow.com" target="_blank">Visit<svg
@@ -231,7 +265,7 @@
                                     <path fill-rule="evenodd"
                                         d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8" />
                                 </svg>
-                            </a>
+                            </a> --}}
                         </div>
                     </div>
                     <div class="single-services text-center mt-30 wow fadeIn" data-wow-duration="1s"
@@ -241,10 +275,10 @@
                                 alt="link" />
                         </div>
                         <div class="services-content">
-                            <h4 class="services-title">
+                            <h4 class="services-titles">
                                 <a href="http://hris.sinarmeadow.com:8081/" target="_blank">Andal Linkage</a>
                             </h4>
-                            <p class="text text-xs">
+                            {{-- <p class="text text-xs">
                                 Website HCD, aplikasi berbasis web yang berfokus pada karyawan.
                             </p>
                             <a class="more" href="http://hris.sinarmeadow.com:8081/">Visit <svg
@@ -253,7 +287,7 @@
                                     <path fill-rule="evenodd"
                                         d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8" />
                                 </svg>
-                            </a>
+                            </a> --}}
                         </div>
                     </div>
                     <div class="single-services text-center mt-30 wow fadeIn" data-wow-duration="1s"
@@ -264,10 +298,10 @@
 
                         </div>
                         <div class="services-content">
-                            <h4 class="services-title">
+                            <h4 class="services-titles">
                                 <a href="https://frontend.sinarmeadow.com/smii/login.php" target="_blank">FrontEnd</a>
                             </h4>
-                            <p class="text text-xs">
+                            {{-- <p class="text text-xs">
                                 Website yang berfokus pada Sales, mulai dari penjualan, distibutor hingga tracking
                                 kunjungan sales.
                             </p>
@@ -278,7 +312,7 @@
                                     <path fill-rule="evenodd"
                                         d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8" />
                                 </svg>
-                            </a>
+                            </a> --}}
                         </div>
                     </div>
                     <div class="single-services text-center mt-30 wow fadeIn" data-wow-duration="1s"
@@ -289,10 +323,10 @@
 
                         </div>
                         <div class="services-content">
-                            <h4 class="services-title">
+                            <h4 class="services-titles">
                                 <a href="https://wotix.sinarmeadow.com/login.php" target="_blank">Wotix</a>
                             </h4>
-                            <p class="text text-xs">
+                            {{-- <p class="text text-xs">
                                 Website permintaan maintenance dan barang khusus pada IT.
                             </p>
                             <a class="more" href="https://wotix.sinarmeadow.com/login.php" target="_blank">Visit
@@ -301,7 +335,7 @@
                                     <path fill-rule="evenodd"
                                         d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8" />
                                 </svg>
-                            </a>
+                            </a> --}}
                         </div>
                     </div>
                     <div class="single-services text-center mt-30 wow fadeIn" data-wow-duration="1s"
@@ -312,10 +346,10 @@
 
                         </div>
                         <div class="services-content">
-                            <h4 class="services-title">
+                            <h4 class="services-titles">
                                 <a href="https://emgmt.sinarmeadow.com/loginPage?next=/" target="_blank">EMGMT</a>
                             </h4>
-                            <p class="text">
+                            {{-- <p class="text">
                                 Website Helpdesk System.
                             </p>
                             <a class="more" href="https://emgmt.sinarmeadow.com/loginPage?next=/"
@@ -325,7 +359,7 @@
                                     <path fill-rule="evenodd"
                                         d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8" />
                                 </svg>
-                            </a>
+                            </a> --}}
                         </div>
                     </div>
                 </div>
@@ -361,57 +395,61 @@
                             </p>
                             <ul class="social">
                                 <li>
-                                    <a href="https://www.facebook.com/sinarmeadow/" target="_blank">
+                                    <a href="https://www.facebook.com/sinarmeadow/" target="_blank"
+                                        class="icon-hover">
                                         <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="30"
                                             height="30" viewBox="0 0 50 50">
                                             <path
-                                                d="M25,3C12.85,3,3,12.85,3,25c0,11.03,8.125,20.137,18.712,21.728V30.831h-5.443v-5.783h5.443v-3.848 c0-6.371,3.104-9.168,8.399-9.168c2.536,0,3.877,0.188,4.512,0.274v5.048h-3.612c-2.248,0-3.033,2.131-3.033,4.533v3.161h6.588 l-0.894,5.783h-5.694v15.944C38.716,45.318,47,36.137,47,25C47,12.85,37.15,3,25,3z">
-                                            </path>
+                                                d="M25,3C12.85,3,3,12.85,3,25c0,11.03,8.125,20.137,18.712,21.728V30.831h-5.443v-5.783h5.443v-3.848 c0-6.371,3.104-9.168,8.399-9.168c2.536,0,3.877,0.188,4.512,0.274v5.048h-3.612c-2.248,0-3.033,2.131-3.033,4.533v3.161h6.588 l-0.894,5.783h-5.694v15.944C38.716,45.318,47,36.137,47,25C47,12.85,37.15,3,25,3z"
+                                                fill="currentColor"></path>
                                         </svg>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="https://www.instagram.com/goldbullion.id/" target="_blank">
+                                    <a href="https://www.instagram.com/goldbullion.id/" target="_blank"
+                                        class="icon-hover">
                                         <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="30"
                                             height="30" viewBox="0 0 50 50">
                                             <path
-                                                d="M 16 3 C 8.83 3 3 8.83 3 16 L 3 34 C 3 41.17 8.83 47 16 47 L 34 47 C 41.17 47 47 41.17 47 34 L 47 16 C 47 8.83 41.17 3 34 3 L 16 3 z M 37 11 C 38.1 11 39 11.9 39 13 C 39 14.1 38.1 15 37 15 C 35.9 15 35 14.1 35 13 C 35 11.9 35.9 11 37 11 z M 25 14 C 31.07 14 36 18.93 36 25 C 36 31.07 31.07 36 25 36 C 18.93 36 14 31.07 14 25 C 14 18.93 18.93 14 25 14 z M 25 16 C 20.04 16 16 20.04 16 25 C 16 29.96 20.04 34 25 34 C 29.96 34 34 29.96 34 25 C 34 20.04 29.96 16 25 16 z">
-                                            </path>
+                                                d="M 16 3 C 8.83 3 3 8.83 3 16 L 3 34 C 3 41.17 8.83 47 16 47 L 34 47 C 41.17 47 47 41.17 47 34 L 47 16 C 47 8.83 41.17 3 34 3 L 16 3 z M 37 11 C 38.1 11 39 11.9 39 13 C 39 14.1 38.1 15 37 15 C 35.9 15 35 14.1 35 13 C 35 11.9 35.9 11 37 11 z M 25 14 C 31.07 14 36 18.93 36 25 C 36 31.07 31.07 36 25 36 C 18.93 36 14 31.07 14 25 C 14 18.93 18.93 14 25 14 z M 25 16 C 20.04 16 16 20.04 16 25 C 16 29.96 20.04 34 25 34 C 29.96 34 34 29.96 34 25 C 34 20.04 29.96 16 25 16 z"
+                                                fill="currentColor"></path>
                                         </svg>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="https://x.com/sinarmeadow" target="_blank">
+                                    <a href="https://x.com/sinarmeadow" target="_blank" class="icon-hover">
                                         <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="30"
                                             height="30" viewBox="0 0 50 50">
                                             <path
-                                                d="M 11 4 C 7.134 4 4 7.134 4 11 L 4 39 C 4 42.866 7.134 46 11 46 L 39 46 C 42.866 46 46 42.866 46 39 L 46 11 C 46 7.134 42.866 4 39 4 L 11 4 z M 13.085938 13 L 21.023438 13 L 26.660156 21.009766 L 33.5 13 L 36 13 L 27.789062 22.613281 L 37.914062 37 L 29.978516 37 L 23.4375 27.707031 L 15.5 37 L 13 37 L 22.308594 26.103516 L 13.085938 13 z M 16.914062 15 L 31.021484 35 L 34.085938 35 L 19.978516 15 L 16.914062 15 z">
-                                            </path>
+                                                d="M 11 4 C 7.134 4 4 7.134 4 11 L 4 39 C 4 42.866 7.134 46 11 46 L 39 46 C 42.866 46 46 42.866 46 39 L 46 11 C 46 7.134 42.866 4 39 4 L 11 4 z M 13.085938 13 L 21.023438 13 L 26.660156 21.009766 L 33.5 13 L 36 13 L 27.789062 22.613281 L 37.914062 37 L 29.978516 37 L 23.4375 27.707031 L 15.5 37 L 13 37 L 22.308594 26.103516 L 13.085938 13 z M 16.914062 15 L 31.021484 35 L 34.085938 35 L 19.978516 15 L 16.914062 15 z"
+                                                fill="currentColor"></path>
                                         </svg>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="https://id.linkedin.com/company/pt-smii" target="_blank">
+                                    <a href="https://id.linkedin.com/company/pt-smii" target="_blank"
+                                        class="icon-hover">
                                         <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="30"
                                             height="30" viewBox="0 0 50 50">
                                             <path
-                                                d="M41,4H9C6.24,4,4,6.24,4,9v32c0,2.76,2.24,5,5,5h32c2.76,0,5-2.24,5-5V9C46,6.24,43.76,4,41,4z M17,20v19h-6V20H17z M11,14.47c0-1.4,1.2-2.47,3-2.47s2.93,1.07,3,2.47c0,1.4-1.12,2.53-3,2.53C12.2,17,11,15.87,11,14.47z M39,39h-6c0,0,0-9.26,0-10 c0-2-1-4-3.5-4.04h-0.08C27,24.96,26,27.02,26,29c0,0.91,0,10,0,10h-6V20h6v2.56c0,0,1.93-2.56,5.81-2.56 c3.97,0,7.19,2.73,7.19,8.26V39z">
-                                            </path>
+                                                d="M41,4H9C6.24,4,4,6.24,4,9v32c0,2.76,2.24,5,5,5h32c2.76,0,5-2.24,5-5V9C46,6.24,43.76,4,41,4z M17,20v19h-6V20H17z M11,14.47c0-1.4,1.2-2.47,3-2.47s2.93,1.07,3,2.47c0,1.4-1.12,2.53-3,2.53C12.2,17,11,15.87,11,14.47z M39,39h-6c0,0,0-9.26,0-10 c0-2-1-4-3.5-4.04h-0.08C27,24.96,26,27.02,26,29c0,0.91,0,10,0,10h-6V20h6v2.56c0,0,1.93-2.56,5.81-2.56 c3.97,0,7.19,2.73,7.19,8.26V39z"
+                                                fill="currentColor"></path>
                                         </svg>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="https://www.youtube.com/channel/UC730Ejz5xjFuZXe9c7zcgBg"
-                                        target="_blank">
+                                    <a href="https://www.youtube.com/channel/UC730Ejz5xjFuZXe9c7zcgBg" target="_blank"
+                                        class="icon-hover">
                                         <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="30"
                                             height="30" viewBox="0 0 50 50">
                                             <path
-                                                d="M 44.898438 14.5 C 44.5 12.300781 42.601563 10.699219 40.398438 10.199219 C 37.101563 9.5 31 9 24.398438 9 C 17.800781 9 11.601563 9.5 8.300781 10.199219 C 6.101563 10.699219 4.199219 12.199219 3.800781 14.5 C 3.398438 17 3 20.5 3 25 C 3 29.5 3.398438 33 3.898438 35.5 C 4.300781 37.699219 6.199219 39.300781 8.398438 39.800781 C 11.898438 40.5 17.898438 41 24.5 41 C 31.101563 41 37.101563 40.5 40.601563 39.800781 C 42.800781 39.300781 44.699219 37.800781 45.101563 35.5 C 45.5 33 46 29.398438 46.101563 25 C 45.898438 20.5 45.398438 17 44.898438 14.5 Z M 19 32 L 19 18 L 31.199219 25 Z">
-                                            </path>
+                                                d="M 44.898438 14.5 C 44.5 12.300781 42.601563 10.699219 40.398438 10.199219 C 37.101563 9.5 31 9 24.398438 9 C 17.800781 9 11.601563 9.5 8.300781 10.199219 C 6.101563 10.699219 4.199219 12.199219 3.800781 14.5 C 3.398438 17 3 20.5 3 25 C 3 29.5 3.398438 33 3.898438 35.5 C 4.300781 37.699219 6.199219 39.300781 8.398438 39.800781 C 11.898438 40.5 17.898438 41 24.5 41 C 31.101563 41 37.101563 40.5 40.601563 39.800781 C 42.800781 39.300781 44.699219 37.800781 45.101563 35.5 C 45.5 33 46 29.398438 46.101563 25 C 45.898438 20.5 45.398438 17 44.898438 14.5 Z M 19 32 L 19 18 L 31.199219 25 Z"
+                                                fill="currentColor"></path>
                                         </svg>
                                     </a>
                                 </li>
                             </ul>
+
                         </div>
                     </div>
                     <div class="col-lg-5 col-md-7 col-sm-12">
