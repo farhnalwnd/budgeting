@@ -21,7 +21,8 @@
     <section class="content">
         <!-- Add Level Button -->
         <div class="mb-4 flex justify-end">
-            <button type="button" class="px-4 py-3 bg-blue-500 text-white rounded hover:bg-blue-600"
+            <button type="button"
+                class="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80 font-medium rounded-lg text-base px-3 py-3 text-center me-2 mb-2 float-right"
                 data-modal-target="createLevelModal" data-modal-toggle="createLevelModal">
                 Add Level
             </button>
@@ -81,45 +82,78 @@
     @push('scripts')
         <script>
             $(document).ready(function() {
-                $('#levelsTable').DataTable({
+                var table = $('#levelsTable').DataTable({
                     "lengthChange": false,
                     "pagingType": "simple_numbers",
                     "dom": 'Bfrtip',
-                    "buttons": [
-                        'copy', 'csv', 'excel', 'pdf', 'print'
-                    ]
-                });
-            });
+                    "buttons": ['copy', 'csv', 'excel', 'pdf', 'print'],
+                    "drawCallback": function(settings) {
+                        // Function to reposition modal in the viewport
+                        function repositionModal(modalId) {
+                            var modal = $('#' + modalId);
+                            var modalDialog = modal.find('.modal-dialog');
 
-            // SweetAlert2 confirmation dialog for delete action
-            $('.delete-form').on('submit', function(e) {
-                e.preventDefault(); // Prevent the form from submitting
+                            // Calculate top position based on viewport and scroll
+                            var modalTop = Math.max(0, ($(window).height() - modalDialog.outerHeight()) /
+                                2) + $(window).scrollTop();
+                            var modalLeft = Math.max(0, ($(window).width() - modalDialog.outerWidth()) / 2);
 
-                var form = this; // Store a reference to the form
+                            modalDialog.css({
+                                'margin-top': modalTop,
+                                'margin-left': modalLeft
+                            });
+                        }
 
-                Swal.fire({
-                    title: 'Apakah Anda yakin?',
-                    text: "Anda tidak akan dapat mengembalikan ini!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Ya, hapus!',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        form.submit(); // Submit the form if confirmed
+                        // SweetAlert2 confirmation dialog for delete action
+                        $('.delete-form').on('submit', function(e) {
+                            e.preventDefault(); // Prevent the form from submitting
+
+                            var form = this; // Store a reference to the form
+
+                            Swal.fire({
+                                title: 'Apakah Anda yakin?',
+                                text: "Anda tidak akan dapat mengembalikan ini!",
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#d33',
+                                cancelButtonColor: '#3085d6',
+                                confirmButtonText: 'Ya, hapus!',
+                                cancelButtonText: 'Batal'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    form.submit(); // Submit the form if confirmed
+                                }
+                            });
+                        });
+
+                        // Trigger reposition on modal show event
+                        $('[data-modal-toggle]').on('click', function() {
+                            var target = $(this).data('modal-target');
+                            $('#' + target).removeClass('hidden').addClass('flex').attr(
+                                'aria-modal', 'true').attr('role', 'dialog');
+                            repositionModal(target); // Reposition modal when shown
+                        });
+
+                        $('[data-modal-hide]').on('click', function() {
+                            var target = $(this).data('modal-hide');
+                            $('#' + target).addClass('hidden').removeClass('flex').removeAttr(
+                                'aria-modal').removeAttr('role');
+                        });
                     }
                 });
-            });
 
-            @if (session()->has('success'))
-                Swal.fire({
-                    icon: 'success',
-                    title: '{{ session()->get('success') }}',
-                    text: '{{ session()->get('message') }}',
-                });
-            @endif
+
+
+
+
+                @if (session()->has('success'))
+                    Swal.fire({
+                        icon: 'success',
+                        title: '{{ session()->get('success') }}',
+                        text: '{{ session()->get('message') }}',
+                    });
+                @endif
+            });
         </script>
     @endpush
     {{-- Modal Create --}}

@@ -1,0 +1,41 @@
+<?php
+
+namespace App\Http\Controllers\Auth;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
+
+class LockScreenController extends Controller
+{
+    /**
+     * Show unlock account view.
+     */
+    public function show(): View {
+        return view('auth.locked');
+    }
+
+    /**
+     * Confirm the user's password.
+     *
+     *
+     * @throws ValidationException
+     */
+    public function store(Request $request): RedirectResponse {
+        if (!Auth::guard('web')->validate([
+            'nik' => $request->user()->nik,
+            'password' => $request->password,
+        ])) {
+            throw ValidationException::withMessages([
+                'password' => __('auth.password'),
+            ]);
+        }
+
+        $request->session()->put('auth.latest_activity_at', now()->timestamp);
+
+        return redirect()->intended();
+    }
+}

@@ -1,8 +1,10 @@
 <x-guest-layout>
+    @section('title')
+Forgot Password
+    @endsection
 
 
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+
 
     <form method="POST" action="{{ route('password.email') }}">
         @csrf
@@ -16,8 +18,10 @@
                             <h2 class="mb-10 text-2xl font-semibold text-primary">Forgot Password ?</h2>
                             <p class="mb-0 text-fade">Enter your email to reset your password.</p>
                         </div>
-                        <div class="px-20 pt-0 pb-20">
-                            <form action="index.html" method="post">
+                         <!-- Session Status -->
+                         <div class="px-20 pt-0 pb-20">
+                            <x-auth-session-status class="" :status="session('status')" />
+                            <form action="#" method="post">
                                 <div class="form-group">
                                         <div class="relative w-full mt-4">
                                     <label for="input-label" class="block font-medium mb-2 dark:text-white text-xl">Email Address</label>

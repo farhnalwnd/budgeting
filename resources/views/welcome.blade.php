@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Intra SMII</title>
+    <title>Intra SMII - Test</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="{{ asset('frontend/assets') }}/css/glightbox.min.css" />
     <link rel="stylesheet" href="{{ asset('frontend/assets') }}/css/bootstrap.min.css" />
     <link rel="stylesheet" href="{{ asset('frontend/assets') }}/css/style.css" />
+
 
     <style>
         .link {
@@ -98,7 +99,7 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <nav class="navbar navbar-expand-lg">
-                            <a class="navbar-brand" href="index.html">
+                            <a class="navbar-brand" href="/">
                                 <img src="{{ asset('frontend/assets') }}/images/logo/logohitam.png" alt="Logo"
                                     width="200" />
                             </a>
@@ -118,7 +119,7 @@
                                         <a class="page-scroll" href="#features">Website</a>
                                     </li>
                                     @if (Route::has('login'))
-                                        <div class="navbar-btn d-none d-sm-inline-block">
+                                        <div class="navbar-btn ">
                                             @auth
                                                 <a class="main-btn" data-scroll-nav="0" href="{{ url('/dashboard') }}"
                                                     rel="nofollow">
@@ -175,10 +176,11 @@
                                 Welcome to <br>
                             </h3>
                             <h2 class="header-title wow fadeInUp" data-wow-duration="1.3s" data-wow-delay="0.5s"
-                                style="color: #c0a01f">
-                                Intra SMII </h2>
+                                style="color: #e01b1b">
+                                Test SMII </h2>
+
                             <p class="text wow fadeInUp" data-wow-duration="1.3s" data-wow-delay="0.8s">
-                                Website Internal PT . Sinar Meadow International Indonesia
+                                Website Internal PT . Sinar Meadow International Indonesia <br>
                             </p>
                         </div>
                     </div>
@@ -543,12 +545,8 @@
         <div id="particles-2"></div>
     </footer>
 
-    <a href="#" class="back-to-top"> <svg clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round"
-            stroke-miterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path
-                d="m11.998 21.995c5.517 0 9.997-4.48 9.997-9.997 0-5.518-4.48-9.998-9.997-9.998-5.518 0-9.998 4.48-9.998 9.998 0 5.517 4.48 9.997 9.998 9.997zm4.843-8.211c.108.141.157.3.157.456 0 .389-.306.755-.749.755h-8.501c-.445 0-.75-.367-.75-.755 0-.157.05-.316.159-.457 1.203-1.554 3.252-4.199 4.258-5.498.142-.184.36-.29.592-.29.23 0 .449.107.591.291z"
-                fill-rule="nonzero" />
-        </svg></a>
+    <a href="#" class="back-to-top"> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="up-arrow"><g><path d="M12 22A10 10 0 1 0 2 12a10 10 0 0 0 10 10zM8.31 10.14l3-2.86a.49.49 0 0 1 .15-.1.54.54 0 0 1 .16-.1.94.94 0 0 1 .76 0 1 1 0 0 1 .33.21l3 3a1 1 0 0 1-1.42 1.42L13 10.41V16a1 1 0 0 1-2 0v-5.66l-1.31 1.25a1 1 0 0 1-1.38-1.45z"></path></g></svg>
+    </a>
     <script src="{{ asset('frontend/assets') }}/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('frontend/assets') }}/js/wow.min.js"></script>
     <script src="{{ asset('frontend/assets') }}/js/glightbox.min.js"></script>

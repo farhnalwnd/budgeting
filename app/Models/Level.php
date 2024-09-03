@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 class Level extends Model
 {
     use HasFactory;
-
+    protected $connection = 'mysql';
     protected $guarded = ['id'];
 
     public function users()
@@ -20,7 +20,7 @@ class Level extends Model
     public static function boot()
     {
         parent::boot();
-    
+
         self::creating(function ($level) {
             $level->level_slug = Str::slug($level->level_name);
         });

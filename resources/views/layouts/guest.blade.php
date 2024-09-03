@@ -6,14 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <link rel="icon" href="{{ url('assets/images/sinarmeadow.png') }}">
+
+    <title>{{ 'INTRA SMII' }} - @yield('title')</title>
 
 <!-- Vendors Style-->
 <link rel="stylesheet" href="{{ asset('assets') }}/src/css/vendors_css.css">
 <link rel="stylesheet" type="text/css" href="{{ asset('assets') }}/src/css/font-awesome-6.4.css">
 
 
-<script src="{{ asset('assets') }}/3.4.3"></script>
+{{-- <script src="{{ asset('assets') }}/3.4.3"></script> --}}
 
 <link rel="stylesheet" href="{{ asset('assets') }}/src/css/tailwind.min.css">
 
@@ -26,7 +28,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="hold-transition theme-primary bg-img bg-center" style="background-image: url({{ asset('assets/images/bg.png') }})">
+<body class="hold-transition theme-primary bg-img bg-fixed" style="background-image: url({{ asset('frontend/assets/images/logo/pic.jpg') }}); background-size: 100% 100%; height: 100vh; width: 100vw;">
 
 	<div class="px-4 md:px-0">
 			<div class="grid grid-cols-1 m-0">

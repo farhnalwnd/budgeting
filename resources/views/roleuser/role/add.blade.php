@@ -1,4 +1,7 @@
 <x-app-layout>
+    @section('title')
+Give Permission to Role
+    @endsection
 
     <div class="container mx-auto mt-5">
         <div class="flex justify-center">
@@ -22,28 +25,49 @@
 
                             <div class="mb-4">
                                 @error('permission')
-                                <span class="text-red-500">{{ $message }}</span>
+                                    <span class="text-red-500">{{ $message }}</span>
                                 @enderror
 
-                                <label for="" class="block mb-2 text-gray-700">Permissions</label>
+                                <label for="selectAll" class="block mb-2 text-gray-700">Permissions</label>
                                 <div class="permission-item">
                                     <input type="checkbox" id="selectAll" class="rounded" onclick="toggleAllCheckboxes(this)">
                                     <label for="selectAll" class="text-sm font-medium ml-2 text-black">Select All</label>
                                 </div>
-                                <div class="permission-group">
-                                    <label class="text-lg font-semibold text-black">Permissions</label>
-                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        @foreach($permissions as $permission)
-                                            <div class="permission-item p-2 text-black">
-                                                <input type="checkbox" id="permissionCheckbox{{ $permission->id }}" class="rounded" name="permission[]" value="{{ $permission->name }}" {{ in_array($permission->name, $role->permissions->pluck('name')->toArray()) ? 'checked' : '' }}>
-                                                <label for="permissionCheckbox{{ $permission->id }}" class="text-sm font-medium ml-2">{{ $permission->name }}</label>
+
+                                @php
+                                    $permissionsByLastWord = [];
+
+                                    foreach ($permissions as $permission) {
+                                        $words = explode(' ', $permission->name);
+                                        $lastWord = end($words);
+
+                                        if (!isset($permissionsByLastWord[$lastWord])) {
+                                            $permissionsByLastWord[$lastWord] = [];
+                                        }
+
+                                        $permissionsByLastWord[$lastWord][] = $permission;
+                                    }
+                                @endphp
+
+                                <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    @foreach($permissionsByLastWord as $lastWord => $permissions)
+                                        <div class="bg-gray-100 rounded-md p-4">
+                                            <label class="text-lg font-semibold text-black">Permissions ({{ ucfirst($lastWord) }})</label>
+                                            <div class="grid grid-cols-1 gap-2 mt-2">
+                                                @foreach($permissions as $permission)
+                                                    <div class="permission-item p-2 text-black">
+                                                        <input type="checkbox" id="permissionCheckbox{{ $permission->id }}" class="rounded" name="permission[]" value="{{ $permission->name }}" {{ in_array($permission->name, $role->permissions->pluck('name')->toArray()) ? 'checked' : '' }}>
+                                                        <label for="permissionCheckbox{{ $permission->id }}" class="text-sm font-medium ml-2">{{ $permission->name }}</label>
+                                                    </div>
+                                                @endforeach
                                             </div>
-                                        @endforeach
-                                    </div>
+                                        </div>
+                                    @endforeach
                                 </div>
                             </div>
+
                             <div class="mb-4">
-                                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Update</button>
+                                <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Update</button>
                             </div>
                         </form>
                     </div>
@@ -62,8 +86,6 @@
                 }
             }
         }
-        </script>
-
+    </script>
     @endpush
-
 </x-app-layout>

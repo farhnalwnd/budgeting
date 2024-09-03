@@ -3,6 +3,11 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Models\PCR\Initiator;
+use App\Models\PCR\PCC;
+use App\Models\QAD\RequisitionMaster;
+use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -11,7 +16,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, CanResetPassword;
 
     /**
      * The attributes that are mass assignable.
@@ -44,5 +49,33 @@ class User extends Authenticatable
     public function position()
     {
         return $this->belongsTo(Position::class);
+    }
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
+
+    public function rqmMstr()
+    {
+        return $this->hasMany(RequisitionMaster::class);
+    }
+
+
+
+    /*
+    * PCR RELATIONS
+    */
+
+    protected $connection = 'mysql';
+
+    public function pccs()
+    {
+        return $this->hasMany(PCC::class, 'user_id', 'id')->connection('mysql_pcr');
+    }
+
+    public function initiators()
+    {
+        return $this->hasMany(Initiator::class, 'user_id', 'id')->connection('mysql_pcr');
     }
 }

@@ -17,24 +17,6 @@
         <nav class="navbar navbar-static-top">
             <!-- Sidebar toggle button-->
             <div class="float-left">
-                {{-- <ul class="header-megamenu nav">
-                    <li class="btn-group inline-flex max-[991px]:hidden min-[992px]:inline-flex">
-                        <div class="app-menu">
-                            <div class="search-bx mx-5">
-                                <form>
-                                    <div class="flex input-group">
-                                        <input type="search" class="form-control" placeholder="Search">
-                                        <div class="input-group-append">
-                                            <button class="btn" type="submit" id="button-addon3"><i
-                                                    class="icon-Search"><span class="path1"></span><span
-                                                        class="path2"></span></i></button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </li>
-                </ul> --}}
             </div>
 
             <div class="navbar-custom-menu r-side inline-flex items-center float-right">
@@ -82,7 +64,7 @@
                                     <!-- inner menu: contains the actual data -->
                                     <div class="slimScrollDiv"
                                         style="position: relative; overflow: hidden; width: auto; height: 250px;">
-                                        <ul class="menu sm-scrol" style="overflow: hidden; width: auto; height: 250px;">
+                                        <ul class="menu sm-scrol" style="overflow-y: scroll; width: auto; height: 250px;">
                                             @foreach (auth()->user()->unreadNotifications as $notification)
                                                 <li class="border-b">
                                                     <a href="#"
@@ -119,20 +101,27 @@
                             </svg>
                         </a>
                     </li>
-                    <!-- Control Sidebar Toggle Button -->
+                    {{-- <!-- Control Sidebar Toggle Button -->
                     <li class="inline-flex rounded-md nav-item max-[1199px]:hidden min-[1200px]:inline-flex">
                         <a href="#" data-toggle="control-sidebar" title="Setting"
                             class="waves-effect waves-light nav-link btn-primary-light svg-bt-icon">
                             <i data-feather="sliders"></i>
                         </a>
-                    </li>
+                    </li> --}}
 
                     <!-- User Account-->
                     <li class="btn-group d-xl-inline-flex d-none">
                         <a href="#" id="dropdownDividerButton" data-dropdown-toggle="dropdownDivider-2"
                             class="justify-center btn-primary-light hover:text-white svg-bt-icon hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm !px-px !py-px text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                            type="button"><img src="{{ asset('assets') }}/images/avatar/avatar-6.png"
-                                class="avatar rounded-full !h-11 !w-11 mt-1" alt=""></a>
+                            type="button">
+                                @if (Auth::user()->avatar)
+                                    <img src="{{ Storage::url('public/user_avatars/' . Auth::user()->avatar) }}"
+                                        class="avatar rounded-full !h-11 !w-11 mt-1" alt="">
+                                @else
+                                    <img src="{{ asset('assets') }}/images/avatar/avatar-6.png"
+                                        class="avatar rounded-full !h-11 !w-11 mt-1" alt="">
+                                @endif
+                            </a>
 
                         <!-- Dropdown menu -->
                         <div id="dropdownDivider-2"
@@ -149,8 +138,14 @@
                                     <p
                                         class="items-center m-0 text-base flex px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                                         <i class="fa fa-briefcase me-3 text-xl" aria-hidden="true"> </i>
-                                         Department {{ Auth::user()->position->department->department_name }}</p>
+                                         Department {{ Auth::user()->department->department_name }}</p>
                                 </li>
+                                {{-- <li>
+                                    <a href="{{ route('locked') }}"
+                                        class="items-center m-0 text-base flex px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"><i
+                                            class="fa fa-lock me-3 text-xl" aria-hidden="true"> </i>
+                                        Lock Screen</a>
+                                </li> --}}
                                 <li>
                                     <a href="{{ route('profile.edit') }}"
                                         class="items-center m-0 text-base flex px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"><i

@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 class Position extends Model
 {
     use HasFactory;
+    protected $connection = 'mysql';
 
     protected $guarded = ['id'];
 

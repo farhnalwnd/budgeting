@@ -1,10 +1,10 @@
 <x-app-layout>
     @section('title')
-    List Departments
+        List Departments
     @endsection
     <div class="content-header">
         <div class="flex items-center justify-between">
-            <h4 class="page-title text-2xl font-lg">List Department</h4>
+            <h4 class="page-title text-2xl font-lg"></h4>
             <div class="inline-flex items-center">
                 <nav>
                     <ol class="breadcrumb flex items-center">
@@ -21,12 +21,16 @@
     <section class="content">
         <!-- Add Department Button -->
         <div class="mb-4 flex justify-end">
-            <button type="button" class="px-4 py-3 bg-blue-500 text-white rounded hover:bg-blue-600"
+            <button type="button"                     class="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80 font-medium rounded-lg text-base px-3 py-3 text-center me-2 mb-2 float-right"
+
                 data-modal-target="createDepartmentModal" data-modal-toggle="createDepartmentModal">
-                Tambah Departemen
+                Add Department
             </button>
         </div>
         <div class="card">
+            <div class="card-header">
+                <h1 class="card-title text-2xl font-medium">List Departments</h1>
+            </div>
             <div class="card-body">
                 <div class="relative overflow-x-auto sm:rounded-lg">
                     <table id="departmentsTable"
@@ -57,28 +61,15 @@
                                         <button type='button'
                                             data-modal-target="createDepartmentModal-{{ $item->id }}"
                                             data-modal-toggle="createDepartmentModal-{{ $item->id }}"
-                                            class="text-fade hover:text-yellow-800">
-                                            <svg xmlns="http://www.w3.org/2000/svg"
-                                            width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round" class="feather feather-edit-2 align-middle">
-                                            <polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon>
-                                        </svg>
+                                            class="text-fade btn btn-warning"><i
+                                                class="fa-solid fa-pencil text-white"></i>
                                         </button>
                                         <form action="/departments/{{ $item->department_slug }}/delete" method="POST"
                                             class="delete-form">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="text-fade hover:text-danger">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                    class="feather feather-trash align-middle">
-                                                    <polyline points="3 6 5 6 21 6"></polyline>
-                                                    <path
-                                                        d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
-                                                    </path>
-                                                </svg>
+                                            <button type="submit" class="text-fade btn btn-danger">
+                                                <i class="fas fa-trash-alt text-white"></i>
                                             </button>
                                         </form>
                                     </td>
@@ -92,38 +83,63 @@
     </section>
 
     @push('scripts')
-        <script>
-            $(document).ready(function() {
-                $('#departmentsTable').DataTable({
-                    "lengthChange": false,
-                    "pagingType": "simple_numbers",
-                    "dom": 'Bfrtip',
-                    "buttons": [
-                        'copy', 'csv', 'excel', 'pdf', 'print'
-                    ]
-                });
-            });
+    <script>
+        $(document).ready(function() {
+            var table = $('#departmentsTable').DataTable({
+                "lengthChange": false,
+                "pagingType": "simple_numbers",
+                "dom": 'Bfrtip',
+                "buttons": ['copy', 'csv', 'excel', 'pdf', 'print'],
+                "drawCallback": function(settings) {
+                    // Function to reposition modal in the viewport
+                    function repositionModal(modalId) {
+                        var modal = $('#' + modalId);
+                        var modalDialog = modal.find('.modal-dialog');
 
-            // SweetAlert2 confirmation dialog for delete action
-            $('.delete-form').on('submit', function(e) {
-                e.preventDefault(); // Prevent the form from submitting
+                        // Calculate top position based on viewport and scroll
+                        var modalTop = Math.max(0, ($(window).height() - modalDialog.outerHeight()) / 2) + $(window).scrollTop();
+                        var modalLeft = Math.max(0, ($(window).width() - modalDialog.outerWidth()) / 2);
 
-                var form = this; // Store a reference to the form
-
-                Swal.fire({
-                    title: 'Apakah Anda yakin?',
-                    text: "Anda tidak akan dapat mengembalikan ini!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Ya, hapus!',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        form.submit(); // Submit the form if confirmed
+                        modalDialog.css({
+                            'margin-top': modalTop,
+                            'margin-left': modalLeft
+                        });
                     }
-                });
+
+                    // SweetAlert2 confirmation dialog for delete action
+                    $('.delete-form').off('submit').on('submit', function(e) {
+                        e.preventDefault(); // Prevent the form from submitting
+
+                        var form = this; // Store a reference to the form
+
+                        Swal.fire({
+                            title: 'Apakah Anda yakin?',
+                            text: "Anda tidak akan dapat mengembalikan ini!",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#d33',
+                            cancelButtonColor: '#3085d6',
+                            confirmButtonText: 'Ya, hapus!',
+                            cancelButtonText: 'Batal'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                form.submit(); // Submit the form if confirmed
+                            }
+                        });
+                    });
+
+                    // Trigger reposition on modal show event
+                    $('[data-modal-toggle]').off('click').on('click', function() {
+                        var target = $(this).data('modal-target');
+                        $('#' + target).removeClass('hidden').addClass('flex').attr('aria-modal', 'true').attr('role', 'dialog');
+                        repositionModal(target); // Reposition modal when shown
+                    });
+
+                    $('[data-modal-hide]').off('click').on('click', function() {
+                        var target = $(this).data('modal-hide');
+                        $('#' + target).addClass('hidden').removeClass('flex').removeAttr('aria-modal').removeAttr('role');
+                    });
+                }
             });
 
             @if (session()->has('success'))
@@ -133,38 +149,10 @@
                     text: '{{ session()->get('message') }}',
                 });
             @endif
+        });
+    </script>
+@endpush
 
-            // Function to toggle modal visibility
-            function toggleModal(modalId) {
-                const modal = document.getElementById(modalId);
-                modal.classList.toggle('hidden');
-                modal.classList.toggle('flex');
-            }
-
-            // Function to hide modal
-            function hideModal(modalId) {
-                const modal = document.getElementById(modalId);
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-            }
-
-            // Event listener for modal toggles
-            document.addEventListener('click', function(e) {
-                if (e.target.dataset.modalToggle !== undefined) {
-                    const targetModal = e.target.dataset.modalTarget;
-                    toggleModal(targetModal);
-                }
-            });
-
-            // Event listener for modal hides
-            document.addEventListener('click', function(e) {
-                if (e.target.dataset.modalHide !== undefined) {
-                    const targetModal = e.target.dataset.modalHide;
-                    hideModal(targetModal);
-                }
-            });
-        </script>
-    @endpush
     {{-- Modal Create --}}
     <div id="createDepartmentModal" tabindex="-1" aria-hidden="true"
         class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">

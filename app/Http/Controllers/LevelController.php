@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\QAD;
 
+use App\Http\Controllers\Controller;
 use App\Models\Level;
 use Illuminate\Http\Request;
 use RealRashid\SweetAlert\Facades\Alert;

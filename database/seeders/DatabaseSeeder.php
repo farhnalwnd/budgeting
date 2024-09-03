@@ -70,6 +70,16 @@ class DatabaseSeeder extends Seeder
          Permission::create(['name' => 'view dashboard QM & HSE']);
          Permission::create(['name' => 'view dashboard R&D']);
 
+
+         Permission::create(['name' => 'view requisition']);
+         Permission::create(['name' => 'get data master']);
+         Permission::create(['name' => 'view browse requisition']);
+         Permission::create(['name' => 'create maintenance requisition']);
+         Permission::create(['name' => 'update maintenance requisition']);
+         Permission::create(['name' => 'delete maintenance requisition']);
+         Permission::create(['name' => 'print maintenance requisition']);
+
+
          //create departements
 
         Department::create(['department_name' => 'Engineering & Maintainance']);
@@ -130,6 +140,9 @@ class DatabaseSeeder extends Seeder
 
         $staffRole->givePermissionTo(['view dashboard Finance']);
         $userRole->givePermissionTo(['view dashboard Sales & Marketing']);
+        $userRole->givePermissionTo(['view browse requisition']);
+
+        $superAdminRole->givePermissionTo(['view requisition', 'get data master', 'view browse requisition', 'create maintenance requisition', 'update maintenance requisition', 'delete maintenance requisition', 'print maintenance requisition']);
 
 
         // Let's Create User and assign Role to it.
@@ -138,11 +151,13 @@ class DatabaseSeeder extends Seeder
                     'email' => 'superadmin@gmail.com',
                 ], [
                     'name' => 'Super Admin',
+                    'username' => 'super',
                     'nik' => 'AG1111',
                     'email' => 'superadmin@gmail.com',
                     'password' => Hash::make ('password'),
                     'email_verified_at' => now(),
-                    'position_id' => 1
+                    'position_id' => 1,
+                    'department_id' => 1,
                 ]);
 
         $superAdminUser->assignRole($superAdminRole);
@@ -152,11 +167,13 @@ class DatabaseSeeder extends Seeder
                             'email' => 'admin@gmail.com'
                         ], [
                             'name' => 'Admin',
+                            'username' => 'admin',
                             'nik' => 'AG2222',
                             'email' => 'admin@gmail.com',
                             'password' => Hash::make ('password'),
                             'email_verified_at' => now(),
-                            'position_id' => 3
+                            'position_id' => 3,
+                            'department_id' => 1,
                         ]);
 
         $adminUser->assignRole($adminRole);
@@ -166,11 +183,13 @@ class DatabaseSeeder extends Seeder
                             'email' => 'staff@gmail.com',
                         ], [
                             'name' => 'Staff',
+                            'username' => 'staff',
                             'nik' => 'AG3333',
                             'email' => 'staff@gmail.com',
                             'password' => Hash::make('password'),
                             'email_verified_at' => now(),
-                            'position_id' => 3
+                            'position_id' => 3,
+                            'department_id' => 1,
                         ]);
 
         $staffUser->assignRole($staffRole);

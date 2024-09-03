@@ -274,12 +274,12 @@ File: horizontal menu scss
       right: 4px;
       width: 34px;
       overflow: hidden;
-      /*font: bold 16px/34px monospace !important;*/
+      font: bold 16px/34px monospace !important;
       text-align: center;
       text-shadow: none;
       border-radius: 0; }
       .sm-blue a .sub-arrow::before {
-        /* content: '+';*/ }
+        content: '+'; }
     .sm-blue a.highlighted .sub-arrow::before {
       content: "\f107"; }
   .sm-blue.highlighted .sub-arrow::before {
@@ -336,7 +336,7 @@ File: horizontal menu scss
 
 @media (min-width: 768px) {
   #main-menu > li > a > .sub-arrow {
-    display: none; }
+    display: block; }
 
   .sm-blue {
     background: #24243E;
