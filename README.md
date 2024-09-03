@@ -1,60 +1,87 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
-
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+    <a href="https://laravel.com" target="_blank">
+        <img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo">
+    </a>
 </p>
 
-## **About Laravel**
+<p align="center">
+    <a href="https://github.com/laravel/framework/actions">
+        <img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status">
+    </a>
+    <a href="https://packagist.org/packages/laravel/framework">
+        <img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads">
+    </a>
+    <a href="https://packagist.org/packages/laravel/framework">
+        <img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version">
+    </a>
+    <a href="https://packagist.org/packages/laravel/framework">
+        <img src="https://img.shields.io/packagist/l/laravel/framework" alt="License">
+    </a>
+</p>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Tentang Laravel
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Laravel adalah framework aplikasi web dengan sintaks yang ekspresif dan elegan. Kami percaya bahwa pengembangan harus menjadi pengalaman yang menyenangkan dan kreatif agar benar-benar memuaskan. Laravel menghilangkan rasa sakit dalam pengembangan dengan memudahkan tugas-tugas umum yang digunakan dalam banyak proyek web, seperti:
 
-## **Installation**
+- [Mesin routing yang sederhana dan cepat](https://laravel.com/docs/routing).
+- [Kontainer injeksi dependensi yang kuat](https://laravel.com/docs/container).
+- Banyak backend untuk penyimpanan [session](https://laravel.com/docs/session) dan [cache](https://laravel.com/docs/cache).
+- [ORM database](https://laravel.com/docs/eloquent) yang ekspresif dan intuitif.
+- [Migrasi skema](https://laravel.com/docs/migrations) yang agnostik terhadap database.
+- [Pemrosesan pekerjaan latar belakang](https://laravel.com/docs/queues) yang kuat.
+- [Penyiaran acara real-time](https://laravel.com/docs/broadcasting).
 
-Follow these steps to set up the project on your local machine.
+## Instalasi
 
-### **1. Prerequisites**
-Ensure you have the following installed:
+Ikuti langkah-langkah ini untuk mengatur proyek di mesin lokal Anda.
 
-- **Git**: Install from [here](https://git-scm.com/downloads).
-- **PHP**: Ensure PHP 7.3 or higher is installed. You can download it from [here](https://www.php.net/downloads).
-- **Composer**: Install from [here](https://getcomposer.org/download/).
-- **Node.js & npm**: Install from [here](https://nodejs.org/).
-- **XAMPP**: Install XAMPP, which includes Apache, MySQL, and PHP. You can download it from [here](https://www.apachefriends.org/index.html).
+### 1. Prasyarat
 
-### **2. Cloning the Repository**
-Clone the repository to your local machine:
+Pastikan Anda telah menginstal:
 
-bash or CMD
-**Clone Repo**
-git clone https://github.com/aderusmana22/template_smii.git
-cd template_smii
+- **Git**: Instal dari [sini](https://git-scm.com/downloads).
+- **PHP**: Pastikan PHP 7.3 atau lebih tinggi telah diinstal. Anda dapat mengunduhnya dari [sini](https://www.php.net/downloads).
+- **Composer**: Instal dari [sini](https://getcomposer.org/download/).
+- **Node.js & npm**: Instal dari [sini](https://nodejs.org/).
+- **XAMPP**: Instal XAMPP, yang mencakup Apache, MySQL, dan PHP. Anda dapat mengunduhnya dari [sini](https://www.apachefriends.org/index.html).
 
-**Instaling Depedency**
-composer install
-npm install
+### 2. Mengkloning Repository dan Mengatur Proyek
 
-**Environment Setup**
-cp .env.example .env
+1. **Klon Repository ke Mesin Lokal Anda:**
+    ```bash
+    git clone https://github.com/aderusmana22/template_smii.git
+    cd template_smii
+    ```
 
-**Generating Application Key**
-php artisan key:generate
+2. **Menginstal Dependensi:**
+    ```bash
+    composer install
+    npm install
+    ```
 
-**Database Setup**
-php artisan migrate
+3. **Pengaturan Lingkungan:**
+    ```bash
+    cp .env.example .env
+    ```
 
-**DB SEED**
-php artisan db:seed
+4. **Menghasilkan Kunci Aplikasi:**
+    ```bash
+    php artisan key:generate
+    ```
 
-**Starting the Development Server**
-php artisan serve
+5. **Pengaturan Database:**
+    ```bash
+    php artisan migrate
+    ```
+
+6. **Seed Database:**
+    ```bash
+    php artisan db:seed
+    ```
+
+7. **Memulai Server Pengembangan:**
+    ```bash
+    php artisan serve
+    ```
+
+Sekarang Anda siap untuk mulai mengembangkan dengan Laravel!
