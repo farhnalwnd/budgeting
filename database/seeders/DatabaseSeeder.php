@@ -79,6 +79,13 @@ class DatabaseSeeder extends Seeder
          Permission::create(['name' => 'delete maintenance requisition']);
          Permission::create(['name' => 'print maintenance requisition']);
 
+        Permission::create(['name' => 'view production dashboard']);
+        Permission::create(['name' => 'view sales dashboard']);
+        Permission::create(['name' => 'view data dashboard']);
+        Permission::create(['name' => 'view inventory dashboard']);
+
+        
+
 
          //create departements
 
