@@ -1,14 +1,13 @@
-
 <header class="main-header">
     <div class="inside-header">
         <div class="flex items-center logo-box justify-start">
             <!-- Logo -->
             <a href="{{ route('dashboard') }}" class="logo">
                 <!-- logo-->
-                <div class="logo-lg">
-                    <span class="light-logo"><img src="{{ asset('assets') }}/images/logohitam.png" width="150"
-                            alt="logo"></span>
-                    <span class="dark-logo"><img src="{{ asset('assets') }}/images/logohitam.png" width="150"
+                <div class="logo-lg mt-5">
+                    <span class="light-logo"><img src="{{ asset('assets') }}/images/logoblack.png" width="220"
+                            alt="logo" style=""></span>
+                    <span class="dark-logo"><img src="{{ asset('assets') }}/images/logoblack.png" width="220"
                             alt="logo"></span>
                 </div>
             </a>
@@ -34,9 +33,9 @@
                         <a id="dropdownDefaultButton" data-dropdown-toggle="dropdown"
                             class="btn-primary-light svg-bt-icon hover:text-white hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-3 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                             title="Notifications" type="button">
-                            <div
+                            <div id="notificationCount"
                                 class="absolute inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full top-[0.7rem] end-[0.7rem] dark:border-gray-900">
-                                {{ auth()->user()->unreadNotifications->count() }}</div>
+                                {{ auth()->user()->unreadNotifications->count() ?? 0 }}</div>
                             <i data-feather="bell"></i>
                             <div class="pulse-wave"></div>
                         </a>
@@ -44,7 +43,7 @@
                         <!-- Dropdown menu -->
                         <div id="dropdown"
                             class="dropdown-menu z-10 bg-white divide-y divide-gray-100 rounded-lg shadow! w-max dark:bg-gray-700"
-                            style="position: absolute; inset: 0px auto auto 0px; margin: 0px; transform: translate(-245px, 58px); min-width: 300px;">
+                            style="position: absolute; inset: 0px auto auto 0px; margin: 0px; transform: translate(-245px, 58px); min-width: 450px;">
                             <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
                                 aria-labelledby="dropdownDefaultButton">
                                 <li class="header">
@@ -53,25 +52,31 @@
                                             <div>
                                                 <div class="text-xl mb-0 mt-0">Notifications</div>
                                             </div>
-                                            <div>
-                                                <a href="#" class="text-danger" id="clearAllNotifications">Clear
-                                                    All</a>
-                                            </div>
+                                            @if (auth()->user()->hasRole('super-admin'))
+                                                <div>
+                                                    <a href="#" class="text-white hover:bg-red-500"
+                                                        id="clearAllNotifications">Clear
+                                                        All</a>
+                                                </div>
+                                            @endif
                                         </div>
                                     </div>
                                 </li>
                                 <li>
                                     <!-- inner menu: contains the actual data -->
                                     <div class="slimScrollDiv"
-                                        style="position: relative; overflow: hidden; width: auto; height: 250px;">
-                                        <ul class="menu sm-scrol" style="overflow-y: scroll; width: auto; height: 250px;">
+                                        style="position: relative; overflow: hidden; width: auto; height: 450px;">
+                                        <ul class="menu sm-scrol"
+                                            style="overflow-y: scroll; width: auto; height: 450px;">
                                             @foreach (auth()->user()->unreadNotifications as $notification)
-                                                <li class="border-b">
+                                                <li class="border-b flex justify-between items-center">
                                                     <a href="#"
-                                                        class="p-3 block m-0 overflow-hidden text-base whitespace-nowrap text-ellipsis">
+                                                        class="p-3 block m-0 overflow-hidden text-base whitespace-nowrap text-ellipsis flex-grow">
                                                         <i class="fa fa-bell text-info"></i>
                                                         {{ $notification->data['data']['message'] }}
                                                     </a>
+                                                    <button class="mark-as-read mr-2 hover:text-blue-600"
+                                                        data-id="{{ $notification->id }}">Mark as Read</button>
                                                 </li>
                                             @endforeach
                                         </ul>
@@ -84,7 +89,7 @@
                                     </div>
                                 </li>
                                 <li class="footer p-3 text-center border-t">
-                                    {{-- <a href="component_notification.html">View all</a> --}}
+                                    <button class="mark-as-read-all hover:text-blue-600">Mark as Read All</button>
                                 </li>
                             </ul>
                         </div>
@@ -114,14 +119,14 @@
                         <a href="#" id="dropdownDividerButton" data-dropdown-toggle="dropdownDivider-2"
                             class="justify-center btn-primary-light hover:text-white svg-bt-icon hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm !px-px !py-px text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                             type="button">
-                                @if (Auth::user()->avatar)
-                                    <img src="{{ Storage::url('public/user_avatars/' . Auth::user()->avatar) }}"
-                                        class="avatar rounded-full !h-11 !w-11 mt-1" alt="">
-                                @else
-                                    <img src="{{ asset('assets') }}/images/avatar/avatar-6.png"
-                                        class="avatar rounded-full !h-11 !w-11 mt-1" alt="">
-                                @endif
-                            </a>
+                            @if (Auth::user()->avatar)
+                                <img src="{{ Storage::url('public/user_avatars/' . Auth::user()->avatar) }}"
+                                    class=" !h-11 !w-11 mt-1" alt="" style="width: 100px; height: 100px;">
+                            @else
+                                <img src="{{ asset('assets') }}/images/sinarmeadow.png"
+                                    class="avatar rounded-full !h-11 !w-11 mt-1" alt="">
+                            @endif
+                        </a>
 
                         <!-- Dropdown menu -->
                         <div id="dropdownDivider-2"
@@ -132,13 +137,15 @@
                                     <p
                                         class="items-center m-0 text-base flex px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                                         <i class="fa fa-user-circle-o me-3 text-xl" aria-hidden="true"> </i>
-                                        {{ Auth::user()->name }} - {{ Auth::user()->position->position_name }}</p>
+                                        {{ Auth::user()->name }} - {{ Auth::user()->position->position_name }}
+                                    </p>
                                 </li>
                                 <li>
                                     <p
                                         class="items-center m-0 text-base flex px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                                         <i class="fa fa-briefcase me-3 text-xl" aria-hidden="true"> </i>
-                                         Department {{ Auth::user()->department->department_name }}</p>
+                                        Department {{ Auth::user()->department->department_name }}
+                                    </p>
                                 </li>
                                 {{-- <li>
                                     <a href="{{ route('locked') }}"
@@ -175,51 +182,117 @@
 </header>
 @push('scripts')
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('clearAllNotifications').addEventListener('click', function(e) {
-                e.preventDefault();
+        function showSuccessMessage(message) {
+            Swal.fire({
+                title: 'Success!',
+                text: message,
+                icon: 'success',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK'
+            });
+        }
 
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: 'This action will delete all notifications.',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Yes, delete all!',
-                    cancelButtonText: 'Cancel'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Kirim request untuk menghapus semua notifikasi
-                        $.ajax({
-                            type: 'DELETE',
-                            url: '{{ route('notifications.clear') }}', // Sesuaikan dengan route yang sesuai
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fungsi untuk memperbarui jumlah notifikasi
+            function updateNotificationCount() {
+                fetch('{{ route('notifications.count') }}')
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('notificationCount').textContent = data.count;
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+
+            // Event listener untuk tombol "Mark as Read"
+            document.querySelectorAll('.mark-as-read').forEach(button => {
+                button.addEventListener('click', function() {
+                    const notificationId = this.getAttribute('data-id');
+                    fetch('{{ route('notifications.markAsRead') }}', {
+                            method: 'POST',
                             headers: {
+                                'Content-Type': 'application/json',
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
                             },
-                            success: function(response) {
-                                Swal.fire(
-                                    'Deleted!',
-                                    'All notifications have been deleted.',
-                                    'success'
-                                ).then(() => {
-                                    // Refresh halaman atau tindakan lain yang diinginkan
-                                    window.location
-                                        .reload(); // Contoh: reload halaman setelah penghapusan
-                                });
-                            },
-                            error: function(xhr, status, error) {
-                                console.error(xhr.responseText);
-                                Swal.fire(
-                                    'Error!',
-                                    'Failed to delete notifications.',
-                                    'error'
-                                );
+                            body: JSON.stringify({
+                                notification_id: notificationId
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                this.closest('li').remove();
+                                updateNotificationCount();
+                            } else {
+                                alert('Failed to mark notification as read.');
                             }
-                        });
-                    }
+                        })
+                        .catch(error => console.error('Error:', error));
                 });
             });
+
+            // Event listener untuk tombol "Mark as Read All"
+            document.querySelector('.mark-as-read-all').addEventListener('click', function() {
+                fetch('{{ route('notifications.markAllAsRead') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.querySelectorAll('.menu li').forEach(li => li.remove());
+                            updateNotificationCount();
+                        } else {
+                            alert('Failed to mark all notifications as read.');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
+
+            // Event listener untuk tombol "Clear All Notifications"
+            const clearAllNotificationsButton = document.getElementById('clearAllNotifications');
+            if (clearAllNotificationsButton) {
+                clearAllNotificationsButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: 'This action will delete all notifications.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Yes, delete all!',
+                        cancelButtonText: 'Cancel'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Kirim request untuk menghapus semua notifikasi
+                            $.ajax({
+                                type: 'DELETE',
+                                url: '{{ route('notifications.clear') }}', // Sesuaikan dengan route yang sesuai
+                                headers: {
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                                success: function(response) {
+                                    showSuccessMessage('Semua notifikasi telah dihapus.');
+                                    // Refresh halaman atau tindakan lain yang diinginkan
+                                    window.location.reload(); // Contoh: reload halaman setelah penghapusan
+                                },
+                                error: function(xhr, status, error) {
+                                    console.error(xhr.responseText);
+                                    Swal.fire(
+                                        'Error!',
+                                        'Failed to delete notifications.',
+                                        'error'
+                                    );
+                                }
+                            });
+                        }
+                    });
+                });
+            }
         });
 
         document.addEventListener('DOMContentLoaded', function() {

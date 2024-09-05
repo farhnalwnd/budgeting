@@ -29,7 +29,7 @@ return [
     |
     */
 
-    'env' => env('APP_ENV', 'production'),
+    'env' => env('APP_ENV', 'local'),
 
     /*
     |--------------------------------------------------------------------------
@@ -171,6 +171,10 @@ return [
         Ladumor\LaravelPwa\PWAServiceProvider::class,
         Artesaos\SEOTools\Providers\SEOToolsServiceProvider::class,
         RealRashid\SweetAlert\SweetAlertServiceProvider::class,
+        Laravel\Passport\PassportServiceProvider::class,
+        Maatwebsite\Excel\ExcelServiceProvider::class,
+        // Haruncpi\LaravelSimpleFilemanager\SimpleFilemanagerServiceProvider::class,
+
 
 
 
