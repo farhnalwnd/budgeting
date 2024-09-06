@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\QAD  ;
 
-use App\Http\Controllers\Controller;
-use App\Models\QAD\Inventory;
 use Illuminate\Http\Request;
+use App\Models\QAD\Inventory;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 use RealRashid\SweetAlert\Facades\Alert;
+use App\Models\QAD\StandardWarehouseProduction;
 
 class InventoryController extends Controller
 {
@@ -91,7 +92,7 @@ class InventoryController extends Controller
                     $existingItem->ld_qty_oh = (string) $item->ld_qty_oh;
                     $existingItem->pt_um = (string) $item->pt_um;
                     $existingItem->ld_date = (string) $item->ld_date;
-                    $existingItem->ld_loc = (string) $item->ld_loc;
+                    $existingItem->ld_loc = strtoupper((string) $item->ld_loc);
                     $existingItem->ld_lot = (string) $item->ld_lot;
                     $existingItem->aging_days = (int) $item->aging_days;
                     $existingItem->ld_expire = (string) $item->ld_expire;
@@ -107,7 +108,7 @@ class InventoryController extends Controller
                     $newItem->ld_qty_oh = (string) $item->ld_qty_oh;
                     $newItem->pt_um = (string) $item->pt_um;
                     $newItem->ld_date = (string) $item->ld_date;
-                    $newItem->ld_loc = (string) $item->ld_loc;
+                    $newItem->ld_loc = strtoupper((string) $item->ld_loc);
                     $newItem->ld_lot = (string) $item->ld_lot;
                     $newItem->aging_days = (int) $item->aging_days;
                     $newItem->ld_expire = (string) $item->ld_expire;
@@ -126,4 +127,54 @@ class InventoryController extends Controller
 
         return redirect()->back();
     }
-}
+
+     // =========================================================StandardWarehouse=====================================================
+
+     public function warehouseindex()
+     {
+         $standardWarehouse = StandardWarehouseProduction::all();
+         return \view('page.standard.warehouse-index',\compact('standardWarehouse'));
+     }
+
+
+
+     public function warehousestore(Request $request)
+     {
+         $standardWarehouse = new StandardWarehouseProduction();
+         $standardWarehouse->location = $request->location;
+         $standardWarehouse->rack = $request->rack;
+         $standardWarehouse->temperature = $request->temperature;
+         $standardWarehouse->pallet_rack = $request->pallet_rack;
+         $standardWarehouse->estimated_tonnage = $request->estimated_tonnage;
+         $standardWarehouse->save();
+         Alert::toast('Standard Warehouse Production successfully added', 'success');
+         return redirect()->back();
+     }
+
+     public function warehouseupdate(Request $request, $id)
+     {
+         $standardWarehouse = StandardWarehouseProduction::findOrFail($id);
+         $standardWarehouse->location = $request->location;
+         $standardWarehouse->rack = $request->rack;
+         $standardWarehouse->temperature = $request->temperature;
+         $standardWarehouse->pallet_rack = $request->pallet_rack;
+         $standardWarehouse->estimated_tonnage = $request->estimated_tonnage;
+         $standardWarehouse->save();
+         Alert::toast('Standard Warehouse Production successfully updated', 'success');
+         return redirect()->back();
+     }
+
+     public function warehousedelete($id)
+     {
+         $standardWarehouse = StandardWarehouseProduction::findOrFail($id);
+         $standardWarehouse->delete();
+         Alert::toast('Standard Production successfully deleted', 'success');
+         return redirect()->back();
+     }
+
+     public function dashboardWarehouse()
+     {
+         return \view('dashboard.dashboardWarehouse');
+     }
+ }
+

@@ -81,6 +81,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [UserController::class, 'updateProfile'])->name('profile.updates');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    Route::get('/get-data-master', [UserController::class, 'getDataMaster'])->name('get.master');
+
     /*Inventory*/
     /*get wsa inventory*/
     Route::get('dashboard/inventory/wsa', [InventoryController::class, 'getDashboardInventory'])->name('dashboard.inventory.wsa');
@@ -104,6 +106,9 @@ Route::middleware('auth')->group(function () {
     /*Locked */
     Route::get('locked', [LockScreenController::class, 'show'])
         ->name('locked');
+
+    Route::post('locked', [LockScreenController::class, 'store']);
+
     Route::post('/notifications/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
     Route::post('/notifications/markAllAsRead', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
     Route::delete('/notifications/clear', [NotificationController::class, 'clearAll'])->name('notifications.clear');
@@ -120,26 +125,35 @@ Route::middleware('auth')->group(function () {
     Route::delete('dashboard/standard-production/destroy/{standardproduction}', [ProductionController::class, 'destroyStandardProductions'])->name('dashboard.standard-production.destroy');
 
     /*standard shipment*/
-    Route::get('dashboard/standard-shipment',[SalesController::class, 'shipmentindex'])->name('dashboard.shipmentindex');
-    Route::post('dashboard/standard-shipment/store',[SalesController::class, 'shipmentstore'])->name('dashboard.shipmentstore');
-    Route::put('dashboard/standard-shipment/{standardshipment}',[SalesController::class, 'shipmentupdate'])->name('dashboard.shipmentupdate');
-    Route::delete('dashboard/standard-shipment/{standardshipment}',[SalesController::class, 'shipmentdelete'])->name('dashboard.shipmentdelete');
+    Route::post('dashboard/standard-shipment', [SalesController::class, 'getShipment'])->name('dashboard.standardshipment.wsa');
+
+    Route::get('dashboard/standard-shipment', [SalesController::class, 'shipmentindex'])->name('dashboard.shipmentindex');
+    Route::post('dashboard/standard-shipment/store', [SalesController::class, 'shipmentstore'])->name('dashboard.shipmentstore');
+    Route::put('dashboard/standard-shipment/{standardshipment}', [SalesController::class, 'shipmentupdate'])->name('dashboard.shipmentupdate');
+    Route::delete('dashboard/standard-shipment/{standardshipment}', [SalesController::class, 'shipmentdelete'])->name('dashboard.shipmentdelete');
 
     /*standard warehouse*/
-    Route::get('dashboard/standard-warehouse',[ProductionController::class, 'warehouseindex'])->name('dashboard.warehouseindex');
-    Route::post('dashboard/standard-warehouse',[ProductionController::class, 'warehousestore'])->name('dashboard.warehousestore');
-    Route::put('dashboard/standard-warehouse/{standardwarehouse}',[ProductionController::class, 'warehouseupdate'])->name('dashboard.warehouseupdate');
-    Route::delete('dashboard/standard-warehouse/{standardwarehouse}',[ProductionController::class, 'warehousedelete'])->name('dashboard.warehousedelete');
+    Route::get('dashboard/standard-warehouse', [InventoryController::class, 'warehouseindex'])->name('dashboard.warehouseindex');
+    Route::post('dashboard/standard-warehouse', [InventoryController::class, 'warehousestore'])->name('dashboard.warehousestore');
+    Route::put('dashboard/standard-warehouse/{standardwarehouse}', [InventoryController::class, 'warehouseupdate'])->name('dashboard.warehouseupdate');
+    Route::delete('dashboard/standard-warehouse/{standardwarehouse}', [InventoryController::class, 'warehousedelete'])->name('dashboard.warehousedelete');
+
+    Route::post('dashboard/inventory/wsa', [InventoryController::class, 'getDashboardInventory'])->name('dashboard.inventory.wsa');
+    /*inventory routes*/
+    Route::get('dashboard/inventory', [InventoryController::class, 'index'])->name('dashboard.inventory');
 
     /*Dashboard Warehouse*/
-    Route::get('dashboard/dashboard-warehouse',[ProductionController::class, 'dashboardWarehouse'])->name('dashboard.dashboardWarehouse');
+    Route::get('dashboard/dashboard-warehouse', [InventoryController::class, 'dashboardWarehouse'])->name('dashboard.dashboardWarehouse');
     /*Dashboard Sales*/
-    Route::get('dashboard/dashboard-sales',[SalesController::class, 'dashboardSales'])->name('dashboard.dashboardSales');
+    Route::get('dashboard/dashboard-sales', [SalesController::class, 'dashboardSales'])->name('dashboard.dashboardSales');
     /*Dashboard Production*/
-    Route::get('dashboard/dashboard-production',[ProductionController::class, 'dashboardProduction'])->name('dashboard.dashboardProduction');
+    Route::get('dashboard/dashboard-production', [ProductionController::class, 'dashboardProduction'])->name('dashboard.dashboardProduction');
     /*Dashboard Inventory*/
-    Route::get('dashboard/dashboard-inventory',[InventoryController::class, 'dashboardInventory'])->name('dashboard.dashboardInventory');
+    Route::get('dashboard/dashboard-inventory', [InventoryController::class, 'dashboardInventory'])->name('dashboard.dashboardInventory');
 
+    /*Dashboard Route Get Filter*/
+    Route::get('/bar-data', [ProductionController::class, 'getBarData']);
+    Route::get('/data-filter', [ProductionController::class, 'filterData']);
 });
 
 

@@ -331,4 +331,9 @@ class UserController extends Controller
             ], 500);
         }
     }
+
+    public function getDataMaster()
+    {
+        return \view('page.wsa-getmstr');
+    }
 }

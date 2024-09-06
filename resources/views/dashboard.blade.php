@@ -3,7 +3,7 @@
 Dashboard
     @endsection
 
-    @include('dashboard.dashboard')
+    {{-- @include('dashboard.dashboard')
     @can('view dashboard Finance')
         @include('dashboard.dashboardInventory')
     @endcan
@@ -14,7 +14,7 @@ Dashboard
 
     @can('view dashboard R&D')
         @include('dashboard.dashboardProduction')
-    @endcan
+    @endcan --}}
 
 
 

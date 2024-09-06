@@ -41,31 +41,31 @@
                                 class="!border-separate table text-fade table-bordered w-full ">
                                 <thead>
                                     <tr class="text-dark text-center" >
-                                        <th class="text-sm">Transaction Number</th>
-                                        <th class="text-sm">Effective Date</th>
-                                        <th class="text-sm">Transaction Type</th>
-                                        <th class="text-sm">Production Line</th>
-                                        <th class="text-sm">Part Number</th>
-                                        <th class="text-sm">Description</th>
-                                        <th class="text-sm">Quantity in Location</th>
-                                        <th class="text-sm">Weight in KG</th>
-                                        <th class="text-sm">Line</th>
-                                        <th class="text-sm">Part Drawing</th>
+                                        <th class="text-lg">Transaction Number</th>
+                                        <th class="text-lg">Effective Date</th>
+                                        <th class="text-lg">Transaction Type</th>
+                                        <th class="text-lg">Production Line</th>
+                                        <th class="text-lg">Part Number</th>
+                                        <th class="text-lg">Description</th>
+                                        <th class="text-lg">Quantity in Location</th>
+                                        <th class="text-lg">Weight in KG</th>
+                                        <th class="text-lg">Line</th>
+                                        <th class="text-lg">Part Drawing</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($productions as $item)
                                         <tr class="text-dark">
-                                            <td >{{ $item->tr_nbr }}</td>
-                                            <td >{{ $item->tr_effdate }}</td>
-                                            <td >{{ $item->tr_type }}</td>
-                                            <td >{{ $item->tr_prod_line }}</td>
-                                            <td >{{ $item->tr_part }}</td>
-                                            <td >{{ $item->pt_desc1 }}</td>
-                                            <td >{{ $item->tr_qty_loc }}</td>
-                                            <td >{{ $item->Weight_in_KG }}</td>
-                                            <td >{{ $item->Line }}</td>
-                                            <td >{{ $item->pt_draw }}</td>
+                                            <td class="text-lg">{{ $item->tr_nbr }}</td>
+                                            <td class="text-lg">{{ $item->tr_effdate }}</td>
+                                            <td class="text-lg">{{ $item->tr_type }}</td>
+                                            <td class="text-lg">{{ $item->tr_prod_line }}</td>
+                                            <td class="text-lg">{{ $item->tr_part }}</td>
+                                            <td class="text-lg">{{ $item->pt_desc1 }}</td>
+                                            <td class="text-lg">{{ $item->tr_qty_loc }}</td>
+                                            <td class="text-lg">{{ $item->Weight_in_KG }}</td>
+                                            <td class="text-lg">{{ $item->Line }}</td>
+                                            <td class="text-lg">{{ $item->pt_draw }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>

@@ -145,6 +145,88 @@ class SalesController extends Controller
 
     // ============================================StandardShipment====================================================
 
+    public function getShipment()
+    {
+        $qxUrl = 'http://smii.qad:24079/wsa/smiiwsa';
+        $timeout = 10;
+        $domain = 'SMII';
+        $totalNewItems = 0;
+        $batchSize = 1000; // Ukuran batch
+        $offset = 0;
+        $startDate = '2024-09-01';
+        $endDate = \date('Y-m-d');
+
+
+        do {
+            $qdocRequest =
+                '<Envelope xmlns="http://schemas.xmlsoap.org/soap/envelope/">
+                    <Body>
+                        <getshipment xmlns="urn:services-qad-com:smiiwsa:0001:smiiwsa">
+                            <tr_domain>'.$domain.'</tr_domain>
+                            <ip_start_date>'.$startDate.'</ip_start_date>
+                            <ip_end_date>'.$endDate.'</ip_end_date>
+                            <ip_batch_size>'.$batchSize.'</ip_batch_size>
+                            <ip_offset>'.$offset.'</ip_offset>
+                        </getshipment>
+                    </Body>
+                </Envelope>';
+
+            $curlOptions = array(
+                CURLOPT_URL => $qxUrl,
+                CURLOPT_CONNECTTIMEOUT => $timeout,
+                CURLOPT_TIMEOUT => $timeout + 5,
+                CURLOPT_HTTPHEADER => $this->httpHeader($qdocRequest),
+                CURLOPT_POSTFIELDS => preg_replace("/\s+/", " ", $qdocRequest),
+                CURLOPT_POST => true,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_SSL_VERIFYHOST => false
+            );
+
+            $curl = curl_init();
+            if ($curl) {
+                curl_setopt_array($curl, $curlOptions);
+                $qdocResponse = curl_exec($curl);
+                curl_close($curl);
+            } else {
+                return redirect()->back()->with('error', 'Gagal menghubungi server.');
+            }
+
+            if (!$qdocResponse) {
+                return redirect()->back()->with('error', 'Tidak ada respons dari server.');
+            }
+
+            $xmlResp = simplexml_load_string($qdocResponse);
+            $xmlResp->registerXPathNamespace('ns', 'urn:services-qad-com:smiiwsa:0001:smiiwsa');
+
+            $qdocResult = (string) $xmlResp->xpath('//ns:opOk')[0];
+
+            $invoices = $xmlResp->xpath('//ns:getshipmentResponse/ns:ttTrData/ns:ttTrDataRow'); // Ubah path untuk invoices
+            $jumlahItemBaru = 0;
+
+            if ($qdocResult == 'true') {
+                foreach ($invoices as $item) {
+                    $tr_effdate = $item->tr_effdate; // Ambil elemen yang sesuai
+                    $tr_ton = $item->tr_ton; // Ambil elemen yang sesuai
+                }
+
+                $newInvoice = new StandardShipment();
+                $newInvoice->date_shipment = $tr_effdate;
+                $newInvoice->ton = $tr_ton;
+                $newInvoice->save();
+                $totalNewItems += $jumlahItemBaru;
+            } else {
+                session(['toastMessage' => 'Gagal mengambil data dari server.', 'toastType' => 'error']);
+                return redirect()->back();
+            }
+
+        } while (count($invoices) > 0); // Ubah kondisi untuk memastikan loop berjalan sampai semua data diambil
+
+        session(['toastMessage' => 'Data berhasil disimpan. Jumlah item baru: ' . $totalNewItems, 'toastType' => 'success']);
+        return redirect()->back();
+    }
+
+
     public function shipmentindex()
     {
         $standardShipment = StandardShipment::all();
