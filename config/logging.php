@@ -131,6 +131,26 @@ return [
             'path' => storage_path('logs/custom.log'),
             'level' => env('LOG_LEVEL', 'debug'),
         ],
+        'pcr' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/pcr.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+        ],
+        'doc' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/doc.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+        ],
+        'inventory' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/inventory.log'),
+            'level' => 'debug',
+        ],
+        'worker' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/worker.log'),
+            'level' => 'debug',
+        ],
     ],
 
 ];

@@ -5,7 +5,7 @@ return [
      * Time to live
      * Seconds to wait after last activity before locking the account.
      */
-    'ttl' => 1 * 60 * 60, // 1 hours
+    'ttl' => 30 * 60, // 30 menit
 
     /**
      * Append middleware to the web middleware group.

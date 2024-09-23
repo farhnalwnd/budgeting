@@ -1,11 +1,11 @@
 <?php
 
-use App\Http\Controllers\Auth\UnlockableController;
+use App\Http\Controllers\LockScreenController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth')->group(function () {
-    Route::get('locked', [UnlockableController::class, 'show'])
+    Route::get('locked', [LockScreenController::class, 'show'])
         ->name('locked');
 
-    Route::post('locked', [UnlockableController::class, 'store']);
+    Route::post('locked', [LockScreenController::class, 'store']);
 });

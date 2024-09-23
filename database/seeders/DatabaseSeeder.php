@@ -20,7 +20,6 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Create Permissions
-         // Create Permissions
          Permission::create(['name' => 'view role']);
          Permission::create(['name' => 'create role']);
          Permission::create(['name' => 'update role']);

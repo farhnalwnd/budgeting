@@ -18,12 +18,12 @@
     const logo = document.querySelector(".navbar-brand img");
 
     if (window.pageYOffset > sticky) {
-      header_navbar.classList.add("sticky");
-      logo.src = "frontend/assets/images/logo/logoputih.png";
-    } else {
-      header_navbar.classList.remove("sticky");
-      logo.src = "frontend/assets/images/logo/logohitam.png";
-    }
+        header_navbar.classList.add("sticky");
+        logo.src = "frontend/assets/images/logo/logowhite.png";
+      } else {
+        header_navbar.classList.remove("sticky");
+        logo.src = "frontend/assets/images/logo/logoblack.png";
+      }
 
     // show or hide the back-top-top button
     const backToTop = document.querySelector(".back-to-top");

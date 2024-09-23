@@ -31,7 +31,6 @@
     <link rel="stylesheet" href="{{ asset('assets') }}/src/css/style.css">
     <link rel="stylesheet" href="{{ asset('assets') }}/src/css/skin_color.css">
     <link rel="stylesheet" href="{{ asset('assets') }}/src/css/custom.css">
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
     @stack('css')
 
@@ -68,17 +67,11 @@
         <!-- Side panel -->
 
 
-        <!-- Control Sidebar -->
-        @include('layouts.partials.theme')
-        <!-- /.control-sidebar -->
-
         <!-- Add the sidebar's background. This div must be placed immediately after the control sidebar -->
         <div class="control-sidebar-bg"></div>
 
     </div>
-    <!-- ./wrapper -->
 
-    <!-- Page Content overlay -->
 
 
 
@@ -88,8 +81,9 @@
     </script>
     <!-- Vendor JS -->
     <script src="{{ asset('assets') }}/src/js/vendors.min.js"></script>
-    <script src="{{ asset('assets') }}/src/js/pages/chat-popup.js"></script>
     <script src="{{ asset('assets') }}/icons/feather-icons/feather.min.js"></script>
+    <script src="{{ asset('assets') }}/vendor_components/echarts/dist/echarts-en.min.js"></script>
+
     <script src="{{ asset('assets') }}/src/js/tailwind.min.js"></script>
 
     <script src="{{ asset('assets') }}/vendor_components/Flot/jquery.flot.js"></script>
@@ -120,33 +114,11 @@
     <script src="{{ asset('assets') }}/vendor_components/jquery-steps-master/build/jquery.steps.js"></script>
     <script src="{{ asset('assets') }}/vendor_components/jquery-validation-1.17.0/dist/jquery.validate.min.js"></script>
     <script src="{{ asset('assets') }}/src/js/pages/steps.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('assets') }}/vendor_components/sweetalert/sweetalert.min.js"></script>
     <script src="{{ asset('assets') }}/src/js/pages/data-table.js"></script>
 
     <script src="{{ asset('assets') }}/src/js/pages/toastr.js"></script>
     <script src="{{ asset('assets') }}/src/js/pages/notification.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
-
-
-    {{-- <script src="{{ asset('/sw.js') }}"></script> --}}
-    {{-- <script>
-        if ("serviceWorker" in navigator) {
-            // Register a service worker hosted at the root of the
-            // site using the default scope.
-            navigator.serviceWorker.register("/sw.js").then(
-                (registration) => {
-                    console.log("Service worker registration succeeded:", registration);
-                },
-                (error) => {
-                    console.error(`Service worker registration failed: ${error}`);
-                },
-            );
-        } else {
-            console.error("Service workers are not supported.");
-        }
-    </script> --}}
 
 @stack('scripts')
 

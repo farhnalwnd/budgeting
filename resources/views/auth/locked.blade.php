@@ -29,9 +29,13 @@
 				<div class="col-12 p-0">
 					<div class="login-card login-dark">
 						<div>
-						<div class="bg-white bg-opacity-70 rounded10 shadow-lg">
-							<div class="content-top-agile items-center justify-center px-60 pt-40 pb-0">
-								<img src="{{ asset('assets') }}/images/sinarmeadow.png" alt="User Image" class="bg-light rounded-full mx-auto" width="100" height="100">
+						<div class="bg-white bg-opacity-70 rounded10 shadow-lg" style="background: rgba(255, 255, 255, 0.651); backdrop-filter: blur(10px); border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+							<div class="content-top-agile items-center justify-center px-100 pt-40 pb-0">
+								@if (Auth::user()->avatar)
+                                    <img src="{{ Storage::url('public/user_avatars/' . Auth::user()->avatar) }}" class="mx-auto rounded-full" alt="" width="100" height="100">
+                                @else
+                                    <img src="{{ asset('assets') }}/images/sinarmeadow.png" alt="User Image" class="bg-light rounded-full mx-auto" width="100" height="100">
+                                @endif
 								<h2 class="text-primary text-2xl font-semibold text-blue-600 mt-6 mb-3">{{ Auth()->user()->name }}</h2>
 								<p class="mb-5 text-fade">Input Password to Back to your Page</p>
 							</div>

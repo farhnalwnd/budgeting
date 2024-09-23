@@ -19,7 +19,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::middleware('auth:api')->get('/user', function (Request $request) {
+    return $request->user();
+});
 
-Route::post('rqmOutbound',[RQMController::class,'rqmOutbound']);
-Route::get('rqmOutbound',[RQMController::class,'rqmOutbound']);
 

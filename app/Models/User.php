@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Models\PCR\Initiator;
 use App\Models\PCR\PCC;
+use App\Models\QAD\Approver;
 use App\Models\QAD\RequisitionMaster;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -61,6 +62,11 @@ class User extends Authenticatable
         return $this->hasMany(RequisitionMaster::class);
     }
 
+    public function approvers()
+    {
+        return $this->hasMany(Approver::class, 'rqa_apr', 'username');
+    }
+
 
 
     /*
@@ -71,11 +77,21 @@ class User extends Authenticatable
 
     public function pccs()
     {
-        return $this->hasMany(PCC::class, 'user_id', 'id')->connection('mysql_pcr');
+        return $this->hasMany(PCC::class, 'user_id', 'id');
     }
 
     public function initiators()
     {
         return $this->hasMany(Initiator::class, 'user_id', 'id')->connection('mysql_pcr');
+    }
+
+    public function pcc()
+    {
+        return $this->setConnection('mysql_pcr')->belongsTo(PCC::class, 'user_id', 'id');
+    }
+
+    public function getUsernameAttribute($value)
+    {
+        return strtolower($value);
     }
 }

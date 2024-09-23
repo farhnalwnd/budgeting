@@ -5,8 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Department;
 use App\Models\Position;
 use App\Models\User;
+use GuzzleHttp\Client;
+use GuzzleHttp\Cookie\CookieJar;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Role;
@@ -85,7 +89,7 @@ class UserController extends Controller
     {
         // Validate the request data
         $request->validate([
-            'email' => 'required|email|max:255'. $user->id,
+            'email' => 'required|email|max:255' . $user->id,
             'nik' => 'required|min:4|max:6|unique:users,nik,' . $user->id,
             'username' => 'required|string|max:255|unique:users,username,' . $user->id,
             'name' => 'required|string|max:255',
@@ -95,13 +99,20 @@ class UserController extends Controller
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'status' => 'required|in:active,non active',
             'position_id' => 'required|exists:positions,id',
-            'department_id' => 'required|exists:departments,id'
+            'department_id' => 'required|exists:departments,id',
+            'passwordsim' => 'nullable|string|min:8|max:20',
         ]);
 
         // Prepare the data for update
         $data = $request->only([
-            'nik', 'username', 'name', 'email',
-            'position_id', 'department_id', 'status'
+            'nik',
+            'username',
+            'name',
+            'email',
+            'position_id',
+            'department_id',
+            'status',
+            'passwordsim'
         ]);
 
         // Update password if provided
@@ -109,31 +120,31 @@ class UserController extends Controller
             $data['password'] = Hash::make($request->password);
         }
 
-       // Handle avatar upload
-if ($request->hasFile('avatar')) {
-    // Delete old avatar if it exists
-    if ($user->avatar) {
-        Storage::disk('public')->delete('user_avatars/' . $user->avatar);
-    }
+        // Handle avatar upload
+        if ($request->hasFile('avatar')) {
+            // Delete old avatar if it exists
+            if ($user->avatar) {
+                Storage::disk('public')->delete('user_avatars/' . $user->avatar);
+            }
 
-    // Get original extension
-    $extension = $request->avatar->getClientOriginalExtension();
+            // Get original extension
+            $extension = $request->avatar->getClientOriginalExtension();
 
-    // Store new avatar with original extension
-    $avatarName = $request->username . '.' . $extension;
-    $path = $request->avatar->storeAs('user_avatars', $avatarName, 'public');
+            // Store new avatar with original extension
+            $avatarName = $request->username . '.' . $extension;
+            $path = $request->avatar->storeAs('user_avatars', $avatarName, 'public');
 
-    // Log path for debugging
-    Log::channel('custom')->info('Avatar stored at path: ' . $path);
-    Log::channel('custom')->info('Storage directory contents:', Storage::disk('public')->allFiles('user_avatars'));
+            // Log path for debugging
+            Log::channel('custom')->info('Avatar stored at path: ' . $path);
+            Log::channel('custom')->info('Storage directory contents:', Storage::disk('public')->allFiles('user_avatars'));
 
-    // Verify that file exists
-    if (!Storage::disk('public')->exists('user_avatars/' . $avatarName)) {
-        Log::error('Failed to store avatar: ' . $avatarName);
-    }
+            // Verify that file exists
+            if (!Storage::disk('public')->exists('user_avatars/' . $avatarName)) {
+                Log::error('Failed to store avatar: ' . $avatarName);
+            }
 
-    $data['avatar'] = $avatarName;
-}
+            $data['avatar'] = $avatarName;
+        }
 
         // Update user data
         $user->update($data);
@@ -168,7 +179,7 @@ if ($request->hasFile('avatar')) {
         $request->validate([
             'nik' => 'required|min:4|max:6|unique:users,nik,' . $request->user()->id,
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,' . $request->user()->id,
+            'email' => 'required|email|max:255' . $request->user()->id,
             'password' => 'nullable|string|min:8|max:20',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
@@ -213,5 +224,116 @@ if ($request->hasFile('avatar')) {
 
         Alert::toast('Profile updated successfully!', 'success');
         return redirect()->route('profile.edit');
+    }
+
+    public function getCsrfToken()
+    {
+        $cookieJar = new CookieJar();
+
+        // Ambil token CSRF dari halaman login
+        $csrfResponse = Http::withOptions(['cookies' => $cookieJar, 'allow_redirects' => true])
+            ->get('http://192.100.150.7:8001/');
+
+        Log::info('Respon CSRF:', ['body' => $csrfResponse->body()]);
+
+        // Ekstrak token CSRF dari respons
+        preg_match('/name="csrfmiddlewaretoken" value="([^"]+)"/', $csrfResponse->body(), $matches);
+        $csrfToken = $matches[1] ?? null;
+
+        if (!$csrfToken) {
+            return response()->json(['status' => 'error', 'message' => 'Gagal mendapatkan token CSRF.'], 500);
+        }
+
+        return response()->json(['csrfToken' => $csrfToken, 'cookies' => $cookieJar->toArray()]);
+    }
+
+    public function loginToPython()
+    {
+        $user = Auth::user(); // Ambil data pengguna yang sedang login
+
+        try {
+            // Step 1: Lakukan GET untuk mengambil halaman login
+            $loginPageResponse = Http::withOptions(['allow_redirects' => true])
+                ->get('http://192.100.150.7:8001/loginAuth?next=/');
+
+            if ($loginPageResponse->failed()) {
+                Log::error('Gagal mengambil halaman login.', ['status' => $loginPageResponse->status()]);
+                return response()->json(['status' => 'error', 'message' => 'Gagal mengambil halaman login.'], 400);
+            }
+
+            // Step 2: Ekstrak CSRF token dari respons HTML
+            preg_match('/name="csrfmiddlewaretoken" value="(.*?)"/', $loginPageResponse->body(), $matches);
+            $csrfToken = $matches[1] ?? null;
+
+            if (!$csrfToken) {
+                Log::error('Gagal mengekstrak CSRF token.');
+                return response()->json(['status' => 'error', 'message' => 'Gagal mengekstrak CSRF token.'], 400);
+            }
+
+            // Step 3: Ambil cookies dari respons
+            $cookies = $loginPageResponse->cookies(); // Ambil cookies dari respons
+
+            if (empty($cookies)) {
+                Log::error('Gagal mendapatkan cookies.');
+                return response()->json(['status' => 'error', 'message' => 'Gagal mendapatkan cookies.'], 400);
+            }
+
+            // Step 4: Ubah cookies menjadi format yang diharapkan oleh Guzzle
+            $cookieArray = [];
+            foreach ($cookies as $cookie) {
+                $cookieArray[$cookie->getName()] = $cookie->getValue();
+            }
+
+            // Inisialisasi CookieJar dengan cookies yang diberikan
+            $cookieJar = CookieJar::fromArray($cookieArray, '192.100.150.7');
+
+            // Step 5: Siapkan data login
+            $postData = [
+                'username' => $user->username,
+                'password' => $user->passwordsim, // Asumsikan password pengguna tersimpan di kolom passwordsim
+                'csrfmiddlewaretoken' => $csrfToken,
+            ];
+
+            Log::info('Posting data ke Python:', $postData);
+
+            // Step 6: Kirim permintaan POST dengan data login
+            $response = Http::withOptions(['cookies' => $cookieJar])
+                ->withHeaders([
+                    'Content-Type' => 'application/x-www-form-urlencoded',
+                    'Referer' => 'http://192.100.150.7:8001/loginAuth',
+                    'X-CSRFToken' => $csrfToken,
+                ])
+                ->asForm() // Format data sebagai form-urlencoded
+                ->post('http://192.100.150.7:8001/loginAuth?next=/', $postData);
+
+            Log::info('Response:', ['body' => $response->body()]);
+
+            // Step 7: Periksa apakah login berhasil
+            if ($response->successful()) {
+                return response()->json(['status' => 'success']);
+            } else {
+                Log::error('Gagal login ke aplikasi Python.', [
+                    'status' => $response->status(),
+                    'body' => $response->body()
+                ]);
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Gagal login ke aplikasi Python. Error: ' . $response->status()
+                ], 401);
+            }
+        } catch (\Exception $e) {
+            Log::error('Terjadi kesalahan saat mencoba login ke aplikasi Python.', [
+                'error' => $e->getMessage()
+            ]);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan tak terduga. Silakan coba lagi.'
+            ], 500);
+        }
+    }
+
+    public function getDataMaster()
+    {
+        return \view('page.wsa-getmstr');
     }
 }

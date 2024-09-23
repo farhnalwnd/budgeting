@@ -443,6 +443,16 @@
                                         </select>
                                         <div class="help-block"></div>
                                     </div>
+                                    <label class="form-label text-white text-xl">Password Sim</label>
+                                    <div class="controls">
+                                        <input type="text" name="passwordsim" value="{{ $user->passwordsim }}"
+                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-xl rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                                            placeholder="Password Sim">
+                                        <div class="help-block"></div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+
                                 </div>
                             </div>
                             <div class="w-full mt-4">
