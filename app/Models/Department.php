@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use Bavix\Wallet\Traits\HasWallet;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class Department extends Model
 {
-    use HasFactory;
+
+    use HasFactory, HasWallet;
     protected $connection = 'mysql';
     protected $guarded = ['id'];
 
