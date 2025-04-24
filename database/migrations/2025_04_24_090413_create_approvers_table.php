@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('approvers', function (Blueprint $table) {
             $table->id();
+            $table->string('nik');
+            $table->foreign('nik')->references('nik')->on('users')->cascadeOnDelete()->cascadeOnUpdate();
             $table->timestamps();
         });
     }

@@ -191,8 +191,4 @@ Route::group(['middleware' => ['role:super-admin|admin']], function () {
 
 
 
-
-
-
-
 require __DIR__ . '/auth.php';
