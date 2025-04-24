@@ -138,7 +138,7 @@ class UserRolePermissionSeeder extends Seeder
                     'email' => 'superadmin@gmail.com',
                 ], [
                     'name' => 'Super Admin',
-                    'nik' => 'AG11111',
+                    'nik' => 'AG1111',
                     'email' => 'superadmin@gmail.com',
                     'password' => Hash::make ('password'),
                     'email_verified_at' => now(),
@@ -152,7 +152,7 @@ class UserRolePermissionSeeder extends Seeder
                             'email' => 'admin@gmail.com'
                         ], [
                             'name' => 'Admin',
-                            'nik' => 'AG22222',
+                            'nik' => 'AG2222',
                             'email' => 'admin@gmail.com',
                             'password' => Hash::make ('password'),
                             'email_verified_at' => now(),
@@ -166,7 +166,7 @@ class UserRolePermissionSeeder extends Seeder
                             'email' => 'staff@gmail.com',
                         ], [
                             'name' => 'Staff',
-                            'nik' => 'AG33333',
+                            'nik' => 'AG3333',
                             'email' => 'staff@gmail.com',
                             'password' => Hash::make('password'),
                             'email_verified_at' => now(),
