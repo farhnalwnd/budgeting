@@ -21,6 +21,8 @@
     <!-- Vendors Style-->
     <link rel="stylesheet" href="{{ asset('assets') }}/src/css/vendors_css.css">
 
+    <!-- {{-- aphine.js script --}}
+        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script> -->
 
     {{-- <script src="{{ asset('assets') }}/3.4.3"></script> --}}
 

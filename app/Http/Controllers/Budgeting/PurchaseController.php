@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Budgeting;
 
 use App\Http\Controllers\Controller;
+use App\Models\Budgeting\Purchase;
 use Illuminate\Http\Request;
 
 class PurchaseController extends Controller
@@ -12,7 +13,8 @@ class PurchaseController extends Controller
      */
     public function index()
     {
-        //
+        $purchases = Purchase::all();
+        return view(".page.budgeting.management.PurchaseRequest.index", ['purchases' => $purchases]);
     }
 
     /**
