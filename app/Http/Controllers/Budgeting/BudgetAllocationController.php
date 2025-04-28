@@ -57,7 +57,13 @@ class BudgetAllocationController extends Controller
                 ->inLog('budget-allocation')
                 ->event('Create')
                 ->causedBy($user)
-                ->withProperties(['no' => $budget->budget_allocation_no, 'action' => 'create'])
+                ->withProperties(['no' => $budget->budget_allocation_no, 'action' => 'create',
+                'data' => [
+                    'budget_allocation_no' => $budget->budget_allocation_no,
+                    'department_id' => $budget->department_id,
+                    'description' => $budget->description ?? null,
+                    'allocated_by' => $budget->allocated_by
+                ]])
                 ->log('Create budget-allocation ' . $budget->budget_allocation_no . ' by ' . $user->name . ' at ' . now());
 
             // Commit transaksi
@@ -107,6 +113,7 @@ class BudgetAllocationController extends Controller
             $user = Auth::user();
 
             $budget = BudgetAllocation::find($id);
+            $budgetOld = clone $budget;
             $budget->update([
                 'budget_allocation_no' => $validatedData['no'],
                 'department_id' => $validatedData['department'],
@@ -118,7 +125,17 @@ class BudgetAllocationController extends Controller
                 ->inLog('budget-allocation')
                 ->event('Update')
                 ->causedBy($user)
-                ->withProperties(['no' => $budget->budget_allocation_no, 'action' => 'create'])
+                ->withProperties(['no' => $budget->budget_allocation_no, 'action' => 'update',
+                'oldData' => [
+                    'budget_allocation_no' => $budgetOld->budget_allocation_no,
+                    'department_id' => $budgetOld->department_id,
+                    'description' => $budgetOld->description ?? null,
+                ],
+                'newData' => [
+                    'budget_allocation_no' => $budget->budget_allocation_no,
+                    'department_id' => $budget->department_id,
+                    'description' => $budget->description ?? null,
+                ]])
                 ->log('Update budget-allocation ' . $budget->budget_allocation_no . ' by ' . $user->name . ' at ' . now());
 
             // Commit transaksi
@@ -153,7 +170,13 @@ class BudgetAllocationController extends Controller
                 ->inLog('budget-allocation')
                 ->event('Delete')
                 ->causedBy($user)
-                ->withProperties(['no' => $budget->budget_allocation_no, 'action' => 'delete'])
+                ->withProperties(['no' => $budget->budget_allocation_no, 'action' => 'delete',
+                'data' => [
+                    'budget_allocation_no' => $budget->budget_allocation_no,
+                    'department_id' => $budget->department_id,
+                    'description' => $budget->description ?? null,
+                    'allocated_by' => $budget->allocated_by
+                ]])
                 ->log('Delete budget-allocation ' . $budget->budget_allocation_no . ' by ' . $user->name . ' at ' . now());
 
             // Commit transaksi

@@ -83,7 +83,7 @@
                         <span class="sr-only">Close modal</span>
                     </button>
                 </div>
-                <div class="p-4 md:p-5 overflow-y-auto max-h-96">
+                <div class="p-4 md:p-5 overflow-y-auto">
                     @if ($errors->any())
                         <div class="alert alert-danger">
                             <ul>
@@ -135,9 +135,9 @@
                                 <label class="form-label text-white text-xl">Quantity<span
                                     class="text-danger">*</span></label>
                                 <div class="controls">
-                                    <input type="number" name="quantity" id="quantity" required
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-xl rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                                        placeholder="Quantity">
+                                    <input type="number" name="quantity" id="quantity" required min="0"
+                                        class="quantity bg-gray-50 border border-gray-300 text-gray-900 text-xl rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                                        placeholder="Quantity" onChange="getTotalAmount(this)">
                                     <div class="help-block"></div>
                                 </div>
                             </div>
@@ -157,9 +157,9 @@
                                 <label class="form-label text-white text-xl">Amount<span
                                     class="text-danger">*</span></label>
                                 <div class="controls">
-                                    <input type="number" name="amount" id="amount" required
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-xl rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                                        placeholder="Amount">
+                                    <input type="number" name="amount" id="amount" required min="0"
+                                        class="amount bg-gray-50 border border-gray-300 text-gray-900 text-xl rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                                        placeholder="Amount" onChange="getTotalAmount(this)">
                                     <div class="help-block"></div>
                                 </div>
                             </div>
@@ -169,8 +169,8 @@
                                     class="text-danger">*</span></label>
                                 <div class="controls">
                                     <input type="number" name="total" id="total" required
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-xl rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                                        placeholder="Total">
+                                        class="total bg-gray-50 border border-gray-300 text-gray-900 text-xl rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                                        placeholder="Total" readonly>
                                     <div class="help-block"></div>
                                 </div>
                             </div>
@@ -417,9 +417,9 @@
                                             <label class="form-label text-white text-xl">Quantity<span
                                                 class="text-danger">*</span></label>
                                             <div class="controls">
-                                                <input type="number" name="quantity" required
-                                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-xl rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                                                    placeholder="Quantity" value="${budget.quantity}">
+                                                <input type="number" name="quantity" required min="1"
+                                                    class="quantity bg-gray-50 border border-gray-300 text-gray-900 text-xl rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                                                    placeholder="Quantity" value="${budget.quantity}" onChange="getTotalAmount(this)">
                                                 <div class="help-block"></div>
                                             </div>
                                         </div>
@@ -439,9 +439,9 @@
                                             <label class="form-label text-white text-xl">Amount<span
                                                 class="text-danger">*</span></label>
                                             <div class="controls">
-                                                <input type="number" name="amount" required
-                                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-xl rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                                                    placeholder="Amount" value="${budget.default_amount}">
+                                                <input type="number" name="amount" required min="0"
+                                                    class="amount bg-gray-50 border border-gray-300 text-gray-900 text-xl rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                                                    placeholder="Amount" value="${budget.default_amount}" onChange="getTotalAmount(this)">
                                                 <div class="help-block"></div>
                                             </div>
                                         </div>
@@ -450,9 +450,9 @@
                                             <label class="form-label text-white text-xl">Total Amount<span
                                                 class="text-danger">*</span></label>
                                             <div class="controls">
-                                                <input type="number" name="total" required
-                                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-xl rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                                                    placeholder="Total" value="${budget.total_amount}">
+                                                <input type="number" name="total" required min="0"
+                                                    class="total bg-gray-50 border border-gray-300 text-gray-900 text-xl rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                                                    placeholder="Total" value="${budget.total_amount}" readonly>
                                                 <div class="help-block"></div>
                                             </div>
                                         </div>
@@ -471,7 +471,26 @@
             modalDiv.innerHTML += newEditModal;
                 
         }
-       
+        
+        function getTotalAmount(currInput)
+        {
+            var parent = currInput.parentNode.parentNode.parentNode;
+            var quantityInput = parent.querySelector('.quantity');
+            var amountInput = parent.querySelector('.amount');
+            var totalInput = parent.querySelector('.total');
+            // var totalInput = parent.lastElementChild.lastElementChild.firstElementChild;
+            console.log(quantityInput.value, amountInput.value, totalInput.value);
+            if(quantityInput.value <= 0)
+            {
+                quantityInput.value = 1;
+            }
+            if(amountInput.value <= 0)
+            {
+                amountInput.value = 1;
+            }
+            totalInput.value = parseFloat(quantityInput.value) * parseFloat(amountInput.value);
+
+        }
 
     </script>
     @endpush

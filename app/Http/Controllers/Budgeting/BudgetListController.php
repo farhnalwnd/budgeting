@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Budgeting;
 
 use App\Http\Controllers\Controller;
+use App\Models\Budgeting\BudgetAllocation;
 use App\Models\Budgeting\BudgetList;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -58,12 +59,23 @@ class BudgetListController extends Controller
                 'total_amount' => $validatedData['total']
             ]);
             
+            $this->calculateBudget($budget->budget_allocation_no);
+
             activity()
                 ->performedOn($budget)
                 ->inLog('budget-list')
                 ->event('Create')
                 ->causedBy($user)
-                ->withProperties(['no' => $budget->budget_allocation_no, 'action' => 'create'])
+                ->withProperties(['no' => $budget->budget_allocation_no, 'action' => 'create',
+                'data' => [
+                    'budget_allocation_no' => $budget->budget_allocation_no,
+                    'name' => $budget->budget_allocation_no,
+                    'category_id' => $budget->category_id,
+                    'quantity' => $budget->quantity,
+                    'um' => $budget->um,
+                    'default_amount' => $budget->default_amount,
+                    'total_amount' => $budget->total_amount
+                ]])
                 ->log('Create budget-list ' . $budget->budget_allocation_no . ' by ' . $user->name . ' at ' . now());
 
             // Commit transaksi
@@ -116,6 +128,8 @@ class BudgetListController extends Controller
 
             $user = Auth::user();
             $budget = BudgetList::findOrFail($id);
+            $budgetOld = clone $budget; //simpan no budget yang lama
+
             $budget->update([
                 'budget_allocation_no' => $validatedData['no'],
                 'name' => $validatedData['name'],
@@ -125,13 +139,37 @@ class BudgetListController extends Controller
                 'default_amount' => $validatedData['amount'],
                 'total_amount' => $validatedData['total']
             ]);
-            
+
+            // kalau no budget berubah
+            if($budgetOld->budget_allocation_no !== $budget->budget_allocation_no){
+                $this->calculateBudget($budgetOld->budget_allocation_no);
+            }
+            $this->calculateBudget($budget->budget_allocation_no);
+
             activity()
                 ->performedOn($budget)
                 ->inLog('budget-list')
                 ->event('Update')
                 ->causedBy($user)
-                ->withProperties(['no' => $budget->budget_allocation_no, 'action' => 'update'])
+                ->withProperties(['no' => $budget->budget_allocation_no, 'action' => 'update', 
+                'oldData' => [
+                    'budget_allocation_no' => $budgetOld->budget_allocation_no,
+                    'name' => $budgetOld->budget_allocation_no,
+                    'category_id' => $budgetOld->category_id,
+                    'quantity' => $budgetOld->quantity,
+                    'um' => $budgetOld->um,
+                    'default_amount' => $budgetOld->default_amount,
+                    'total_amount' => $budgetOld->total_amount
+                ],
+                'newData' => [
+                    'budget_allocation_no' => $budget->budget_allocation_no,
+                    'name' => $budget->budget_allocation_no,
+                    'category_id' => $budget->category_id,
+                    'quantity' => $budget->quantity,
+                    'um' => $budget->um,
+                    'default_amount' => $budget->default_amount,
+                    'total_amount' => $budget->total_amount
+                ]])
                 ->log('Update budget-list ' . $budget->budget_allocation_no . ' by ' . $user->name . ' at ' . now());
 
             // Commit transaksi
@@ -161,12 +199,23 @@ class BudgetListController extends Controller
             $budget = BudgetList::findOrFail($id);
             $budget->delete();
             
+            $this->calculateBudget($budget->budget_allocation_no);
+
             activity()
                 ->performedOn($budget)
                 ->inLog('budget-list')
                 ->event('Delete')
                 ->causedBy($user)
-                ->withProperties(['no' => $budget->budget_allocation_no, 'action' => 'delete'])
+                ->withProperties(['no' => $budget->budget_allocation_no, 'action' => 'delete',
+                'data' => [
+                    'budget_allocation_no' => $budget->budget_allocation_no,
+                    'name' => $budget->budget_allocation_no,
+                    'category_id' => $budget->category_id,
+                    'quantity' => $budget->quantity,
+                    'um' => $budget->um,
+                    'default_amount' => $budget->default_amount,
+                    'total_amount' => $budget->total_amount
+                ]])
                 ->log('Delete budget-list ' . $budget->budget_allocation_no . ' by ' . $user->name . ' at ' . now());
 
             // Commit transaksi
@@ -185,5 +234,26 @@ class BudgetListController extends Controller
     public function getBudgetList(){
         $budgets = BudgetList::with('category')->get();
         return response()->json($budgets);
+    }
+
+    public function calculateBudget($no){
+        // Mulai transaction untuk memastikan integritas data
+        DB::beginTransaction();
+
+        try{
+            $totalAmount = BudgetList::where('budget_allocation_no', $no)->sum('total_amount');
+            $budget = BudgetAllocation::where('budget_allocation_no', $no)->first();
+            $budget->update([
+                'total_amount' => $totalAmount > 0 ? $totalAmount : null
+            ]);
+            // Commit transaksi
+            DB::commit();
+            return True;
+
+        } catch (\Exception $e) {
+            // Rollback transaksi jika terjadi kesalahan
+            DB::rollback();
+            return False;
+        }
     }
 }
