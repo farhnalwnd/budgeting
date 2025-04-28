@@ -59,4 +59,10 @@ class DepartmentController extends Controller
 
         return redirect()->route('department.index');
     }
+
+    public function getDepartmentData()
+    {
+        $departments = Department::all();
+        return response()->json($departments);
+    }
 }

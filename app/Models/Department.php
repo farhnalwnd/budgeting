@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Budgeting\BudgetAllocation;
 use Bavix\Wallet\Traits\HasWallet;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -27,6 +28,11 @@ class Department extends Model
     public function position()
     {
         return $this->belongsTo(Position::class);
+    }
+    
+    public function budgetAllocation()
+    {
+        return $this->hasMany(BudgetAllocation::class, 'department_id');
     }
 
     public static function boot()

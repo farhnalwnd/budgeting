@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+
+use App\Models\Budgeting\CategoryMaster;
 use App\Models\User;
 use App\Models\Level;
 use App\Models\Position;
@@ -199,5 +201,19 @@ class DatabaseSeeder extends Seeder
                         ]);
 
         $staffUser->assignRole($staffRole);
+
+
+        CategoryMaster::Create(['name' => 'Plant & Machineries']);
+        CategoryMaster::Create(['name' => 'Factory Building']);
+        CategoryMaster::Create(['name' => 'Storage Equipment']);
+        CategoryMaster::Create(['name' => 'Laboratory Equipment']);
+        CategoryMaster::Create(['name' => 'Test Bakery Equipment']);
+        CategoryMaster::Create(['name' => 'Office Building']);
+        CategoryMaster::Create(['name' => 'Furniture & Fixture']);
+        CategoryMaster::Create(['name' => 'Office Equipment']);
+        CategoryMaster::Create(['name' => 'Passanger Vehicle']);
+        CategoryMaster::Create(['name' => 'Delivery Truck']);
+        CategoryMaster::Create(['name' => 'Forklift']);
+        CategoryMaster::Create(['name' => 'Land improvement']);
     }
 }
