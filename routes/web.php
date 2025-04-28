@@ -113,7 +113,7 @@ Route::group(['middleware' => ['role:super-admin|admin']], function () {
     Route::post('levels', [LevelController::class, 'store'])->name('level.store');
     Route::delete('levels/{level:level_slug}/delete', [LevelController::class, 'destroy'])->name('level.destroy');
 
-    Route::resource('purchaseRequest',PurchaseController::class);
+    Route::resource('purchaseRequest.index',PurchaseController::class);
 });
 
 
