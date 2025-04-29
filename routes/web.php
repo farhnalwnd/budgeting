@@ -114,6 +114,11 @@ Route::group(['middleware' => ['role:super-admin|admin']], function () {
     Route::delete('levels/{level:level_slug}/delete', [LevelController::class, 'destroy'])->name('level.destroy');
 
     Route::resource('PurchaseRequest',PurchaseController::class);
+    
+
+    Route::get('/test-helper', function() {
+    dd(generateDocumentNumber('SURAT', 'CAPEX')); // Contoh output: "BUDGET-001/CAPEX/07/24"
+});
 });
 
 

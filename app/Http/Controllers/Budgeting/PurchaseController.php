@@ -35,6 +35,8 @@ class PurchaseController extends Controller
         $validatedData = $this->validateRequest($request);
         
         $purchases = $this->preparePurchaseData($validatedData);
+
+        $purchases = $this->addBudgetNumbers($purchases);
         
         // Simpan menggunakan transaction
         DB::transaction(function () use ($purchases) {
@@ -77,9 +79,19 @@ class PurchaseController extends Controller
                 'updated_at' => now()
             ];
         }
-        
         return $purchases;
+
     }
+protected function addBudgetNumbers(array $purchases)
+{
+    $budgetNumbers = generateMultipleDocumentNumbers(count($purchases), 'SURAT', 'CAPEX');
+
+    foreach ($purchases as $index => &$purchase) {
+        $purchase['budget_no'] = $budgetNumbers[$index];
+    }
+
+    return $purchases;
+}
 
     /**
      * Display the specified resource.

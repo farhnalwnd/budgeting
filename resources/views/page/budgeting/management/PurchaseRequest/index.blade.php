@@ -45,7 +45,7 @@
                         <thead class="uppercase border-b">
                             <tr>
                                 <th class="px-6 py-3 text-lg w-5">#</th>
-                                <th class="px-6 py-3 text-lg max-w-5">NO Budget</th>
+                                <th class="px-6 py-3 text-lg whitespace-nowrap w-10">NO Budget</th>
                                 <th class="px-6 py-3 text-lg">Item Name</th>
                                 <th class="px-6 py-3 text-lg w-5">Amount</th>
                                 <th class="px-6 py-3 text-lg w-5">status</th>
@@ -55,11 +55,11 @@
                         <tbody>
                             @foreach ($purchases as $purchase)
                             <tr>
-                                <td class="px-6 py-4 text-lg">{{ $purchase->id }}</td>
-                                <td class="px-6 py-4 text-lg">{{ $purchase->budget_no }}</td>
+                                <td class="px-6 py-4 text-lg w-5">{{ $purchase->id }}</td>
+                                <td class="px-6 py-4 text-lg whitespace-nowrap w-10">{{ $purchase->budget_no }}</td>
                                 <td class="px-6 py-4 text-lg">{{ $purchase->item_name }}</td>
-                                <td class="px-6 py-4 text-lg">{{ $purchase->amount }}</td>
-                                <td class="px-6 py-4 text-lg">{{ $purchase->status }}</td>
+                                <td class="px-6 py-4 text-lg w-5">{{ $purchase->amount }}</td>
+                                <td class="px-6 py-4 text-lg w-5">{{ $purchase->status }}</td>
                                 <td class="px-6 py-4 text-lg">{{ $purchase->remarks }}</td>
                                 </tr>
                             @endforeach
