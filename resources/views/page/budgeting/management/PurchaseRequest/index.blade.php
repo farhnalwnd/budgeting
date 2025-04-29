@@ -48,6 +48,7 @@
                                 <th class="px-6 py-3 text-lg whitespace-nowrap w-10">NO Budget</th>
                                 <th class="px-6 py-3 text-lg">Item Name</th>
                                 <th class="px-6 py-3 text-lg w-5">Amount</th>
+                                <th class="px-6 py-3 text-lg w-5">Quantity</th>
                                 <th class="px-6 py-3 text-lg w-5">status</th>
                                 <th class="px-6 py-3 text-lg ">remarks</th>
                             </tr>
@@ -59,8 +60,9 @@
                                 <td class="px-6 py-4 text-lg whitespace-nowrap w-10">{{ $purchase->budget_no }}</td>
                                 <td class="px-6 py-4 text-lg">{{ $purchase->item_name }}</td>
                                 <td class="px-6 py-4 text-lg w-5">{{ $purchase->amount }}</td>
+                                <td class="px-6 py-4 text-lg">{{ $purchase->quanitity }}</td>
                                 <td class="px-6 py-4 text-lg w-5">{{ $purchase->status }}</td>
-                                <td class="px-6 py-4 text-lg">{{ $purchase->remarks }}</td>
+                                <td class="px-6 py-4 text-lg w-2/6">{{ $purchase->remarks }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -98,70 +100,73 @@
 
         <!-- Table -->
         <div class="container pt-20">
-            <form method="POST" action="{{route('PurchaseRequest.store')}}">
-                @csrf
-                <table class="table-auto w-full border-collapse" id="testTable">
-                    <thead>
-                        <tr>
-                            <th class="text-center w-fit">ITEM NAME</th>
-                            <th class="text-center w-36">HARGA (RP)</th>
-                            <th class="text-center w-36">JML</th>
-                            <th class="text-center w-36">TOTAL</th>
-                            <th class="text-center w-52">REMARK</th>
-                            <th class="text-center">ACTION</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><input type="text" name="description[]"
-                                    class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none"
-                                    required>
-                            </td>
-                            <td>
-                                <input type="text" name="price[]"
-                                    class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none price-input"
-                                    required>
-                            </td>
-                            <td>
-                                <input type="number" name="quantity[]"
-                                    class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none quantity-input"
-                                    min="0" required>
-                            </td>
-                            <td>
-                                <input type="text" name="total[]"
-                                    class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none total-input"
-                                    readonly>
-                            </td>
-                            <td><textarea name="remark[]"
-                                    class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none"></textarea>
-                            </td>
-                            <td class="text-center">
-                                <div class="flex justify-center space-x-2">
-                                    <button type="button" class="remove-row btn btn-danger">Remove</button>
-                                    <button type="button" class="clear-btn btn btn-warning">Clear</button>
-                                </div>
-                            </td>
-                        </tr>
+<form method="POST" action="{{ route('PurchaseRequest.store') }}">
+    @csrf
+    <table class="table-auto w-full border-collapse" id="testTable">
+        <thead>
+            <tr>
+                <th class="text-center w-fit">ITEM NAME</th>
+                <th class="text-center w-48">HARGA (RP)</th>
+                <th class="text-center w-28">JML</th>
+                <th class="text-center w-48">TOTAL</th>
+                <th class="text-center w-56">REMARK</th>
+                <th class="text-center w-36">ACTION</th>
+                </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" name="description[]"
+                        class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none" required>
+                </td>
+                <td>
+                    <input type="text" name="price[]"
+                        class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none price-input"
+                        maxlength="10" required>
+                </td>
+                <td>
+                    <input type="number" name="quantity[]"
+                        class="w-full p-1 border-none focus:bg-transparent focus:ring-0 focus:border-none quantity-input"
+                        min="0" maxlength="2" required>
+                </td>
+                <td>
+                    <input type="text" name="total[]"
+                        class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none total-input"
+                        readonly>
+                </td>
+                <td><textarea name="remark[]"
+                        class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none"></textarea>
+                </td>
+                <td class="text-center">
+                    <div class="flex justify-center space-x-1">
+                        <button type="button" class="remove-row btn btn-danger text-base px-2 py-1">Remove</button>
+                        <button type="button" class="clear-btn btn btn-warning text-base px-2 py-1">Clear</button>
+                    </div>
+                    </td>
+                    </tr>
                     </tbody>
-                </table>
+                    </table>
+            <div class="my-3 flex flex-col items-end">
                 <h3>Grand Total: <span id="grand-total">Rp 0</span></h3>
-
                 <h3>Saldo Wallet: <span id="wallet-balance">Rp 1.000.000</span></h3>
-
                 <h3>Sisa Wallet: <span id="wallet-after">Rp 1.000.000</span></h3>
-
-                <div class="flex items-center justify-between mx-4 mt-4">
-
-                    <div>
-                        <button type="button" id="add-row" class="btn btn-primary">Tambah Baris</button>
+            </div>
+            <div class="flex items-center justify-between mx-4 mt-4">
+                <div>
+                    <button type="button" id="add-row" class="btn btn-primary group active:scale-90 transition-transform duration-200">
+                        <svg class="w-[27px] h-[27px] text-gray-800 dark:text-white transform transition-transform duration-200 group-hover:scale-125 group-active:scale-90"
+                            xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7"
+                                d="M9 5v14m8-7h-2m0 0h-2m2 0v2m0-2v-2M3 11h6m-6 4h6m11 4H4c-.55228 0-1-.4477-1-1V6c0-.55228.44772-1 1-1h16c.5523 0 1 .44772 1 1v12c0 .5523-.4477 1-1 1Z" />
+                        </svg>
+                    </button>
                     </div>
+        <div class="flex gap-2">
+            <button type="submit" class="btn btn-success">Simpan</button>
+            <button @click="open = !open" class="btn btn-danger">Exit</button>
+        </div>
+        </div>
+        </form>
 
-                    <div class="flex gap-2">
-                        <button type="submit" class="btn btn-success">Simpan</button>
-                        <button @click="open = !open" class="btn btn-danger">Exit</button>
-                    </div>
-                </div>
-            </form>
         </div>
     </div>
 </div>
@@ -210,6 +215,18 @@
         }
 
         function formatPriceInput(input) {
+            input.addEventListener('keydown', function (e) {
+                // Hanya izinkan angka, backspace, delete, arrow keys
+                if (
+                    !(
+                        (e.key >= '0' && e.key <= '9') ||
+                        ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)
+                    )
+                ) {
+                    e.preventDefault();
+                }
+            });
+
             input.addEventListener('blur', function () {
                 let numeric = parseRupiah(this.value) || 0;
                 this.value = toRupiah(numeric);
@@ -226,6 +243,29 @@
             });
         }
 
+        function formatQuantityInput(input, row) {
+            input.addEventListener('keydown', function (e) {
+                if (
+                    !(
+                        (e.key >= '0' && e.key <= '9') ||
+                        ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)
+                    )
+                ) {
+                    e.preventDefault();
+                }
+            });
+
+            input.addEventListener('input', function () {
+                let val = parseInt(this.value) || 0;
+                if (val > 99) {
+                    this.value = '99';
+                } else if (val < 0) {
+                    this.value = '0';
+                }
+                updateTotal(row);
+            });
+        }
+
         function clearRow(row) {
             row.querySelector('input[name="description[]"]').value = '';
             row.querySelector('.price-input').value = toRupiah(0);
@@ -236,9 +276,7 @@
 
         function setupRow(row) {
             formatPriceInput(row.querySelector('.price-input'));
-            row.querySelector('.quantity-input').addEventListener('input', function () {
-                updateTotal(row);
-            });
+            formatQuantityInput(row.querySelector('.quantity-input'), row);
 
             row.querySelector('.clear-btn').addEventListener('click', function () {
                 clearRow(row);
@@ -279,7 +317,6 @@
         document.getElementById('wallet-after').innerText = toRupiah(walletBalance);
     });
 </script>
-
 @endpush
 
 </x-app-layout>
