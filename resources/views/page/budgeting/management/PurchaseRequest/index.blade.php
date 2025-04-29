@@ -44,11 +44,12 @@
                     <table id="usersTable" class="table table-striped w-full text-left rtl:text-right table-bordered">
                         <thead class="uppercase border-b">
                             <tr>
-                                <th class="px-6 py-3 text-lg">#</th>
-                                <th class="px-6 py-3 text-lg">NO Budget</th>
+                                <th class="px-6 py-3 text-lg w-5">#</th>
+                                <th class="px-6 py-3 text-lg max-w-5">NO Budget</th>
                                 <th class="px-6 py-3 text-lg">Item Name</th>
-                                <th class="px-6 py-3 text-lg">Amount</th>
-                                <th class="px-6 py-3 text-lg">Status</th>
+                                <th class="px-6 py-3 text-lg w-5">Amount</th>
+                                <th class="px-6 py-3 text-lg w-5">status</th>
+                                <th class="px-6 py-3 text-lg ">remarks</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -59,6 +60,7 @@
                                 <td class="px-6 py-4 text-lg">{{ $purchase->item_name }}</td>
                                 <td class="px-6 py-4 text-lg">{{ $purchase->amount }}</td>
                                 <td class="px-6 py-4 text-lg">{{ $purchase->status }}</td>
+                                <td class="px-6 py-4 text-lg">{{ $purchase->remarks }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -96,7 +98,7 @@
 
         <!-- Table -->
         <div class="container pt-20">
-            <form method="POST" action="">
+            <form method="POST" action="{{route('PurchaseRequest.store')}}">
                 @csrf
                 <table class="table-auto w-full border-collapse" id="testTable">
                     <thead>
@@ -208,23 +210,19 @@
         }
 
         function formatPriceInput(input) {
-            input.addEventListener('input', function () {
-                let original = input.value;
-                let numeric = parseRupiah(original);
-                input.value = toRupiah(numeric);
+            input.addEventListener('blur', function () {
+                let numeric = parseRupiah(this.value) || 0;
+                this.value = toRupiah(numeric);
                 updateTotal(input.closest('tr'));
             });
 
             input.addEventListener('focus', function () {
-                if (input.value.trim() === '') {
-                    input.value = toRupiah(0);
-                }
+                let numeric = parseRupiah(this.value);
+                this.value = numeric > 0 ? numeric.toString() : '';
             });
 
-            input.addEventListener('blur', function () {
-                if (input.value.trim() === '' || parseRupiah(input.value) === 0) {
-                    input.value = toRupiah(0);
-                }
+            input.addEventListener('input', function () {
+                updateTotal(input.closest('tr'));
             });
         }
 
@@ -242,12 +240,10 @@
                 updateTotal(row);
             });
 
-            // Setup clear button
             row.querySelector('.clear-btn').addEventListener('click', function () {
                 clearRow(row);
             });
 
-            // Setup remove button
             row.querySelector('.remove-row').addEventListener('click', function () {
                 if (document.querySelectorAll('#testTable tbody tr').length > 1) {
                     row.remove();
@@ -268,7 +264,6 @@
             let tableBody = document.querySelector('#testTable tbody');
             let newRow = tableBody.querySelector('tr').cloneNode(true);
 
-            // Clear inputs
             newRow.querySelector('input[name="description[]"]').value = '';
             newRow.querySelector('.price-input').value = toRupiah(0);
             newRow.querySelector('.quantity-input').value = '';
@@ -284,6 +279,7 @@
         document.getElementById('wallet-after').innerText = toRupiah(walletBalance);
     });
 </script>
+
 @endpush
 
 </x-app-layout>
