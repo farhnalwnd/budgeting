@@ -65,7 +65,7 @@ class ActivityLogController extends Controller
     }
 
     public function getLogsData(){
-        $logs = Activity::all();
+        $logs = Activity::orderBy('created_at', 'desc')->get();
         if($logs){
             return response()->json($logs);
         }

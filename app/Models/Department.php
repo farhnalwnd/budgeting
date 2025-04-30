@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Budgeting\BudgetAllocation;
+use Bavix\Wallet\Interfaces\Wallet;
 use Bavix\Wallet\Traits\HasWallet;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

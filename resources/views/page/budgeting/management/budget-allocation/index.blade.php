@@ -108,9 +108,10 @@
                             <label class="form-label text-white text-xl">Department<span
                                     class="text-danger">*</span></label>
                             <div class="controls">
-                                <select name="department" id="department" required
+                                <select name="department" id="department" required onChange="getBudgetNumber()"
                                     class="form-select w-full text-xl" aria-invalid="false"
                                     placeholder="Department">
+                                    <option value="" selected disabled>Select Department</option>
                                 </select>
                                 <div class="help-block"></div>
                             </div>
@@ -145,20 +146,7 @@
         var budgets = null;
         var departments = null;
         document.addEventListener('DOMContentLoaded', function() {
-            // Get no budget new
-            $.ajax({
-                url: '{{ route('get.budget.no') }}',
-                method: 'GET',
-                success: function(response) {
-                    var no = document.getElementById('no');
-                    no.value = response;
-                },
-                error: function() {
-                    // Jika gagal, tampilkan pesan error
-                    console.log('Error ketika mengambil nomor budget.');
-                }
-            });
-
+            
             // get department list
             $.ajax({
                 url: '{{ route('get.department.data') }}',
@@ -343,6 +331,28 @@
                 
         }
        
+        function getBudgetNumber(){
+            // Get no budget new
+            var departmentSelectValue = document.getElementById('department').value;
+            console.log(departmentSelectValue);
+            $.ajax({
+                url: '{{ route('get.budget.no') }}',
+                method: 'GET',
+                data: {
+                    departmentId: departmentSelectValue
+                },
+                success: function(response) {
+                    console.log(response);
+                    var no = document.getElementById('no');
+                    no.value = response;
+                },
+                error: function() {
+                    // Jika gagal, tampilkan pesan error
+                    console.log('Error ketika mengambil nomor budget.');
+                }
+            });
+
+        }
 
     </script>
     @endpush
