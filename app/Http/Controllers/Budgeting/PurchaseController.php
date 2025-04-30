@@ -6,7 +6,9 @@ namespace App\Http\Controllers\Budgeting;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\Budgeting\Purchase;
+use App\Models\Department;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PurchaseController extends Controller
 {
@@ -15,8 +17,15 @@ class PurchaseController extends Controller
      */
     public function index()
     {
-        $purchases = Purchase::all();
-        return view(".page.budgeting.management.PurchaseRequest.index", ['purchases' => $purchases]);
+        $department = Department::first();
+        $purchases = Purchase::with('department')->paginate(5);
+        $user = Auth::user();
+        return view(".page.budgeting.management.PurchaseRequest.index", [
+            'purchases' => $purchases,
+            'department'=>$department,
+            'userDepartment'=>$user->department->department_name ?? 'unknown',
+            'currentDate'=>now()->format('j M y'),
+        ]);
     }
 
     /**
@@ -33,8 +42,14 @@ class PurchaseController extends Controller
     public function store(Request $request)
     {
         $validatedData = $this->validateRequest($request);
+
+        $departmentId = auth()->user()->department_id;
+        if (!$departmentId) {
+            abort(403, 'User tidak memiliki department');
+        }
+
         
-        $purchases = $this->preparePurchaseData($validatedData);
+        $purchases = $this->preparePurchaseData($validatedData, $departmentId);
 
         $purchases = $this->addBudgetNumbers($purchases);
         
@@ -61,7 +76,7 @@ class PurchaseController extends Controller
         ]);
     }
 
-    protected function preparePurchaseData(array $validatedData)
+    protected function preparePurchaseData(array $validatedData, $departmentId)
     {
         $purchases = [];
         
@@ -75,6 +90,7 @@ class PurchaseController extends Controller
                 'quanitity' => $quantity,
                 'total_amount' => $price * $quantity,
                 'remarks' => $validatedData['remark'][$index] ?? null,
+                'department_id'=> $departmentId,
                 'created_at' => now(),
                 'updated_at' => now()
             ];
