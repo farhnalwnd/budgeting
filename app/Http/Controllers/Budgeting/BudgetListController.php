@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Budgeting;
 use App\Http\Controllers\Controller;
 use App\Models\Budgeting\BudgetAllocation;
 use App\Models\Budgeting\BudgetList;
+use App\Models\Department;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -243,8 +244,19 @@ class BudgetListController extends Controller
         try{
             $totalAmount = BudgetList::where('budget_allocation_no', $no)->sum('total_amount');
             $budget = BudgetAllocation::where('budget_allocation_no', $no)->first();
+            $department = Department::findOrFail($budget->department_id);
+            $departmentBudget = $budget->total_amount ?? 0;
+
+            $finalAmount = $totalAmount - $departmentBudget;
+            if($finalAmount > 0){
+                $department->deposit(abs($finalAmount));
+            }
+            else if($finalAmount < 0)
+            {
+                $department->withdraw(abs($finalAmount));
+            }
             $budget->update([
-                'total_amount' => $totalAmount > 0 ? $totalAmount : null
+                'total_amount' => $department->balance
             ]);
             // Commit transaksi
             DB::commit();

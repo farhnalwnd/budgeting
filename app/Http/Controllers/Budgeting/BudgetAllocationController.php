@@ -196,27 +196,26 @@ class BudgetAllocationController extends Controller
         $budgets = BudgetAllocation::with('department')->get();
         return response()->json($budgets);
     }
+    
+    public function getBudgetNo(Request $request)
+    {
+        $departmentId = $request->input('departmentId');
+        // Ambil departemen berdasarkan ID
+        $department = Department::findOrFail($departmentId);
+        $departmentCode = str_replace(" ","", strtoupper(substr($department->department_name, 0, 3))); // Ambil 3 huruf pertama nama departemen
 
-    public function getBudgetNo(){
-        $year = date('y');
-        $prefix = "{$year}CAPEX";
-        $lastBudget = BudgetAllocation::where('budget_allocation_no', 'like', "{$prefix}%")->orderBy('budget_allocation_no', 'desc')->first();
+        // Cari alokasi terakhir yang dimulai dengan CAPEX/{kodeDepartemen}
+        $lastAllocation = BudgetAllocation::where('budget_allocation_no', 'like', 'CAPEX/'.$departmentCode.'/%')
+                                        ->latest()
+                                        ->first();
 
-        if ($lastBudget) {
-            $lastNo = (int)substr($lastBudget->budget_allocation_no, -4);
-            $newNo = $lastNo + 1;
-        } else {
-            $newNo = 1;
-        }
+        // Ambil angka urutan terakhir dari nomor alokasi
+        $lastNumber = $lastAllocation ? (int) substr($lastAllocation->budget_allocation_no, -4) : 0;
 
-        do {
-            $newNoReg = $prefix . str_pad($newNo, 4, '0', STR_PAD_LEFT);
-            $existingBudget = BudgetAllocation::where('budget_allocation_no', $newNoReg)->first();
-            if ($existingBudget) {
-                $newNo++;
-            }
-        } while ($existingBudget);
+        // Menambahkan 1 dan memastikan nomor urut 4 digit
+        $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
 
-        return response()->json($newNoReg);
+        // Menghasilkan nomor alokasi baru
+        return "CAPEX/{$departmentCode}/{$newNumber}";
     }
 }

@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use App\Models\Budgeting\BudgetAllocation;
+use Bavix\Wallet\Interfaces\Wallet;
 use Bavix\Wallet\Traits\HasWallet;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
-class Department extends Model
+class Department extends Model implements Wallet
 {
 
     use HasFactory, HasWallet;
