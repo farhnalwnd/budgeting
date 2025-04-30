@@ -173,6 +173,7 @@ return [
         RealRashid\SweetAlert\SweetAlertServiceProvider::class,
         Laravel\Passport\PassportServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
+        App\Providers\HelperServiceProvider::class,
         // Haruncpi\LaravelSimpleFilemanager\SimpleFilemanagerServiceProvider::class,
 
 

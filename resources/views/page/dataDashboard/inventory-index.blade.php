@@ -82,10 +82,8 @@
     <script type="text/javascript" src="{{ asset('assets') }}/ajax/libs/jQuery-slimScroll/1.3.8/jquery-3.7.1.min.js">
     </script>
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
-    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.js">
-        < /> <
-        script src = "https://cdn.datatables.net/2.0.8/js/dataTables.jqueryui.js" >
-    </script>
+    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.jqueryui.js"></script>
     <script src="https://cdn.datatables.net/searchpanes/2.3.1/js/dataTables.searchPanes.js"></script>
     <script src="https://cdn.datatables.net/searchpanes/2.3.1/js/searchPanes.jqueryui.js"></script>
     <script src="https://cdn.datatables.net/select/2.0.3/js/dataTables.select.js"></script>
@@ -136,13 +134,13 @@
 
 
             // Penanganan pesan sukses
-            @if (session()->has('success'))
+            <!-- @if (session()->has('success'))
                 Swal.fire({
                     icon: 'success',
                     title: '{{ session()->get('success') }}',
                     text: '{{ session()->get('message') }}',
                 });
-            @endif
+            @endif -->
         </script>
     @endpush
 </x-app-layout>

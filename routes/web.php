@@ -7,6 +7,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\Budgeting\BudgetAllocationController;
+use App\Http\Controllers\Budgeting\PurchaseController;
 use App\Http\Controllers\Budgeting\BudgetListController;
 use App\Http\Controllers\Budgeting\CategoryController;
 use App\Http\Controllers\NotificationController;
@@ -111,6 +112,13 @@ Route::group(['middleware' => ['role:super-admin|admin']], function () {
     Route::put('levels/{level:level_slug}/update', [LevelController::class, 'update'])->name('level.update');
     Route::post('levels', [LevelController::class, 'store'])->name('level.store');
     Route::delete('levels/{level:level_slug}/delete', [LevelController::class, 'destroy'])->name('level.destroy');
+
+    Route::resource('PurchaseRequest',PurchaseController::class);
+    
+
+    Route::get('/test-helper', function() {
+    dd(generateDocumentNumber('SURAT', 'CAPEX')); // Contoh output: "BUDGET-001/CAPEX/07/24"
+});
 });
 
 
