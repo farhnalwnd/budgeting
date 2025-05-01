@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use App\Models\Budgeting\Purchase;
-use Bavix\Wallet\Interfaces\Wallet;
 
 class Department extends Model implements Wallet
 {

@@ -116,7 +116,7 @@
 
         <!-- Table -->
         <div class="container pt-20 max-h- overflow-y-scroll">
-            <form x-on:keydown.enter.window="$submit()" id="purchase-form" method="POST"
+            <form x-on:keydown.enter.window="$el.submit()" method="POST"
                 action="{{ route('PurchaseRequest.store') }}">
     @csrf
     <table class="table-auto w-full border-collapse" id="testTable">
@@ -131,7 +131,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                    <tr id="row-template" class="hidden">
+                    <tr>
                         <td><input type="text" name="description[]"
                         class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none" required>
                 </td>
@@ -191,84 +191,151 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const table = document.getElementById('testTable').getElementsByTagName('tbody')[0];
-        const addRowBtn = document.getElementById('add-row');
-        const grandTotalDisplay = document.getElementById('grand-total');
-        const walletAfter = document.getElementById('wallet-after');
-        const walletBalance = {{ $department-> balance
+        let walletBalance = {{ $department-> balance
     }};
-            document.getElementById('wallet-balance').innerText = 'Rp ' + walletBalance.toLocaleString('id-ID');
 
-                    function formatCurrency(number) {
-                        return 'Rp ' + Number(number).toLocaleString('id-ID');
+                            function toRupiah(number) {
+                                return new Intl.NumberFormat('id-ID', {
+                                    style: 'currency',
+                                    currency: 'IDR',
+                                    minimumFractionDigits: 0
+                                }).format(number);
         }
 
-                    function calculateTotals() {
+                            function parseRupiah(rpString) {
+                                return parseInt(rpString.replace(/[^0-9]/g, '')) || 0;
+                            }
+
+                            function updateTotal(row) {
+                                const priceInput = row.querySelector('.price-input');
+                                const quantityInput = row.querySelector('.quantity-input');
+                                const totalInput = row.querySelector('.total-input');
+
+                                const price = parseRupiah(priceInput.value);
+                                const quantity = parseFloat(quantityInput.value) || 0;
+                                const total = price * quantity;
+
+                                totalInput.value = toRupiah(total);
+                                updateGrandTotal();
+                            }
+
+                            function updateGrandTotal() {
+                                const totalInputs = document.querySelectorAll('.total-input');
             let grandTotal = 0;
-                    document.querySelectorAll('#testTable tbody tr:not(#row-template)').forEach(row => {
-                        const qty = parseFloat(row.querySelector('.quantity-input')?.value) || 0;
-                        const price = parseFloat(row.querySelector('.price-input')?.value) || 0;
-                        const total = qty * price;
-                        row.querySelector('.total-input').value = total.toFixed(2);
-                        grandTotal += total;
+
+                            totalInputs.forEach(input => {
+                                grandTotal += parseRupiah(input.value);
                 });
 
-                    grandTotalDisplay.innerText = formatCurrency(grandTotal);
-                    const sisa = walletBalance - grandTotal;
-                    walletAfter.innerText = formatCurrency(sisa);
-                    walletAfter.style.color = sisa < 0 ? 'red' : 'black';
+                            const remainingBalance = walletBalance - grandTotal;
 
-                    return sisa;
+                            document.getElementById('grand-total').innerText = toRupiah(grandTotal);
+                            document.getElementById('wallet-after').innerText = toRupiah(remainingBalance);
+
+                            const saveBtn = document.getElementById('save-transaction');
+                            if (saveBtn) {
+                                saveBtn.disabled = remainingBalance < 0;
+                            }
+
+                            const walletAfterElem = document.getElementById('wallet-after');
+                            walletAfterElem.classList.toggle('text-red-600', remainingBalance < 0);
+                            walletAfterElem.classList.toggle('text-black', remainingBalance >= 0);
+                        }
+
+                function formatPriceInput(input) {
+                    input.addEventListener('keydown', function (e) {
+                        const allowedKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'];
+                        if (!(e.key >= '0' && e.key <= '9') && !allowedKeys.includes(e.key)) {
+                            e.preventDefault();
+                        }
+                });
+
+                input.addEventListener('blur', function () {
+                    const numeric = parseRupiah(this.value) || 0;
+                    this.value = toRupiah(numeric);
+                    updateTotal(input.closest('tr'));
+                });
+
+                input.addEventListener('focus', function () {
+                    const numeric = parseRupiah(this.value);
+                    this.value = numeric > 0 ? numeric.toString() : '';
+                });
+
+                input.addEventListener('input', function () {
+                    updateTotal(input.closest('tr'));
+                });
                 }
 
-                    function clearRow(button) {
-                        const row = button.closest('tr');
-                        row.querySelectorAll('input, textarea').forEach(input => input.value = '');
-                        calculateTotals();
+                function formatQuantityInput(input, row) {
+                    input.addEventListener('keydown', function (e) {
+                        const allowedKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'];
+                        if (!(e.key >= '0' && e.key <= '9') && !allowedKeys.includes(e.key)) {
+                            e.preventDefault();
+                        }
+                });
+
+                input.addEventListener('input', function () {
+                    let val = parseInt(this.value) || 0;
+                    this.value = val > 99 ? '99' : (val < 0 ? '0' : val.toString());
+                    updateTotal(row);
+                });
         }
 
-                    function removeRow(button) {
-                        button.closest('tr').remove();
-                        calculateTotals();
-                }
+    function clearRow(row) {
+        row.querySelector('input[name="description[]"]').value = '';
+        row.querySelector('.price-input').value = toRupiah(0);
+        row.querySelector('.quantity-input').value = '';
+        row.querySelector('textarea[name="remark[]"]').value = '';
+        row.querySelector('.total-input').value = toRupiah(0);
+        updateTotal(row);
+    }
 
-                    function createRow() {
-                        const template = document.getElementById('row-template');
-                        const clone = template.cloneNode(true);
-                        clone.removeAttribute('id');
-                        clone.classList.remove('hidden');
-                        table.appendChild(clone);
-        }
+    function setupRow(row) {
+        const priceInput = row.querySelector('.price-input');
+        const quantityInput = row.querySelector('.quantity-input');
 
-                    table.addEventListener('click', function (event) {
-                        if (event.target.classList.contains('clear-btn')) {
-                            clearRow(event.target);
-        }
-                    if (event.target.classList.contains('remove-row')) {
-                        removeRow(event.target);
-                    }
+        formatPriceInput(priceInput);
+        formatQuantityInput(quantityInput, row);
+
+        row.querySelector('.clear-btn')?.addEventListener('click', function () {
+            clearRow(row);
             });
 
-                    table.addEventListener('input', function (event) {
-                        if (event.target.classList.contains('price-input') || event.target.classList.contains('quantity-input')) {
-                            calculateTotals();
+        row.querySelector('.remove-row')?.addEventListener('click', function () {
+            const rows = document.querySelectorAll('#testTable tbody tr');
+            if (rows.length > 1) {
+                row.remove();
+                updateGrandTotal();
                 }
-                });
+        });
+    }
 
-                    addRowBtn.addEventListener('click', function () {
-                        createRow();
+                                        // Setup semua baris awal
+                                        document.querySelectorAll('#testTable tbody tr').forEach(row => {
+                                            row.querySelector('.price-input').value = toRupiah(0);
+                                            row.querySelector('.total-input').value = toRupiah(0);
+                                            setupRow(row);
         });
 
-                    document.getElementById('purchase-form').addEventListener('submit', function (e) {
-                        const sisa = calculateTotals();
-                        if (sisa < 0) {
-                            e.preventDefault();
-                            alert("Tidak bisa melakukan purchase, saldo kurang!");
-                        }
+                                        // Tambah baris baru
+                                        document.getElementById('add-row')?.addEventListener('click', function () {
+                                            const tableBody = document.querySelector('#testTable tbody');
+                                            const newRow = tableBody.querySelector('tr').cloneNode(true);
+                                            newRow.querySelector('input[name="description[]"]').value = '';
+                                            newRow.querySelector('.price-input').value = toRupiah(0);
+                                            newRow.querySelector('.quantity-input').value = '';
+                                            newRow.querySelector('textarea[name="remark[]"]').value = '';
+                                            newRow.querySelector('.total-input').value = toRupiah(0);
+
+                                            tableBody.appendChild(newRow);
+                                            setupRow(newRow);
         });
 
-                    calculateTotals();
-});
+                                        // Inisialisasi nilai awal saldo
+                                        document.getElementById('wallet-balance').innerText = toRupiah(walletBalance);
+                                        document.getElementById('wallet-after').innerText = toRupiah(walletBalance);
+                                        updateGrandTotal();
+    });
 </script>
 @endpush
 

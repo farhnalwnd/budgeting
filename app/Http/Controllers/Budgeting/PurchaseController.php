@@ -48,7 +48,6 @@ class PurchaseController extends Controller
             abort(403, 'User tidak memiliki department');
         }
 
-        
         $purchases = $this->preparePurchaseData($validatedData, $departmentId);
 
         $purchases = $this->addBudgetNumbers($purchases);
