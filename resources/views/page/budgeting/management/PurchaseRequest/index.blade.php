@@ -153,6 +153,7 @@
                 <td><textarea name="remark[]"
                         class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none"></textarea>
                 </td>
+                <input type="hidden" name="grand_total" id="grand-total-input">
                 <td class="text-center">
                     <div class="flex justify-center space-x-1">
                         <button type="button" class="remove-row btn btn-danger text-base px-2 py-1">Remove</button>
@@ -232,6 +233,8 @@
                             document.getElementById('grand-total').innerText = toRupiah(grandTotal);
                             document.getElementById('wallet-after').innerText = toRupiah(remainingBalance);
 
+                                document.getElementById('grand-total-input').value = grandTotal;
+
                             const saveBtn = document.getElementById('save-transaction');
                             if (saveBtn) {
                                 saveBtn.disabled = remainingBalance < 0;
@@ -262,6 +265,15 @@
                 });
 
                 input.addEventListener('input', function () {
+                    const cursorPosition = input.selectionStart;
+                    const numeric = parseRupiah(input.value);
+                    input.value = toRupiah(numeric);
+                    updateTotal(input.closest('tr'));
+
+                    setTimeout(() => {
+                        input.setSelectionRange(input.value.length, input.value.length);
+                    }, 0);
+
                     updateTotal(input.closest('tr'));
                 });
                 }

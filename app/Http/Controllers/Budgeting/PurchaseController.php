@@ -42,14 +42,23 @@ class PurchaseController extends Controller
     public function store(Request $request)
     {
         $validatedData = $this->validateRequest($request);
+        $department = auth()->user()->department;
+        $walletBalance = $department->balance;
 
-        $departmentId = auth()->user()->department_id;
-        if (!$departmentId) {
-            abort(403, 'User tidak memiliki department');
-        }
+    $grandTotal = 0;
+    foreach ($validatedData['price'] as $index => $priceStr) {
+        $price = Purchase::parseRupiah($priceStr);
+        $quantity = $validatedData['quantity'][$index];
+        $grandTotal += $price * $quantity;
+    }
 
-        $purchases = $this->preparePurchaseData($validatedData, $departmentId);
+    if ($grandTotal > $walletBalance) {
+        return back();
+    }else{
+        $department->withdraw($grandTotal);
+    }
 
+        $purchases = $this->preparePurchaseData($validatedData, $department->id);
         $purchases = $this->addBudgetNumbers($purchases);
         
         // Simpan menggunakan transaction
