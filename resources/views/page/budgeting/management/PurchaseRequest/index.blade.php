@@ -88,7 +88,7 @@
 <!-- Modal -->
 <div x-show="open" x-on:keydown.escape.window="open = false" x-transition.duration.400ms
     class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-    <div class="bg-white text-black p-6 rounded-lg shadow-lg w-2/3 h-fit">
+    <div class="bg-white text-black p-6 rounded-lg shadow-lg w-2/3">
         <!-- Header -->
         <div class="flex justify-start">
             <div class="flex items-center">
@@ -115,12 +115,14 @@
         </div>
 
         <!-- Table -->
-        <div class="container pt-20 max-h- overflow-y-scroll">
+        <div class="container mt-10">
             <form x-on:keydown.enter.window="$el.submit()" method="POST"
                 action="{{ route('PurchaseRequest.store') }}">
+<div x-data="{ scrolled: false }" @scroll="scrolled = $el.scrollTop > 0 || false"
+    class="overflow-y-auto max-h-[350px] mt-6">
     @csrf
     <table class="table-auto w-full border-collapse" id="testTable">
-        <thead>
+        <thead :class="scrolled ? 'bg-white shadow-md border-none' : ''" class="sticky top-0 z-10">
             <tr>
                 <th class="text-center w-fit">ITEM NAME</th>
                 <th class="text-center w-48">HARGA (RP)</th>
@@ -130,7 +132,7 @@
                 <th class="text-center w-36">ACTION</th>
                 </tr>
                 </thead>
-                <tbody>
+                <tbody class="max-h-[50vh] overflow-y-auto">
                     <tr>
                         <td><input type="text" name="description[]"
                         class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none" required>
@@ -163,6 +165,7 @@
                     </tr>
                     </tbody>
                     </table>
+</div>
             <div class="my-3 flex">
                 <div class="mr-auto"></div>
                 <div>
@@ -198,7 +201,7 @@
         let walletBalance = {{ $department-> balance
     }};
 
-                            function toRupiah(number) {
+        function toRupiah(number) {
                                 return new Intl.NumberFormat('id-ID', {
                                     style: 'currency',
                                     currency: 'IDR',
@@ -206,11 +209,11 @@
                                 }).format(number);
         }
 
-                            function parseRupiah(rpString) {
+        function parseRupiah(rpString) {
                                 return parseInt(rpString.replace(/[^0-9]/g, '')) || 0;
                             }
 
-                            function updateTotal(row) {
+        function updateTotal(row) {
                                 const priceInput = row.querySelector('.price-input');
                                 const quantityInput = row.querySelector('.quantity-input');
                                 const totalInput = row.querySelector('.total-input');
@@ -223,7 +226,7 @@
                                 updateGrandTotal();
                             }
 
-                            function updateGrandTotal() {
+        function updateGrandTotal() {
                                 const totalInputs = document.querySelectorAll('.total-input');
             let grandTotal = 0;
 
@@ -248,7 +251,7 @@
                             walletAfterElem.classList.toggle('text-black', remainingBalance >= 0);
                         }
 
-                function formatPriceInput(input) {
+        function formatPriceInput(input) {
                     input.addEventListener('keydown', function (e) {
                         const allowedKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'];
                         if (!(e.key >= '0' && e.key <= '9') && !allowedKeys.includes(e.key)) {
@@ -281,7 +284,7 @@
                 });
                 }
 
-                function formatQuantityInput(input, row) {
+        function formatQuantityInput(input, row) {
                     input.addEventListener('keydown', function (e) {
                         const allowedKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'];
                         if (!(e.key >= '0' && e.key <= '9') && !allowedKeys.includes(e.key)) {
@@ -325,15 +328,18 @@
         });
     }
 
-                                        // Setup semua baris awal
-                                        document.querySelectorAll('#testTable tbody tr').forEach(row => {
+        function requestBudget() {
+            document.getElementById('')
+        }
+            // Setup semua baris awal
+            document.querySelectorAll('#testTable tbody tr').forEach(row => {
                                             row.querySelector('.price-input').value = toRupiah(0);
                                             row.querySelector('.total-input').value = toRupiah(0);
                                             setupRow(row);
         });
 
-                                        // Tambah baris baru
-                                        document.getElementById('add-row')?.addEventListener('click', function () {
+            // Tambah baris baru
+            document.getElementById('add-row')?.addEventListener('click', function () {
                                             const tableBody = document.querySelector('#testTable tbody');
                                             const newRow = tableBody.querySelector('tr').cloneNode(true);
                                             newRow.querySelector('input[name="description[]"]').value = '';
@@ -346,11 +352,12 @@
                                             setupRow(newRow);
         });
 
-                                        // Inisialisasi nilai awal saldo
-                                        document.getElementById('wallet-balance').innerText = toRupiah(walletBalance);
-                                        document.getElementById('wallet-after').innerText = toRupiah(walletBalance);
-                                        updateGrandTotal();
+            // Inisialisasi nilai awal saldo
+            document.getElementById('wallet-balance').innerText = toRupiah(walletBalance);
+            document.getElementById('wallet-after').innerText = toRupiah(walletBalance);
+            updateGrandTotal();
     });
+
 </script>
 @endpush
 
