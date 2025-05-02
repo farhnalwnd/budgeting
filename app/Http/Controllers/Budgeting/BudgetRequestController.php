@@ -129,7 +129,10 @@ class BudgetRequestController extends Controller
                 'reviewTextArea' => 'nullable|string'
             ]);
 
-            $toDept = Department::where('department_name', $validatedData['to_department'])->first();
+            $budget = BudgetRequest::findOrFail($id);
+
+            $fromDept = Department::findOrFail($budget->from_department_id);
+            $toDept = Department::findOrFail($budget->to_department_id);
 
             if($toDept->balance < $validatedData['amount']){
                 DB::rollback();
@@ -148,13 +151,14 @@ class BudgetRequestController extends Controller
                 {
                     $review = $validatedData['reviewTextArea'];
                 }
+                $toDept->transfer($fromDept, $budget->amount);
             }
             else
             {   
                 $status = 'Rejected';
                 $review = $validatedData['reviewTextArea'];
             }
-            $budget = BudgetRequest::findOrFail($id);
+
             $budget->update([
                 'status' => $status,
                 'feedback' => $review
