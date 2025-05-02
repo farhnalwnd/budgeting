@@ -25,11 +25,11 @@ return new class extends Migration
             $table->foreignId('budget_purchase_no')->constrained(
                 table:'purchases',
                 indexName:'fk_budgetPurchases_purchases'
-            ); //pemberi
+            )->nullable(); //no purchasing
             $table->decimal('amount',18,2); // jumlah diminta
             $table->text('reason'); // alasan permintaan
             $table->enum('status', ['pending','approved','rejected'])->default('pending');
-            $table->text('feedback'); // alasan penolakan
+            $table->text('feedback')->nullable(); // alasan penolakan
             $table->timestamps();
         });
     }

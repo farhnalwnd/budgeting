@@ -13,8 +13,11 @@ return new class extends Migration
     {
         Schema::create('budget_approvers', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('department_id')->constrained(
+                table:'departments',
+                indexName:'fk_budgetRequests_departments'
+            ); //pemohon
             $table->string('nik');
-            $table->string('status');
             $table->text('token')->nullable();
             $table->timestamps();
         });

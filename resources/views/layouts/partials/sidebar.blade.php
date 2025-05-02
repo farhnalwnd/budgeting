@@ -26,7 +26,13 @@
                             class="path1"></span><span class="path2"></span></i>Purchase Request</a></li>
                 <li><a href="{{ route('budget-allocation.index') }}"
                         class="{{ request()->is('management/budget-allocation') ? 'current' : '' }}"><i class="icon-Commit"><span
-                                class="path1"></span><span class="path2"></span></i>Budget Allocation </a></li>
+                                class="path1"></span><span class="path2"></span></i>Budget Allocation</a></li>
+                <li><a href="{{ route('budget-request.index') }}"
+                    class="{{ request()->is('management/budget-request') ? 'current' : '' }}"><i class="icon-Commit"><span
+                            class="path1"></span><span class="path2"></span></i>Budget Request</a></li>
+                <li><a href="{{ route('budget-request.approval') }}"
+                    class="{{ request()->is('management/budget-approval') ? 'current' : '' }}"><i class="icon-Commit"><span
+                            class="path1"></span><span class="path2"></span></i>Budget Request Approval</a></li>
                 <li><a href="{{ route('category.index') }}"
                         class="{{ request()->is('management/category') ? 'current' : '' }}"><i class="icon-Commit"><span
                                 class="path1"></span><span class="path2"></span></i>Category </a></li>
