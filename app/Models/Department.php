@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Budgeting\BudgetAllocation;
+use App\Models\Budgeting\BudgetRequest;
 use Bavix\Wallet\Interfaces\Wallet;
 use Bavix\Wallet\Traits\HasWallet;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -35,13 +36,24 @@ class Department extends Model implements Wallet
     {
         return $this->hasMany(BudgetAllocation::class, 'department_id');
     }
+    
+    public function budgetRequestFrom()
+    {
+        return $this->hasMany(BudgetRequest::class, 'from_department_id');
+    }
+    
+    public function budgetRequestTo()
+    {
+        return $this->hasMany(BudgetRequest::class, 'to_department_id');
+    }
+
 
     public static function boot()
-{
-    parent::boot();
+    {
+        parent::boot();
 
-    self::creating(function ($department) {
-        $department->department_slug = Str::slug($department->department_name);
-    });
-}
+        self::creating(function ($department) {
+            $department->department_slug = Str::slug($department->department_name);
+        });
+    }
 }

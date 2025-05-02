@@ -9,6 +9,7 @@ use App\Http\Controllers\LevelController;
 use App\Http\Controllers\Budgeting\BudgetAllocationController;
 use App\Http\Controllers\Budgeting\PurchaseController;
 use App\Http\Controllers\Budgeting\BudgetListController;
+use App\Http\Controllers\Budgeting\BudgetRequestController;
 use App\Http\Controllers\Budgeting\CategoryController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PositionController;
@@ -71,12 +72,20 @@ Route::middleware('auth')->group(function () {
         Route::resource('budget-allocation', BudgetAllocationController::class);
         Route::resource('budget-list', BudgetListController::class);
         Route::resource('category', CategoryController::class);
+        Route::resource('budget-request', BudgetRequestController::class);
         Route::resource('activity', ActivityLogController::class);
+
+        Route::get('budget-approval', [BudgetRequestController::class, 'BudgetRequestApprovalIndex'])->name('budget-request.approval');
+        Route::get('getBudgetRequestApprovalList-approval', [BudgetRequestController::class, 'getBudgetRequestApprovalList'])->name('get.budget-request.approval.list');
+
         Route::get('getCategoryData', [CategoryController::class, 'getCategoryData'])->name('get.category.data');
         Route::get('getBudgetData', [BudgetAllocationController::class, 'getBudgetData'])->name('get.budget.data');
         Route::get('getBudgetNo', [BudgetAllocationController::class, 'getBudgetNo'])->name('get.budget.no');
         Route::get('getBudgetList', [BudgetListController::class, 'getBudgetList'])->name('get.budget.list');
+        Route::get('getBudgetRequestList', [BudgetRequestController::class, 'getBudgetRequestList'])->name('get.budget.request.list');
         
+        Route::get('getBudgetRequestNo', [BudgetRequestController::class, 'getBudgetRequestNo'])->name('get.budget.request.no');
+
         Route::get('getLogsData', [ActivityLogController::class, 'getLogsData'])->name('get.logs.data');
     });
 
