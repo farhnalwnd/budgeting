@@ -106,8 +106,8 @@
                     <h2 class="font-semibold text-base">{{$userDepartment}}</h2>
                 </div>
                 <div class="ml-auto">
-                    <h1 class="font-bold text-lg">NO PURCHASE:</h1>
-                    <span class="font-semibold text-base">nomer purchase</span>
+                    <h1 class="font-bold text-lg">Budget No:</h1>
+                    <span class="font-semibold text-base">{{$budgetNo}}</span>
                 </div>
             </div>
             <h1 class="font-bold text-lg mt-3">DATE:</h1>
@@ -138,7 +138,7 @@
                 <td>
                     <input type="text" name="price[]"
                         class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none price-input"
-                        maxlength="10" required>
+                        maxlength="17" required>
                 </td>
                 <td>
                     <input type="number" name="quantity[]"
@@ -163,10 +163,13 @@
                     </tr>
                     </tbody>
                     </table>
-            <div class="my-3 flex flex-col items-end">
-                <h3>Grand Total: <span id="grand-total"></span></h3>
-                <h3>Saldo Wallet: <span id="wallet-balance"></span></h3>
-                <h3>Sisa Wallet: <span id="wallet-after"></span></h3>
+            <div class="my-3 flex">
+                <div class="mr-auto"></div>
+                <div>
+                    <h3 class="text-lg font-mono font-semibold">Grand Total : <span id="grand-total"></span></h3>
+                    <h3 class="text-lg font-mono font-semibold">Saldo Wallet: <span id="wallet-balance"></span></h3>
+                    <h3 class="text-lg font-mono font-semibold">Sisa Wallet : <span id="wallet-after"></span></h3>
+                </div>
             </div>
             <div class="flex items-center justify-between mx-4 mt-4">
                 <div>

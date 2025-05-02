@@ -26,4 +26,9 @@ class BudgetAllocation extends Model
     {
         return $this->hasMany(BudgetList::class, 'budget_allocation_no');
     }
+
+    public function Purchase()
+    {
+        return $this->hasMany(Purchase::class);
+    }
 }

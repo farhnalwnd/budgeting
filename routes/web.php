@@ -117,11 +117,11 @@ Route::group(['middleware' => ['role:super-admin|admin']], function () {
     Route::resource('PurchaseRequest',PurchaseController::class);
     
 
-    Route::get('/test-helper', function() {
-    $department = Department::first();
-    $department->deposit(10000);
-    dd($department->balanceInt, $department->department_name); 
-});
+//     Route::get('/test-helper', function() {
+//     $department = Department::first();
+//     $department->deposit(10000);
+//     dd($department->balanceInt, $department->department_name); 
+// });
 });
 
 

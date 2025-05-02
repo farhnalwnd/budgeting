@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Budgeting;
 
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Models\Budgeting\BudgetAllocation;
 use App\Models\Budgeting\Purchase;
 use App\Models\Department;
 use Illuminate\Http\Request;
@@ -20,11 +21,14 @@ class PurchaseController extends Controller
         $department = Department::first();
         $purchases = Purchase::with('department')->paginate(5);
         $user = Auth::user();
+        $budget = BudgetAllocation::where('department_id', $user->department_id)->latest()->first();
+
         return view(".page.budgeting.management.PurchaseRequest.index", [
             'purchases' => $purchases,
             'department'=>$department,
             'userDepartment'=>$user->department->department_name ?? 'unknown',
             'currentDate'=>now()->format('j M y'),
+            'budgetNo' => $budget->budget_allocation_no ?? 'N/A'
         ]);
     }
 

@@ -38,6 +38,10 @@ class Purchase extends Model
         return $this->belongsTo(Department::class);
     }
 
+    public function BudgetAllocation(){
+        return $this->belongsTo(BudgetAllocation::class);
+    }
+
 
     //     protected static function boot()
     // {
