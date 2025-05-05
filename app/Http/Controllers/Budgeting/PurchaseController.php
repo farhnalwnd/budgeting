@@ -5,8 +5,11 @@ namespace App\Http\Controllers\Budgeting;
 
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Models\Budgeting\BudgetAllocation;
 use App\Models\Budgeting\Purchase;
+use App\Models\Department;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PurchaseController extends Controller
 {
@@ -15,8 +18,20 @@ class PurchaseController extends Controller
      */
     public function index()
     {
-        $purchases = Purchase::all();
-        return view(".page.budgeting.management.PurchaseRequest.index", ['purchases' => $purchases]);
+        $purchases = Purchase::with('department')->paginate(5);
+        $user = Auth::user();
+        $departments = Department::all();
+        $department= $user->department;
+        $budget = BudgetAllocation::where('department_id', $user->department_id)->latest()->first();
+
+        return view(".page.budgeting.management.PurchaseRequest.index", [
+            'purchases' => $purchases,
+            'department'=>$department,
+            'userDepartment'=>$user->department->department_name ?? 'unknown',
+            'currentDate'=>now()->format('j M y'),  
+            'budgetNo' => $budget->budget_allocation_no ?? 'N/A',
+            'departments'=>$departments,
+        ]);
     }
 
     /**
@@ -32,20 +47,41 @@ class PurchaseController extends Controller
      */
     public function store(Request $request)
     {
-        $validatedData = $this->validateRequest($request);
-        
-        $purchases = $this->preparePurchaseData($validatedData);
 
-        $purchases = $this->addBudgetNumbers($purchases);
-        
-        // Simpan menggunakan transaction
-        DB::transaction(function () use ($purchases) {
-            Purchase::insert($purchases);
-        });
-        
-        return redirect()->route('PurchaseRequest.index')
-               ->with('success', 'Data pembelian berhasil disimpan');
+    $validatedData = $this->validateRequest($request);
+    $department = auth()->user()->department;
+    $walletBalance = $department->balance;
+
+    // Hitung grand total
+    $grandTotal = 0;
+    foreach ($validatedData['price'] as $index => $priceStr) {
+        $price = max(0, Purchase::parseRupiah($priceStr)); // Pastikan harga tidak negatif
+        $quantity = $validatedData['quantity'][$index];
+        $grandTotal += $price * $quantity;
     }
+
+    // Validasi saldo
+    if ($grandTotal > $walletBalance) {
+        return back()->with('error', 'Saldo departemen tidak mencukupi!');
+    }
+
+    // Siapkan data + nomor budget
+    $purchases = $this->preparePurchaseData($validatedData, $department->id);
+    $purchases = $this->addBudgetNumbers($purchases);
+
+    // Eksekusi dalam transaksi
+    try {
+        DB::transaction(function () use ($purchases, $department, $grandTotal) {
+            $department->withdraw($grandTotal); // Kurangi saldo
+            Purchase::insert($purchases); // Simpan data
+        });
+    } catch (\Exception $e) {
+        return back()->with('error', 'Gagal menyimpan data: ' . $e->getMessage());
+    }
+
+    return redirect()->route('PurchaseRequest.index')
+           ->with('success', 'Data pembelian berhasil disimpan');
+}
 
     protected function validateRequest(Request $request)
     {
@@ -61,7 +97,7 @@ class PurchaseController extends Controller
         ]);
     }
 
-    protected function preparePurchaseData(array $validatedData)
+    protected function preparePurchaseData(array $validatedData, $departmentId)
     {
         $purchases = [];
         
@@ -75,6 +111,7 @@ class PurchaseController extends Controller
                 'quanitity' => $quantity,
                 'total_amount' => $price * $quantity,
                 'remarks' => $validatedData['remark'][$index] ?? null,
+                'department_id'=> $departmentId,
                 'created_at' => now(),
                 'updated_at' => now()
             ];

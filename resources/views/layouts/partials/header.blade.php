@@ -1,4 +1,4 @@
-<header class="main-header">
+<header class="main-header z-10">
     <div class="inside-header">
         <div class="flex items-center logo-box justify-start">
             <!-- Logo -->

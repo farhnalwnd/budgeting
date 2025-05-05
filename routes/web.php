@@ -19,6 +19,7 @@ use App\Http\Controllers\Role\RoleController;
 use App\Http\Controllers\UserController;
 use Artesaos\SEOTools\Facades\SEOMeta;
 use Illuminate\Support\Facades\Route;
+use App\Models\Department;
 
 
 
@@ -125,9 +126,11 @@ Route::group(['middleware' => ['role:super-admin|admin']], function () {
     Route::resource('PurchaseRequest',PurchaseController::class);
     
 
-    Route::get('/test-helper', function() {
-    dd(generateDocumentNumber('SURAT', 'CAPEX')); // Contoh output: "BUDGET-001/CAPEX/07/24"
-});
+//     Route::get('/test-helper', function() {
+//     $department = Department::first();
+//     $department->deposit(10000);
+//     dd($department->balanceInt, $department->department_name); 
+// });
 });
 
 

@@ -20,7 +20,7 @@ return new class extends Migration
                 indexName:'fk_budgetAllocation_departments'
                 )->cascadeOnDelete();
             $table->text('description')->nullable();
-            $table->decimal('total_amount',8,2)->nullable();
+            $table->decimal('total_amount',18,2)->nullable();
             $table->string('allocated_by');
             $table->foreign('allocated_by')->references('nik')->on('users');
             $table->timestamps();

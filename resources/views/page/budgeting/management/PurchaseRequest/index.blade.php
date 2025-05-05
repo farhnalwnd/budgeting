@@ -13,6 +13,9 @@
         <div class="flex items-center justify-between">
             <h4 class="page-title text-2xl font-lg"></h4>
             <div class="inline-flex items-center">
+                <div>
+                    <h1>testetsest</h1>
+                </div>
                 <nav>
                     <ol class="breadcrumb flex items-center">
                         <li class="breadcrumb-item pr-1"><a href="{{ route('dashboard') }}"><i
@@ -26,13 +29,20 @@
     </div>
 
     <section x-data="{open : false}" class="content">
-        <!-- Add User Button -->
-        <div @click="open = ! open" class="mb-4 flex justify-end">
-            <button type="button"
-                class="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80 font-medium rounded-lg text-base px-3 py-3 text-center me-2 mb-2 float-right">
-                Add User
-            </button>
+        <div class="mb-4 flex px-4">
+            <div
+                class="w-fit h-max shadow-md rounded-md shadow-neutral-500 bg-gradient-to-t from-cyan-500 to-blue-500  text-lg p-3 hover:scale-105 group">
+                <h1 class="group-hover:cursor-pointer">Rp. {{number_format($department->balance , 0, ',',
+                    '.')}}</h1>
+            </div>
+            <div @click="open = ! open" class="ml-auto">
+                <button type="button"
+                    class="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80 font-medium rounded-lg text-base px-3 py-3 text-center me-2 mb-2 float-right">
+                    Add Purchase
+                    </button>
+                    </div>
         </div>
+        <!-- Add User Button -->
 
         <!-- Card Data Display -->
         <div class="card">
@@ -47,10 +57,11 @@
                                 <th class="px-6 py-3 text-lg text-center w-5">#</th>
                                 <th class="px-6 py-3 text-lg text-center whitespace-nowrap w-10">NO Budget</th>
                                 <th class="px-6 py-3 text-lg text-center">Item Name</th>
+                                <th class="px-6 py-3 text-lg text-center w-56">department</th>
                                 <th class="px-6 py-3 text-lg text-center w-48">Amount</th>
                                 <th class="px-6 py-3 text-lg text-center w-5">Quantity</th>
                                 <th class="px-6 py-3 text-lg text-center w-5">status</th>
-                                <th class="px-6 py-3 text-lg text-center ">remarks</th>
+                                <th class="px-6 py-3 text-lg text-center w-1/6">remarks</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -59,20 +70,25 @@
                                 <td class="px-6 py-4 text-lg text-center w-5">{{ $purchase->id }}</td>
                                 <td class="px-6 py-4 text-lg text-center whitespace-nowrap w-10">{{ $purchase->budget_no }}</td>
                                 <td class="px-6 py-4 text-lg">{{ $purchase->item_name }}</td>
+                                <td class="px-6 py-4 text-lg w-56 text-center">{{ $purchase->department->department_name }}</td>
                                 <td class="px-6 py-4 text-lg text-center w-48">Rp. {{ number_format($purchase->amount, 0, ',', '.') }}</td>
                                 <td class="px-6 py-4 text-lg text-center">{{ $purchase->quanitity }}</td>
                                 <td class="px-6 py-4 text-lg text-center w-5">{{ $purchase->status }}</td>
-                                <td class="px-6 py-4 text-lg w-2/6">{{ $purchase->remarks }}</td>
+                                <td class="px-6 py-4 text-lg w-1/6">{{ $purchase->remarks }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
+                    <div class="mt-4">
+                        {{ $purchases->links()}}
+                    </div>
                 </div>
             </div>
         </div>
 <!-- Modal -->
-<div x-show="open" x-transition class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-    <div class="bg-white text-black p-6 rounded-lg shadow-lg w-2/3 h-fit">
+<div x-show="open" x-on:keydown.escape.window="open = false" x-transition.duration.400ms
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white text-black p-6 rounded-lg shadow-lg w-2/3">
         <!-- Header -->
         <div class="flex justify-start">
             <div class="flex items-center">
@@ -87,23 +103,26 @@
             <div class="flex items-center mt-2">
                 <div>
                     <h1 class="font-bold text-lg">ON: </h1>
-                    <h2 class="font-semibold text-base">Department</h2>
+                    <h2 class="font-semibold text-base">{{$userDepartment}}</h2>
                 </div>
                 <div class="ml-auto">
-                    <h1 class="font-bold text-lg">NO PURCHASE:</h1>
-                    <span class="font-semibold text-base">nomer purchase</span>
+                    <h1 class="font-bold text-lg">Budget No:</h1>
+                    <span class="font-semibold text-base">{{$budgetNo}}</span>
                 </div>
             </div>
             <h1 class="font-bold text-lg mt-3">DATE:</h1>
-            <span class="font-semibold text-base">tanggal</span>
+            <span class="font-semibold text-base">{{$currentDate}}</span>
         </div>
 
         <!-- Table -->
-        <div class="container pt-20">
-<form method="POST" action="{{ route('PurchaseRequest.store') }}">
+        <div class="container mt-10">
+            <form x-on:keydown.enter.window="$el.submit()" method="POST"
+                action="{{ route('PurchaseRequest.store') }}">
+<div x-data="{ scrolled: false }" @scroll="scrolled = $el.scrollTop > 0 || false"
+    class="overflow-y-auto max-h-[350px] mt-6">
     @csrf
     <table class="table-auto w-full border-collapse" id="testTable">
-        <thead>
+        <thead :class="scrolled ? 'bg-white shadow-md border-none' : ''" class="sticky top-0 z-10">
             <tr>
                 <th class="text-center w-fit">ITEM NAME</th>
                 <th class="text-center w-48">HARGA (RP)</th>
@@ -113,7 +132,7 @@
                 <th class="text-center w-36">ACTION</th>
                 </tr>
                 </thead>
-                <tbody>
+                <tbody class="max-h-[50vh] overflow-y-auto">
                     <tr>
                         <td><input type="text" name="description[]"
                         class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none" required>
@@ -121,7 +140,7 @@
                 <td>
                     <input type="text" name="price[]"
                         class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none price-input"
-                        maxlength="10" required>
+                        maxlength="17" required>
                 </td>
                 <td>
                     <input type="number" name="quantity[]"
@@ -136,6 +155,7 @@
                 <td><textarea name="remark[]"
                         class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none"></textarea>
                 </td>
+                <input type="hidden" name="grand_total" id="grand-total-input">
                 <td class="text-center">
                     <div class="flex justify-center space-x-1">
                         <button type="button" class="remove-row btn btn-danger text-base px-2 py-1">Remove</button>
@@ -145,11 +165,49 @@
                     </tr>
                     </tbody>
                     </table>
-            <div class="my-3 flex flex-col items-end">
-                <h3>Grand Total: <span id="grand-total">Rp 0</span></h3>
-                <h3>Saldo Wallet: <span id="wallet-balance">Rp 1.000.000</span></h3>
-                <h3>Sisa Wallet: <span id="wallet-after">Rp 1.000.000</span></h3>
+</div>
+            <div class="my-3 flex">
+                <div class="mr-auto"></div>
+                <div>
+                    <h3 class="text-lg font-mono font-semibold">Grand Total : <span id="grand-total"></span></h3>
+                    <h3 class="text-lg font-mono font-semibold">Saldo Wallet: <span id="wallet-balance"></span></h3>
+                    <h3 class="text-lg font-mono font-semibold">Sisa Wallet : <span id="wallet-after"></span></h3>
+                </div>
             </div>
+<!--! table budget kurang -->
+<div id="request-budget-form" class="hidden mt-4 border border-gray-300 p-4 rounded-lg bg-gray-50">
+    <h2 class="text-lg font-semibold mb-2">Budget Request Form</h2>
+    <table class="w-full table-auto border-collapse">
+        <tr>
+            <td class="font-medium py-2 pr-4">From Department:</td>
+            <td><input type="text" name="from_department" id="from-department" class="w-full border rounded p-2"
+                    readonly value="{{ $userDepartment }}"></td>
+        </tr>
+        <tr>
+            <td class="font-medium py-2 pr-4">To Department:</td>
+            <td>
+                <select name="to_department" id="to-department" class="w-full border rounded p-2">
+                    <option value="">Select Department</option>
+                    @foreach ($departments as $dept)
+                    <option value="{{ $dept->id }}">{{ $dept->department_name }}</option>
+                    @endforeach
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="font-medium py-2 pr-4">Amount:</td>
+            <td><input type="text" name="amount" id="request-amount" class="w-full border rounded p-2" readonly></td>
+        </tr>
+        <tr>
+            <td class="font-medium py-2 pr-4">Reason:</td>
+            <td><textarea name="reason" id="request-reason" rows="3" class="w-full border rounded p-2"
+                    placeholder="Explain the purpose of the request..."></textarea></td>
+        </tr>
+    </table>
+    <div class="mt-4">
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Submit Request</button>
+    </div>
+</div>
             <div class="flex items-center justify-between mx-4 mt-4">
                 <div>
                     <button type="button" id="add-row" class="btn btn-primary group active:scale-90 transition-transform duration-200">
@@ -174,288 +232,184 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        let walletBalance = 1000000;
+        let walletBalance = {{ $department-> balance
+    }};
 
         function toRupiah(number) {
-            return new Intl.NumberFormat('id-ID', {
-                style: 'currency',
-                currency: 'IDR',
-                minimumFractionDigits: 0
-            }).format(number);
+                                return new Intl.NumberFormat('id-ID', {
+                                    style: 'currency',
+                                    currency: 'IDR',
+                                    minimumFractionDigits: 0
+                                }).format(number);
         }
 
         function parseRupiah(rpString) {
-            return parseInt(rpString.replace(/[^0-9]/g, '')) || 0;
-        }
+                                return parseInt(rpString.replace(/[^0-9]/g, '')) || 0;
+                            }
 
         function updateTotal(row) {
-            let priceInput = row.querySelector('.price-input');
-            let quantityInput = row.querySelector('.quantity-input');
-            let totalInput = row.querySelector('.total-input');
+                                const priceInput = row.querySelector('.price-input');
+                                const quantityInput = row.querySelector('.quantity-input');
+                                const totalInput = row.querySelector('.total-input');
 
-            let price = parseRupiah(priceInput.value);
-            let quantity = parseFloat(quantityInput.value) || 0;
-            let total = price * quantity;
+                                const price = parseRupiah(priceInput.value);
+                                const quantity = parseFloat(quantityInput.value) || 0;
+                                const total = price * quantity;
 
-            totalInput.value = toRupiah(total);
-            updateGrandTotal();
-        }
+                                totalInput.value = toRupiah(total);
+                                updateGrandTotal();
+                            }
 
         function updateGrandTotal() {
-            let totalInputs = document.querySelectorAll('.total-input');
+                                const totalInputs = document.querySelectorAll('.total-input');
             let grandTotal = 0;
-            totalInputs.forEach(input => {
-                grandTotal += parseRupiah(input.value);
-            });
-            document.getElementById('grand-total').innerText = toRupiah(grandTotal);
 
-            let remainingBalance = walletBalance - grandTotal;
-            document.getElementById('wallet-after').innerText = toRupiah(remainingBalance);
-            document.getElementById('save-transaction').disabled = remainingBalance < 0;
-        }
+                            totalInputs.forEach(input => {
+                                grandTotal += parseRupiah(input.value);
+                });
+
+                            const remainingBalance = walletBalance - grandTotal;
+
+                            document.getElementById('grand-total').innerText = toRupiah(grandTotal);
+                            document.getElementById('wallet-after').innerText = toRupiah(remainingBalance);
+
+                                document.getElementById('grand-total-input').value = grandTotal;
+
+                            const saveBtn = document.getElementById('save-transaction');
+                            if (saveBtn) {
+                                saveBtn.disabled = remainingBalance < 0;
+                            }
+
+                            const walletAfterElem = document.getElementById('wallet-after');
+                            walletAfterElem.classList.toggle('text-red-600', remainingBalance < 0);
+                            walletAfterElem.classList.toggle('text-black', remainingBalance >= 0);
+            requestBudget(grandTotal);
+                        }
 
         function formatPriceInput(input) {
-            input.addEventListener('keydown', function (e) {
-                // Hanya izinkan angka, backspace, delete, arrow keys
-                if (
-                    !(
-                        (e.key >= '0' && e.key <= '9') ||
-                        ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)
-                    )
-                ) {
-                    e.preventDefault();
+                    input.addEventListener('keydown', function (e) {
+                        const allowedKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'];
+                        if (!(e.key >= '0' && e.key <= '9') && !allowedKeys.includes(e.key)) {
+                            e.preventDefault();
+                        }
+                });
+
+                input.addEventListener('blur', function () {
+                    const numeric = parseRupiah(this.value) || 0;
+                    this.value = toRupiah(numeric);
+                    updateTotal(input.closest('tr'));
+                });
+
+                input.addEventListener('focus', function () {
+                    const numeric = parseRupiah(this.value);
+                    this.value = numeric > 0 ? numeric.toString() : '';
+                });
+
+                input.addEventListener('input', function () {
+                    const cursorPosition = input.selectionStart;
+                    const numeric = parseRupiah(input.value);
+                    input.value = toRupiah(numeric);
+                    updateTotal(input.closest('tr'));
+
+                    setTimeout(() => {
+                        input.setSelectionRange(input.value.length, input.value.length);
+                    }, 0);
+
+                    updateTotal(input.closest('tr'));
+                });
                 }
-            });
-
-            input.addEventListener('blur', function () {
-                let numeric = parseRupiah(this.value) || 0;
-                this.value = toRupiah(numeric);
-                updateTotal(input.closest('tr'));
-            });
-
-            input.addEventListener('focus', function () {
-                let numeric = parseRupiah(this.value);
-                this.value = numeric > 0 ? numeric.toString() : '';
-            });
-
-            input.addEventListener('input', function () {
-                updateTotal(input.closest('tr'));
-            });
-        }
 
         function formatQuantityInput(input, row) {
-            input.addEventListener('keydown', function (e) {
-                if (
-                    !(
-                        (e.key >= '0' && e.key <= '9') ||
-                        ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)
-                    )
-                ) {
-                    e.preventDefault();
-                }
-            });
+                    input.addEventListener('keydown', function (e) {
+                        const allowedKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'];
+                        if (!(e.key >= '0' && e.key <= '9') && !allowedKeys.includes(e.key)) {
+                            e.preventDefault();
+                        }
+                });
 
-            input.addEventListener('input', function () {
-                let val = parseInt(this.value) || 0;
-                if (val > 99) {
-                    this.value = '99';
-                } else if (val < 0) {
-                    this.value = '0';
-                }
-                updateTotal(row);
-            });
+                input.addEventListener('input', function () {
+                    let val = parseInt(this.value) || 0;
+                    this.value = val > 99 ? '99' : (val < 0 ? '0' : val.toString());
+                    updateTotal(row);
+                });
         }
 
-        function clearRow(row) {
-            row.querySelector('input[name="description[]"]').value = '';
-            row.querySelector('.price-input').value = toRupiah(0);
-            row.querySelector('.quantity-input').value = '';
-            row.querySelector('textarea[name="remark[]"]').value = '';
-            updateTotal(row);
-        }
+    function clearRow(row) {
+        row.querySelector('input[name="description[]"]').value = '';
+        row.querySelector('.price-input').value = toRupiah(0);
+        row.querySelector('.quantity-input').value = '';
+        row.querySelector('textarea[name="remark[]"]').value = '';
+        row.querySelector('.total-input').value = toRupiah(0);
+        updateTotal(row);
+    }
 
-        function setupRow(row) {
-            formatPriceInput(row.querySelector('.price-input'));
-            formatQuantityInput(row.querySelector('.quantity-input'), row);
+    function setupRow(row) {
+        const priceInput = row.querySelector('.price-input');
+        const quantityInput = row.querySelector('.quantity-input');
 
-            row.querySelector('.clear-btn').addEventListener('click', function () {
-                clearRow(row);
+        formatPriceInput(priceInput);
+        formatQuantityInput(quantityInput, row);
+
+        row.querySelector('.clear-btn')?.addEventListener('click', function () {
+            clearRow(row);
             });
 
-            row.querySelector('.remove-row').addEventListener('click', function () {
-                if (document.querySelectorAll('#testTable tbody tr').length > 1) {
-                    row.remove();
-                    updateGrandTotal();
+        row.querySelector('.remove-row')?.addEventListener('click', function () {
+            const rows = document.querySelectorAll('#testTable tbody tr');
+            if (rows.length > 1) {
+                row.remove();
+                updateGrandTotal();
                 }
-            });
-        }
+        });
+    }
 
-        // Initialize existing rows
-        document.querySelectorAll('#testTable tbody tr').forEach(row => {
-            row.querySelector('.price-input').value = toRupiah(0);
-            row.querySelector('.total-input').value = toRupiah(0);
-            setupRow(row);
+                                function requestBudget(grandTotal) {
+                                    const requestForm = document.getElementById('request-budget-form');
+                                    const requestAmount = document.getElementById('request-amount');
+                                    if (!requestForm || !requestAmount) return;
+
+                                    const overAmount = grandTotal - walletBalance;
+
+                                    if (grandTotal > walletBalance) {
+                                        requestForm.classList.remove('hidden');
+                                        requestAmount.value = toRupiah(overAmount);
+                                    } else {
+                                        requestForm.classList.add('hidden');
+                                        requestAmount.value = '';
+                                    }
+                                    console.log('Request Budget Function Called');
+                                    console.log("Grand Total:", grandTotal);
+                                    console.log("Wallet Balance:", walletBalance);
+                                    console.log("Over Amount:", overAmount);
+        }
+            // Setup semua baris awal
+            document.querySelectorAll('#testTable tbody tr').forEach(row => {
+                                            row.querySelector('.price-input').value = toRupiah(0);
+                                            row.querySelector('.total-input').value = toRupiah(0);
+                                            setupRow(row);
         });
 
-        // Add new row
-        document.getElementById('add-row').addEventListener('click', function () {
-            let tableBody = document.querySelector('#testTable tbody');
-            let newRow = tableBody.querySelector('tr').cloneNode(true);
+            // Tambah baris baru
+            document.getElementById('add-row')?.addEventListener('click', function () {
+                                            const tableBody = document.querySelector('#testTable tbody');
+                                            const newRow = tableBody.querySelector('tr').cloneNode(true);
+                                            newRow.querySelector('input[name="description[]"]').value = '';
+                                            newRow.querySelector('.price-input').value = toRupiah(0);
+                                            newRow.querySelector('.quantity-input').value = '';
+                                            newRow.querySelector('textarea[name="remark[]"]').value = '';
+                                            newRow.querySelector('.total-input').value = toRupiah(0);
 
-            newRow.querySelector('input[name="description[]"]').value = '';
-            newRow.querySelector('.price-input').value = toRupiah(0);
-            newRow.querySelector('.quantity-input').value = '';
-            newRow.querySelector('textarea[name="remark[]"]').value = '';
-            newRow.querySelector('.total-input').value = toRupiah(0);
-
-            tableBody.appendChild(newRow);
-            setupRow(newRow);
+                                            tableBody.appendChild(newRow);
+                                            setupRow(newRow);
         });
 
-        // Initialize wallet display
-        document.getElementById('wallet-balance').innerText = toRupiah(walletBalance);
-        document.getElementById('wallet-after').innerText = toRupiah(walletBalance);
+            // Inisialisasi nilai awal saldo
+            document.getElementById('wallet-balance').innerText = toRupiah(walletBalance);
+            document.getElementById('wallet-after').innerText = toRupiah(walletBalance);
+            updateGrandTotal();
     });
+
 </script>
 @endpush
 
 </x-app-layout>
-<!-- document.addEventListener('DOMContentLoaded', function () {
-    let walletBalance = 1000000; // contoh saldo awal Rp 1.000.000
-
-    function toRupiah(number) {
-        return new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
-            minimumFractionDigits: 0
-        }).format(number);
-    }
-
-    function parseRupiah(rpString) {
-        return parseInt(rpString.replace(/[^0-9]/g, '')) || 0;
-    }
-
-    function updateTotal(row) {
-        let priceInput = row.querySelector('input[name="price[]"]');
-        let quantityInput = row.querySelector('input[name="quantity[]"]');
-        let totalInput = row.querySelector('input[name="total[]"]');
-
-        let price = parseRupiah(priceInput.value);
-        let quantity = parseFloat(quantityInput.value) || 0;
-        let total = price * quantity;
-
-        totalInput.value = toRupiah(total);
-        updateGrandTotal();
-    }
-
-    function updateGrandTotal() {
-        let totalInputs = document.querySelectorAll('input[name="total[]"]');
-        let grandTotal = 0;
-        totalInputs.forEach(input => {
-            grandTotal += parseRupiah(input.value);
-        });
-        document.getElementById('grand-total').innerText = toRupiah(grandTotal);
-
-        updateWalletBalance(grandTotal);
-    }
-
-    function updateWalletBalance(grandTotal) {
-        let sisaWallet = walletBalance - grandTotal;
-        let sisaWalletElement = document.getElementById('sisa-wallet');
-        let submitButton = document.getElementById('submit-btn');
-
-        sisaWalletElement.innerText = toRupiah(sisaWallet);
-
-        if (sisaWallet < 0) {
-            sisaWalletElement.style.color = 'red';
-            submitButton.disabled = true;
-        } else {
-            sisaWalletElement.style.color = 'black';
-            submitButton.disabled = false;
-        }
-    }
-
-    function formatPriceInput(input) {
-        input.addEventListener('input', function () {
-            let original = input.value;
-            let numeric = parseRupiah(original);
-
-            input.value = toRupiah(numeric);
-
-            let row = input.closest('tr');
-            updateTotal(row);
-        });
-
-        input.addEventListener('focus', function () {
-            if (input.value.trim() === '') {
-                input.value = toRupiah(0);
-            }
-        });
-
-        input.addEventListener('blur', function () {
-            if (input.value.trim() === '' || parseRupiah(input.value) === 0) {
-                input.value = toRupiah(0);
-            }
-        });
-    }
-
-    function formatQuantityInput(input) {
-        input.addEventListener('input', function () {
-            let row = input.closest('tr');
-            updateTotal(row);
-        });
-    }
-
-    function addEventListeners(row) {
-        let priceInput = row.querySelector('input[name="price[]"]');
-        let quantityInput = row.querySelector('input[name="quantity[]"]');
-
-        formatPriceInput(priceInput);
-        formatQuantityInput(quantityInput);
-    }
-
-    let rows = document.querySelectorAll('#testTable tbody tr');
-    rows.forEach(row => {
-        let priceInput = row.querySelector('input[name="price[]"]');
-        let totalInput = row.querySelector('input[name="total[]"]');
-
-        priceInput.value = toRupiah(0);
-        totalInput.value = toRupiah(0);
-
-        addEventListeners(row);
-    });
-
-    document.getElementById('add-row')?.addEventListener('click', function () {
-        let tableBody = document.querySelector('#testTable tbody');
-        let newRow = tableBody.rows[0].cloneNode(true);
-
-        Array.from(newRow.querySelectorAll('input')).forEach(input => input.value = '');
-        Array.from(newRow.querySelectorAll('textarea')).forEach(textarea => textarea.value = '');
-
-        let priceInput = newRow.querySelector('input[name="price[]"]');
-        let totalInput = newRow.querySelector('input[name="total[]"]');
-
-        priceInput.value = toRupiah(0);
-        totalInput.value = toRupiah(0);
-
-        tableBody.appendChild(newRow);
-        addEventListeners(newRow);
-    });
-
-    document.querySelector('#testTable').addEventListener('click', function (event) {
-        if (event.target.classList.contains('remove-row')) {
-            let row = event.target.closest('tr');
-            let tableBody = document.querySelector('#testTable tbody');
-
-            if (tableBody.rows.length > 1) {
-                row.remove();
-                updateGrandTotal();
-            }
-        }
-    });
-
-    document.getElementById('clear-btn').addEventListener('click', clearInputs);
-
-    // Inisialisasi awal sisa wallet
-    updateGrandTotal();
-}); -->

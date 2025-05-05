@@ -5,6 +5,7 @@ namespace App\Models\Budgeting;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Casts\AsDecimal;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\department;
 
 class Purchase extends Model
 {
@@ -14,6 +15,7 @@ class Purchase extends Model
         'item_name',
         'budget_no',
         'amount',
+        'department_id',
         'quanitity',
         'total_amount',
         'remarks'
@@ -30,6 +32,16 @@ class Purchase extends Model
     {
         return (float) preg_replace('/[^0-9]/', '', $rupiah);
     }
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
+
+    public function BudgetAllocation(){
+        return $this->belongsTo(BudgetAllocation::class);
+    }
+
 
     //     protected static function boot()
     // {

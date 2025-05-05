@@ -9,6 +9,7 @@ use Bavix\Wallet\Traits\HasWallet;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use App\Models\Budgeting\Purchase;
 
 class Department extends Model implements Wallet
 {
@@ -47,6 +48,11 @@ class Department extends Model implements Wallet
         return $this->hasMany(BudgetRequest::class, 'to_department_id');
     }
 
+
+    public function purchases()
+{
+    return $this->hasMany(Purchase::class);
+}
 
     public static function boot()
     {
