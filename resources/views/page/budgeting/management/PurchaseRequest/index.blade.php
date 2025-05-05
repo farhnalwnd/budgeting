@@ -88,7 +88,7 @@
 <!-- Modal -->
 <div x-show="open" x-on:keydown.escape.window="open = false" x-transition.duration.400ms
     class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-    <div class="bg-white text-black p-6 rounded-lg shadow-lg w-2/3 h-fit">
+    <div class="bg-white text-black p-6 rounded-lg shadow-lg w-2/3">
         <!-- Header -->
         <div class="flex justify-start">
             <div class="flex items-center">
@@ -115,12 +115,14 @@
         </div>
 
         <!-- Table -->
-        <div class="container pt-20 max-h- overflow-y-scroll">
+        <div class="container mt-10">
             <form x-on:keydown.enter.window="$el.submit()" method="POST"
                 action="{{ route('PurchaseRequest.store') }}">
+<div x-data="{ scrolled: false }" @scroll="scrolled = $el.scrollTop > 0 || false"
+    class="overflow-y-auto max-h-[350px] mt-6">
     @csrf
     <table class="table-auto w-full border-collapse" id="testTable">
-        <thead>
+        <thead :class="scrolled ? 'bg-white shadow-md border-none' : ''" class="sticky top-0 z-10">
             <tr>
                 <th class="text-center w-fit">ITEM NAME</th>
                 <th class="text-center w-48">HARGA (RP)</th>
@@ -130,7 +132,7 @@
                 <th class="text-center w-36">ACTION</th>
                 </tr>
                 </thead>
-                <tbody>
+                <tbody class="max-h-[50vh] overflow-y-auto">
                     <tr>
                         <td><input type="text" name="description[]"
                         class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none" required>
@@ -163,6 +165,7 @@
                     </tr>
                     </tbody>
                     </table>
+</div>
             <div class="my-3 flex">
                 <div class="mr-auto"></div>
                 <div>
@@ -171,6 +174,40 @@
                     <h3 class="text-lg font-mono font-semibold">Sisa Wallet : <span id="wallet-after"></span></h3>
                 </div>
             </div>
+<!--! table budget kurang -->
+<div id="request-budget-form" class="hidden mt-4 border border-gray-300 p-4 rounded-lg bg-gray-50">
+    <h2 class="text-lg font-semibold mb-2">Budget Request Form</h2>
+    <table class="w-full table-auto border-collapse">
+        <tr>
+            <td class="font-medium py-2 pr-4">From Department:</td>
+            <td><input type="text" name="from_department" id="from-department" class="w-full border rounded p-2"
+                    readonly value="{{ $userDepartment }}"></td>
+        </tr>
+        <tr>
+            <td class="font-medium py-2 pr-4">To Department:</td>
+            <td>
+                <select name="to_department" id="to-department" class="w-full border rounded p-2">
+                    <option value="">Select Department</option>
+                    @foreach ($departments as $dept)
+                    <option value="{{ $dept->id }}">{{ $dept->department_name }}</option>
+                    @endforeach
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="font-medium py-2 pr-4">Amount:</td>
+            <td><input type="text" name="amount" id="request-amount" class="w-full border rounded p-2" readonly></td>
+        </tr>
+        <tr>
+            <td class="font-medium py-2 pr-4">Reason:</td>
+            <td><textarea name="reason" id="request-reason" rows="3" class="w-full border rounded p-2"
+                    placeholder="Explain the purpose of the request..."></textarea></td>
+        </tr>
+    </table>
+    <div class="mt-4">
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Submit Request</button>
+    </div>
+</div>
             <div class="flex items-center justify-between mx-4 mt-4">
                 <div>
                     <button type="button" id="add-row" class="btn btn-primary group active:scale-90 transition-transform duration-200">
@@ -198,7 +235,7 @@
         let walletBalance = {{ $department-> balance
     }};
 
-                            function toRupiah(number) {
+        function toRupiah(number) {
                                 return new Intl.NumberFormat('id-ID', {
                                     style: 'currency',
                                     currency: 'IDR',
@@ -206,11 +243,11 @@
                                 }).format(number);
         }
 
-                            function parseRupiah(rpString) {
+        function parseRupiah(rpString) {
                                 return parseInt(rpString.replace(/[^0-9]/g, '')) || 0;
                             }
 
-                            function updateTotal(row) {
+        function updateTotal(row) {
                                 const priceInput = row.querySelector('.price-input');
                                 const quantityInput = row.querySelector('.quantity-input');
                                 const totalInput = row.querySelector('.total-input');
@@ -223,7 +260,7 @@
                                 updateGrandTotal();
                             }
 
-                            function updateGrandTotal() {
+        function updateGrandTotal() {
                                 const totalInputs = document.querySelectorAll('.total-input');
             let grandTotal = 0;
 
@@ -246,9 +283,10 @@
                             const walletAfterElem = document.getElementById('wallet-after');
                             walletAfterElem.classList.toggle('text-red-600', remainingBalance < 0);
                             walletAfterElem.classList.toggle('text-black', remainingBalance >= 0);
+            requestBudget(grandTotal);
                         }
 
-                function formatPriceInput(input) {
+        function formatPriceInput(input) {
                     input.addEventListener('keydown', function (e) {
                         const allowedKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'];
                         if (!(e.key >= '0' && e.key <= '9') && !allowedKeys.includes(e.key)) {
@@ -281,7 +319,7 @@
                 });
                 }
 
-                function formatQuantityInput(input, row) {
+        function formatQuantityInput(input, row) {
                     input.addEventListener('keydown', function (e) {
                         const allowedKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'];
                         if (!(e.key >= '0' && e.key <= '9') && !allowedKeys.includes(e.key)) {
@@ -325,15 +363,34 @@
         });
     }
 
-                                        // Setup semua baris awal
-                                        document.querySelectorAll('#testTable tbody tr').forEach(row => {
+                                function requestBudget(grandTotal) {
+                                    const requestForm = document.getElementById('request-budget-form');
+                                    const requestAmount = document.getElementById('request-amount');
+                                    if (!requestForm || !requestAmount) return;
+
+                                    const overAmount = grandTotal - walletBalance;
+
+                                    if (grandTotal > walletBalance) {
+                                        requestForm.classList.remove('hidden');
+                                        requestAmount.value = toRupiah(overAmount);
+                                    } else {
+                                        requestForm.classList.add('hidden');
+                                        requestAmount.value = '';
+                                    }
+                                    console.log('Request Budget Function Called');
+                                    console.log("Grand Total:", grandTotal);
+                                    console.log("Wallet Balance:", walletBalance);
+                                    console.log("Over Amount:", overAmount);
+        }
+            // Setup semua baris awal
+            document.querySelectorAll('#testTable tbody tr').forEach(row => {
                                             row.querySelector('.price-input').value = toRupiah(0);
                                             row.querySelector('.total-input').value = toRupiah(0);
                                             setupRow(row);
         });
 
-                                        // Tambah baris baru
-                                        document.getElementById('add-row')?.addEventListener('click', function () {
+            // Tambah baris baru
+            document.getElementById('add-row')?.addEventListener('click', function () {
                                             const tableBody = document.querySelector('#testTable tbody');
                                             const newRow = tableBody.querySelector('tr').cloneNode(true);
                                             newRow.querySelector('input[name="description[]"]').value = '';
@@ -346,11 +403,12 @@
                                             setupRow(newRow);
         });
 
-                                        // Inisialisasi nilai awal saldo
-                                        document.getElementById('wallet-balance').innerText = toRupiah(walletBalance);
-                                        document.getElementById('wallet-after').innerText = toRupiah(walletBalance);
-                                        updateGrandTotal();
+            // Inisialisasi nilai awal saldo
+            document.getElementById('wallet-balance').innerText = toRupiah(walletBalance);
+            document.getElementById('wallet-after').innerText = toRupiah(walletBalance);
+            updateGrandTotal();
     });
+
 </script>
 @endpush
 
