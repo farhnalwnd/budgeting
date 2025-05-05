@@ -193,7 +193,7 @@ class BudgetAllocationController extends Controller
     }
 
     public function getBudgetData(){
-        $budgets = BudgetAllocation::with('department')->get();
+        $budgets = BudgetAllocation::with('department.wallet')->get();
         return response()->json($budgets);
     }
     

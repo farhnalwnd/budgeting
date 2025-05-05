@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Budgeting;
 
 use App\Http\Controllers\Controller;
+use App\Models\Budgeting\BudgetApprover;
 use App\Models\Budgeting\BudgetRequest;
 use App\Models\Department;
 use Illuminate\Http\Request;
@@ -240,11 +241,20 @@ class BudgetRequestController extends Controller
 
     public function getBudgetRequestApprovalList(){
         $user = Auth::user();
-        $departmentId = $user->department->id;
-        $budgets = BudgetRequest::with('fromDepartment', 'toDepartment')
-            ->where('to_department_id', $departmentId)
-            ->where('status', 'pending')
-            ->get();
-        return response()->json($budgets);
+        $approvals = BudgetApprover::where('nik', $user->nik)->get();
+        if($approvals->isNotEmpty())
+        {
+            $departmentIds = $approvals->pluck('department_id'); 
+            $budgets = BudgetRequest::with('fromDepartment', 'toDepartment')
+                ->whereIn('to_department_id', $departmentIds)
+                ->where('status', 'pending')
+                ->get();
+                return response()->json($budgets);
+        }
+        else
+        {
+            return response()->json(null);
+        }
+
     }
 }

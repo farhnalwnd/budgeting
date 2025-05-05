@@ -332,8 +332,9 @@ class UserController extends Controller
         }
     }
 
-    public function getDataMaster()
+    public function getUsersData()
     {
-        return \view('page.wsa-getmstr');
+        $users = User::all();
+        return response()->json($users);
     }
 }

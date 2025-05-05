@@ -74,9 +74,8 @@
                         <li><a href="{{ route('permissions.index') }}"
                                 class="{{ request()->is('permissions*') ? 'current' : '' }}"><i class="icon-Commit"><span
                                         class="path1"></span><span class="path2"></span></i>Permission</a></li>
-                        <li><a href="{{ route('get.master') }}" class="{{ request()->is('get.master*') ? 'current' : '' }}"><i
-                                    class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Get Data
-                                Master </a></li>
+                        <li><a href="{{ route('approver.index') }}" class="{{ request()->is('approver.index*') ? 'current' : '' }}"><i
+                                    class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Approver</a></li>
                         
                 </ul>
             </li>

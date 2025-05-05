@@ -22,10 +22,12 @@ return new class extends Migration
                 table:'departments',
                 indexName:'fk_toDepartment_departments'
             ); //pemberi
-            $table->foreignId('budget_purchase_no')->constrained(
+            $table->foreignId('budget_purchase_no')
+                ->nullable()    
+                ->constrained(
                 table:'purchases',
                 indexName:'fk_budgetPurchases_purchases'
-            )->nullable(); //no purchasing
+            ); //no purchasing
             $table->decimal('amount',18,2); // jumlah diminta
             $table->text('reason'); // alasan permintaan
             $table->enum('status', ['pending','approved','rejected'])->default('pending');

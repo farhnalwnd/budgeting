@@ -265,8 +265,9 @@ class BudgetListController extends Controller
             {
                 $department->withdraw(abs($finalAmount));
             }
+            $departmentBudget += $finalAmount;
             $budget->update([
-                'total_amount' => $department->balance
+                'total_amount' => $departmentBudget
             ]);
             // Commit transaksi
             DB::commit();

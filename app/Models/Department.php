@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Budgeting\BudgetAllocation;
+use App\Models\Budgeting\BudgetApprover;
 use App\Models\Budgeting\BudgetRequest;
 use Bavix\Wallet\Interfaces\Wallet;
 use Bavix\Wallet\Traits\HasWallet;
@@ -46,6 +47,11 @@ class Department extends Model implements Wallet
     public function budgetRequestTo()
     {
         return $this->hasMany(BudgetRequest::class, 'to_department_id');
+    }
+
+    public function budgetApprovers()
+    {
+        return $this->hasMany(BudgetApprover::class, 'department_id');
     }
 
 
