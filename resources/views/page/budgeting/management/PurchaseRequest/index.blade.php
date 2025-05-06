@@ -88,7 +88,7 @@
 <!-- Modal -->
 <div x-show="open" x-on:keydown.escape.window="open = false" x-transition.duration.400ms
     class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-    <div class="bg-white text-black p-6 rounded-lg shadow-lg w-2/3">
+    <div class="absolute top-32 bg-white text-black p-6 rounded-lg shadow-lg w-2/3 max-h-[800px] overflow-y-scroll">
         <!-- Header -->
         <div class="flex justify-start">
             <div class="flex items-center">
@@ -119,7 +119,7 @@
             <form x-on:keydown.enter.window="$el.submit()" method="POST"
                 action="{{ route('PurchaseRequest.store') }}">
 <div x-data="{ scrolled: false }" @scroll="scrolled = $el.scrollTop > 0 || false"
-    class="overflow-y-auto max-h-[350px] mt-6">
+    class="overflow-y-auto max-h-[250px] mt-6">
     @csrf
     <table class="table-auto w-full border-collapse" id="testTable">
         <thead :class="scrolled ? 'bg-white shadow-md border-none' : ''" class="sticky top-0 z-10">
@@ -132,7 +132,7 @@
                 <th class="text-center w-36">ACTION</th>
                 </tr>
                 </thead>
-                <tbody class="max-h-[50vh] overflow-y-auto">
+                <tbody class="">
                     <tr>
                         <td><input type="text" name="description[]"
                         class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none" required>
@@ -204,9 +204,6 @@
                     placeholder="Explain the purpose of the request..."></textarea></td>
         </tr>
     </table>
-    <div class="mt-4">
-        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Submit Request</button>
-    </div>
 </div>
             <div class="flex items-center justify-between mx-4 mt-4">
                 <div>

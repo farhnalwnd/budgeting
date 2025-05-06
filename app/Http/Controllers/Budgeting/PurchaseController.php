@@ -9,6 +9,7 @@ use App\Models\Budgeting\BudgetAllocation;
 use App\Models\Budgeting\Purchase;
 use App\Models\Department;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 
 class PurchaseController extends Controller
@@ -53,16 +54,9 @@ class PurchaseController extends Controller
     $walletBalance = $department->balance;
 
     // Hitung grand total
-    $grandTotal = 0;
-    foreach ($validatedData['price'] as $index => $priceStr) {
-        $price = max(0, Purchase::parseRupiah($priceStr)); // Pastikan harga tidak negatif
-        $quantity = $validatedData['quantity'][$index];
-        $grandTotal += $price * $quantity;
-    }
-
-    // Validasi saldo
-    if ($grandTotal > $walletBalance) {
-        return back()->with('error', 'Saldo departemen tidak mencukupi!');
+    $grandTotal = $this->priceStatus($validatedData['price'], $validatedData['quantity']);
+    if($grandTotal>$walletBalance){
+        return back()->with('error','saldo tidak mencukupi');
     }
 
     // Siapkan data + nomor budget
@@ -128,6 +122,16 @@ protected function addBudgetNumbers(array $purchases)
     }
 
     return $purchases;
+}
+
+protected function priceStatus(array $prices, array $quantities){
+        $grandTotal = 0;
+    foreach ($prices as $index => $priceStr) {
+        $price = max(0, Purchase::parseRupiah($priceStr)); // Hindari nilai negatif
+        $quantity = $quantities[$index];
+        $grandTotal += $price * $quantity;
+    }
+return $grandTotal;
 }
 
     /**
