@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('purchases', function (Blueprint $table) {
             $table->id();
-            $table->string('budget_no')->unique();
+            $table->string('purchase_no')->unique();
             $table->foreignId('department_id')->constrained(
                 table:'departments',
                 indexName:'fk_purchases_department'

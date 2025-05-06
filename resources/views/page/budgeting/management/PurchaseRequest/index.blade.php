@@ -55,7 +55,7 @@
                         <thead class="uppercase border-b">
                             <tr>
                                 <th class="px-6 py-3 text-lg text-center w-5">#</th>
-                                <th class="px-6 py-3 text-lg text-center whitespace-nowrap w-10">NO Budget</th>
+                                <th class="px-6 py-3 text-lg text-center whitespace-nowrap w-10">PO Number</th>
                                 <th class="px-6 py-3 text-lg text-center">Item Name</th>
                                 <th class="px-6 py-3 text-lg text-center w-56">department</th>
                                 <th class="px-6 py-3 text-lg text-center w-48">Amount</th>
@@ -181,7 +181,9 @@
         <tr>
             <td class="font-medium py-2 pr-4">From Department:</td>
             <td><input type="text" name="from_department" id="from-department" class="w-full border rounded p-2"
-                    readonly value="{{ $userDepartment }}"></td>
+                    readonly value="{{ $department->department_name }}"></td>
+            <input type="hidden" name="from_department" id="from-department" class="w-full border rounded p-2"
+                    readonly value="{{ $department->id }}">
         </tr>
         <tr>
             <td class="font-medium py-2 pr-4">To Department:</td>
@@ -374,7 +376,6 @@
                                         requestForm.classList.add('hidden');
                                         requestAmount.value = '';
                                     }
-                                    console.log('Request Budget Function Called');
                                     console.log("Grand Total:", grandTotal);
                                     console.log("Wallet Balance:", walletBalance);
                                     console.log("Over Amount:", overAmount);

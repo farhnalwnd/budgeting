@@ -11,13 +11,13 @@ if (!function_exists('generateDocumentNumber')) {
         $month = $now->format('m');
         $year = $now->format('y');
         
-        $lastDocument = Purchase::where('budget_no', 'like', "$prefix%/$type/$month/$year")
+        $lastDocument = Purchase::where('purchase_no', 'like', "$prefix%/$type/$month/$year")
             ->orderBy('id', 'desc')
             ->first();
         
         $lastNumber = 0;
         if ($lastDocument) {
-            preg_match('/^' . preg_quote($prefix) . '-(\d+)/', $lastDocument->budget_no, $matches);
+            preg_match('/^' . preg_quote($prefix) . '-(\d+)/', $lastDocument->purchase_no, $matches);
             $lastNumber = (int) ($matches[1] ?? 0);
         }
         
@@ -34,13 +34,13 @@ if (!function_exists('generateMultipleDocumentNumbers')) {
         $month = $now->format('m');
         $year = $now->format('y');
 
-        $lastDocument = Purchase::where('budget_no', 'like', "$prefix%/$type/$month/$year")
+        $lastDocument = Purchase::where('purchase_no', 'like', "$prefix%/$type/$month/$year")
             ->orderBy('id', 'desc')
             ->first();
 
         $lastNumber = 0;
         if ($lastDocument) {
-            preg_match('/^' . preg_quote($prefix) . '-(\d+)/', $lastDocument->budget_no, $matches);
+            preg_match('/^' . preg_quote($prefix) . '-(\d+)/', $lastDocument->purchase_no, $matches);
             $lastNumber = (int) ($matches[1] ?? 0);
         }
 

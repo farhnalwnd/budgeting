@@ -13,7 +13,7 @@ class Purchase extends Model
 
         protected $fillable = [
         'item_name',
-        'budget_no',
+        'purchase_no',
         'amount',
         'department_id',
         'quanitity',
