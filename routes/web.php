@@ -2,11 +2,11 @@
 
 use App\Http\Controllers\Auth\LockScreenController;
 use App\Http\Controllers\Budgeting\ActivityLogController;
-use App\Http\Controllers\Budgeting\BudgetingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\Budgeting\BudgetAllocationController;
+use App\Http\Controllers\Budgeting\BudgetApproverController;
 use App\Http\Controllers\Budgeting\PurchaseController;
 use App\Http\Controllers\Budgeting\BudgetListController;
 use App\Http\Controllers\Budgeting\BudgetRequestController;
@@ -52,7 +52,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [UserController::class, 'updateProfile'])->name('profile.updates');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('/get-data-master', [UserController::class, 'getDataMaster'])->name('get.master');
+    Route::get('/getUsersData', [UserController::class, 'getUsersData'])->name('get.users.data');
 
 
     /*Locked */
@@ -75,6 +75,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('category', CategoryController::class);
         Route::resource('budget-request', BudgetRequestController::class);
         Route::resource('activity', ActivityLogController::class);
+        Route::resource('approver', BudgetApproverController::class);
 
         Route::get('budget-approval', [BudgetRequestController::class, 'BudgetRequestApprovalIndex'])->name('budget-request.approval');
         Route::get('getBudgetRequestApprovalList-approval', [BudgetRequestController::class, 'getBudgetRequestApprovalList'])->name('get.budget-request.approval.list');
@@ -84,6 +85,7 @@ Route::middleware('auth')->group(function () {
         Route::get('getBudgetNo', [BudgetAllocationController::class, 'getBudgetNo'])->name('get.budget.no');
         Route::get('getBudgetList', [BudgetListController::class, 'getBudgetList'])->name('get.budget.list');
         Route::get('getBudgetRequestList', [BudgetRequestController::class, 'getBudgetRequestList'])->name('get.budget.request.list');
+        Route::get('getApproverData', [BudgetApproverController::class, 'getApproverData'])->name('get.approver.data');
         
         Route::get('getBudgetRequestNo', [BudgetRequestController::class, 'getBudgetRequestNo'])->name('get.budget.request.no');
 

@@ -60,7 +60,10 @@ class BudgetListController extends Controller
                 'total_amount' => $validatedData['total']
             ]);
             
-            $this->calculateBudget($budget->budget_allocation_no);
+            $result = $this->calculateBudget($budget->budget_allocation_no);
+            if($result instanceof \Exception){
+                throw new \Exception("Failed to calculate budget.");
+            }
 
             activity()
                 ->performedOn($budget)
@@ -87,7 +90,7 @@ class BudgetListController extends Controller
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
             DB::rollback();
-            Alert::toast('There was an error creating the budget-list.'.$e->getMessage(), 'error');
+            Alert::toast('There was an error creating the budget-list. '.$e->getMessage(), 'error');
             return back();
         }
     }
@@ -145,7 +148,11 @@ class BudgetListController extends Controller
             if($budgetOld->budget_allocation_no !== $budget->budget_allocation_no){
                 $this->calculateBudget($budgetOld->budget_allocation_no);
             }
-            $this->calculateBudget($budget->budget_allocation_no);
+
+            $result = $this->calculateBudget($budget->budget_allocation_no);
+            if($result instanceof \Exception){
+                throw new \Exception("Failed to calculate budget.");
+            }
 
             activity()
                 ->performedOn($budget)
@@ -181,7 +188,7 @@ class BudgetListController extends Controller
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
             DB::rollback();
-            Alert::toast('There was an error updating the budget-list.'.$e->getMessage(), 'error');
+            Alert::toast('There was an error updating the budget-list. '.$e->getMessage(), 'error');
             return back();
         }
     }
@@ -200,8 +207,11 @@ class BudgetListController extends Controller
             $budget = BudgetList::findOrFail($id);
             $budget->delete();
             
-            $this->calculateBudget($budget->budget_allocation_no);
-
+            $result = $this->calculateBudget($budget->budget_allocation_no);
+            if($result instanceof \Exception){
+                throw new \Exception("Failed to calculate budget.");
+            }
+            
             activity()
                 ->performedOn($budget)
                 ->inLog('budget-list')
@@ -227,7 +237,7 @@ class BudgetListController extends Controller
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
             DB::rollback();
-            Alert::toast('There was an error deleting the budget-list.'.$e->getMessage(), 'error');
+            Alert::toast('There was an error deleting the budget-list. '.$e->getMessage(), 'error');
             return back();
         }
     }
@@ -255,8 +265,9 @@ class BudgetListController extends Controller
             {
                 $department->withdraw(abs($finalAmount));
             }
+            $departmentBudget += $finalAmount;
             $budget->update([
-                'total_amount' => $department->balance
+                'total_amount' => $departmentBudget
             ]);
             // Commit transaksi
             DB::commit();
@@ -265,7 +276,7 @@ class BudgetListController extends Controller
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
             DB::rollback();
-            return False;
+            return $e;
         }
     }
 }

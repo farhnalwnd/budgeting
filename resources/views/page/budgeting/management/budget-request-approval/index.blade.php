@@ -28,7 +28,7 @@
     <section class="content">
         <div class="card">
             <div class="card-header">
-                <h1 class="card-title text-2xl font-medium">List Budget-List</h1>
+                <h1 class="card-title text-2xl font-medium">List Budget-Request</h1>
             </div>
             <div class="card-body">
                 <div class="relative overflow-x-auto sm:rounded-lg">

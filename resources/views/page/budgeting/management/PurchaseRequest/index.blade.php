@@ -130,41 +130,49 @@
                 <th class="text-center w-48">TOTAL</th>
                 <th class="text-center w-56">REMARK</th>
                 <th class="text-center w-36">ACTION</th>
+<<<<<<< HEAD
                 </tr>
                 </thead>
                 <tbody class="">
                     <tr>
                         <td><input type="text" name="description[]"
+=======
+            </tr>
+        </thead>
+            <tbody class="max-h-[50vh] overflow-y-auto">
+                <tr>
+                    <td><input type="text" name="description[]"
+>>>>>>> ryan
                         class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none" required>
-                </td>
-                <td>
-                    <input type="text" name="price[]"
-                        class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none price-input"
-                        maxlength="17" required>
-                </td>
-                <td>
-                    <input type="number" name="quantity[]"
-                        class="w-full p-1 border-none focus:bg-transparent focus:ring-0 focus:border-none quantity-input"
-                        min="0" maxlength="2" required>
-                </td>
-                <td>
-                    <input type="text" name="total[]"
-                        class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none total-input"
-                        readonly>
-                </td>
-                <td><textarea name="remark[]"
-                        class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none"></textarea>
-                </td>
-                <input type="hidden" name="grand_total" id="grand-total-input">
-                <td class="text-center">
-                    <div class="flex justify-center space-x-1">
-                        <button type="button" class="remove-row btn btn-danger text-base px-2 py-1">Remove</button>
-                        <button type="button" class="clear-btn btn btn-warning text-base px-2 py-1">Clear</button>
-                    </div>
                     </td>
-                    </tr>
-                    </tbody>
-                    </table>
+                    <td>
+                        <input type="text" name="price[]"
+                            class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none price-input"
+                            maxlength="17" required>
+                    </td>
+                    <td>
+                        <input type="number" name="quantity[]"
+                            class="w-full p-1 border-none focus:bg-transparent focus:ring-0 focus:border-none quantity-input"
+                            min="0" maxlength="2" required>
+                    </td>
+                    <td>
+                        <input type="text" name="total[]"
+                            class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none total-input"
+                            readonly>
+                    </td>
+                    <td><textarea name="remark[]"
+                            class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none"></textarea>
+                    </td>
+                    <input type="hidden" name="grand_total" id="grand-total-input">
+                    <td class="text-center">
+                        <div class="flex justify-center space-x-1">
+                            <button type="button" class="remove-row btn btn-danger text-base px-2 py-1">Remove</button>
+                            <button type="button" class="clear-btn btn btn-warning text-base px-2 py-1">Clear</button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
 </div>
             <div class="my-3 flex">
                 <div class="mr-auto"></div>
