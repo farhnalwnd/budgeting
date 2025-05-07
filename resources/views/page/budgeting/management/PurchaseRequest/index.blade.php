@@ -118,58 +118,55 @@
         <div class="container mt-10">
             <form x-on:keydown.enter.window="$el.submit()" method="POST"
                 action="{{ route('PurchaseRequest.store') }}">
-<div x-data="{ scrolled: false }" @scroll="scrolled = $el.scrollTop > 0 || false"
-    class="overflow-y-auto max-h-[250px] mt-6">
-    @csrf
-    <table class="table-auto w-full border-collapse" id="testTable">
-        <thead :class="scrolled ? 'bg-white shadow-md border-none' : ''" class="sticky top-0 z-10">
-            <tr>
-                <th class="text-center w-fit">ITEM NAME</th>
-                <th class="text-center w-48">HARGA (RP)</th>
-                <th class="text-center w-28">JML</th>
-                <th class="text-center w-48">TOTAL</th>
-                <th class="text-center w-56">REMARK</th>
-                <th class="text-center w-36">ACTION</th>
-<<<<<<< HEAD
+        <div x-data="{ scrolled: false }" @scroll="scrolled = $el.scrollTop > 0 || false"
+            class="overflow-y-auto max-h-[250px] mt-6">
+            @csrf
+            <table class="table-auto w-full border-collapse" id="testTable">
+                <thead :class="scrolled ? 'bg-white shadow-md border-none' : ''" class="sticky top-0 z-10">
+                    <tr>
+                        <th class="text-center w-fit">ITEM NAME</th>
+                        <th class="text-center w-48">HARGA (RP)</th>
+                        <th class="text-center w-28">JML</th>
+                        <th class="text-center w-48">TOTAL</th>
+                        <th class="text-center w-56">REMARK</th>
+                        <th class="text-center w-36">ACTION</th>
+                    </tr>
+                    </thead>
+                    <tbody class="max-h-[50vh] overflow-y-auto">
+                        <tr>
+                            <td><input type="text" name="description[]"
 
-=======
-            </tr>
-        </thead>
-            <tbody class="max-h-[50vh] overflow-y-auto">
-                <tr>
-                    <td><input type="text" name="description[]"
->>>>>>> ryan
-                        class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none" required>
-                    </td>
-                    <td>
-                        <input type="text" name="price[]"
-                            class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none price-input"
-                            maxlength="17" required>
-                    </td>
-                    <td>
-                        <input type="number" name="quantity[]"
-                            class="w-full p-1 border-none focus:bg-transparent focus:ring-0 focus:border-none quantity-input"
-                            min="0" maxlength="2" required>
-                    </td>
-                    <td>
-                        <input type="text" name="total[]"
-                            class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none total-input"
-                            readonly>
-                    </td>
-                    <td><textarea name="remark[]"
-                            class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none"></textarea>
-                    </td>
-                    <input type="hidden" name="grand_total" id="grand-total-input">
-                    <td class="text-center">
-                        <div class="flex justify-center space-x-1">
-                            <button type="button" class="remove-row btn btn-danger text-base px-2 py-1">Remove</button>
-                            <button type="button" class="clear-btn btn btn-warning text-base px-2 py-1">Clear</button>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-</div>
+                                class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none" required>
+                            </td>
+                            <td>
+                                <input type="text" name="price[]"
+                                    class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none price-input"
+                                    maxlength="17" required>
+                            </td>
+                            <td>
+                                <input type="number" name="quantity[]"
+                                    class="w-full p-1 border-none focus:bg-transparent focus:ring-0 focus:border-none quantity-input"
+                                    min="0" maxlength="2" required>
+                            </td>
+                            <td>
+                                <input type="text" name="total[]"
+                                    class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none total-input"
+                                    readonly>
+                            </td>
+                            <td><textarea name="remark[]"
+                                    class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none"></textarea>
+                            </td>
+                            <input type="hidden" name="grand_total" id="grand-total-input">
+                            <td class="text-center">
+                                <div class="flex justify-center space-x-1">
+                                    <button type="button" class="remove-row btn btn-danger text-base px-2 py-1">Remove</button>
+                                    <button type="button" class="clear-btn btn btn-warning text-base px-2 py-1">Clear</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+        </div>
             <div class="my-3 flex">
                 <div class="mr-auto"></div>
                 <div>
@@ -178,39 +175,39 @@
                     <h3 class="text-lg font-mono font-semibold">Sisa Wallet : <span id="wallet-after"></span></h3>
                 </div>
             </div>
-<!--! table budget kurang -->
-<div id="request-budget-form" class="hidden mt-4 border border-gray-300 p-4 rounded-lg bg-gray-50">
-    <h2 class="text-lg font-semibold mb-2">Budget Request Form</h2>
-    <table class="w-full table-auto border-collapse">
-        <tr>
-            <td class="font-medium py-2 pr-4">From Department:</td>
-            <td><input type="text" name="from_department" id="from-department" class="w-full border rounded p-2"
-                    readonly value="{{ $department->department_name }}"></td>
-            <input type="hidden" name="from_department" id="from-department" class="w-full border rounded p-2"
-                    readonly value="{{ $department->id }}">
-        </tr>
-        <tr>
-            <td class="font-medium py-2 pr-4">To Department:</td>
-            <td>
-                <select name="to_department" id="to-department" class="w-full border rounded p-2">
-                    <option value="">Select Department</option>
-                    @foreach ($departments as $dept)
-                    <option value="{{ $dept->id }}">{{ $dept->department_name }}</option>
-                    @endforeach
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <td class="font-medium py-2 pr-4">Amount:</td>
-            <td><input type="text" name="amount" id="request-amount" class="w-full border rounded p-2" readonly></td>
-        </tr>
-        <tr>
-            <td class="font-medium py-2 pr-4">Reason:</td>
-            <td><textarea name="reason" id="request-reason" rows="3" class="w-full border rounded p-2"
-                    placeholder="Explain the purpose of the request..."></textarea></td>
-        </tr>
-    </table>
-</div>
+            <!--! table budget kurang -->
+            <div id="request-budget-form" class="hidden mt-4 border border-gray-300 p-4 rounded-lg bg-gray-50">
+                <h2 class="text-lg font-semibold mb-2">Budget Request Form</h2>
+                <table class="w-full table-auto border-collapse">
+                    <tr>
+                        <td class="font-medium py-2 pr-4">From Department:</td>
+                        <td><input type="text" name="from_department" id="from-department" class="w-full border rounded p-2"
+                                readonly value="{{ $department->department_name }}"></td>
+                        <input type="hidden" name="from_department" id="from-department" class="w-full border rounded p-2" readonly
+                            value="{{ $department->id }}">
+                    </tr>
+                    <tr>
+                        <td class="font-medium py-2 pr-4">To Department:</td>
+                        <td>
+                            <select name="to_department" id="to-department" class="w-full border rounded p-2">
+                                <option value="">Select Department</option>
+                                @foreach ($departments as $dept)
+                                <option value="{{ $dept->id }}">{{ $dept->department_name }}</option>
+                                @endforeach
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-medium py-2 pr-4">Amount:</td>
+                        <td><input type="text" name="amount" id="request-amount" class="w-full border rounded p-2" readonly></td>
+                    </tr>
+                    <tr>
+                        <td class="font-medium py-2 pr-4">Reason:</td>
+                        <td><textarea name="reason" id="request-reason" rows="3" class="w-full border rounded p-2"
+                                placeholder="Explain the purpose of the request..."></textarea></td>
+                    </tr>
+                </table>
+            </div>
             <div class="flex items-center justify-between mx-4 mt-4">
                 <div>
                     <button type="button" id="add-row" class="btn btn-primary group active:scale-90 transition-transform duration-200">
