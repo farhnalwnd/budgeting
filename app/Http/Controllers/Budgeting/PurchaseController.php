@@ -9,6 +9,7 @@ use App\Models\Budgeting\BudgetAllocation;
 use App\Models\Budgeting\BudgetRequest;
 use App\Models\Budgeting\Purchase;
 use App\Models\Department;
+use Illuminate\Auth\Events\Validated;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -103,6 +104,7 @@ class PurchaseController extends Controller
     
         Purchase::insert($purchases);
 
+        $amount = Purchase::parseRupiah($validatedData['amount']);
         if ($grandTotal > $department->balance) {
             if (
                 $validatedData['from_department'] &&
@@ -111,7 +113,7 @@ class PurchaseController extends Controller
                 $validatedData['reason']
             ) {
                 $toDept = Department::findorfail($validatedData['to_department']);
-                if($toDept->balance < $validatedData['amount']){
+                if($toDept->balance < $amount){
                     DB::rollback();
                     Alert::toast("The selected department's budget is insufficient.", 'error');
                     return back();
