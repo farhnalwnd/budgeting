@@ -17,6 +17,7 @@ class Purchase extends Model
         'amount',
         'department_id',
         'quanitity',
+        'status',
         'total_amount',
         'remarks'
     ];

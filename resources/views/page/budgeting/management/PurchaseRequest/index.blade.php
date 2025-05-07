@@ -68,7 +68,7 @@
                             @foreach ($purchases as $purchase)
                             <tr>
                                 <td class="px-6 py-4 text-lg text-center w-5">{{ $purchase->id }}</td>
-                                <td class="px-6 py-4 text-lg text-center whitespace-nowrap w-10">{{ $purchase->budget_no }}</td>
+                                <td class="px-6 py-4 text-lg text-center whitespace-nowrap w-10">{{ $purchase->purchase_no }}</td>
                                 <td class="px-6 py-4 text-lg">{{ $purchase->item_name }}</td>
                                 <td class="px-6 py-4 text-lg w-56 text-center">{{ $purchase->department->department_name }}</td>
                                 <td class="px-6 py-4 text-lg text-center w-48">Rp. {{ number_format($purchase->amount, 0, ',', '.') }}</td>

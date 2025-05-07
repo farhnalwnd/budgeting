@@ -30,7 +30,7 @@ return new class extends Migration
             //     table:'category_masters',
             //     indexName:'fk_purchases_categoryMasters'
             // )->nullable();
-            $table->enum('status', ['pending','approved','rejected'])->default('pending');
+            $table->enum('status', ['pending','approved','rejected'])->default('approved');
             $table->timestamps();
         });
     }
