@@ -131,11 +131,7 @@
                 <th class="text-center w-56">REMARK</th>
                 <th class="text-center w-36">ACTION</th>
 <<<<<<< HEAD
-                </tr>
-                </thead>
-                <tbody class="">
-                    <tr>
-                        <td><input type="text" name="description[]"
+
 =======
             </tr>
         </thead>

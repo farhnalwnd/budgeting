@@ -22,20 +22,11 @@ return new class extends Migration
                 table:'departments',
                 indexName:'fk_toDepartment_departments'
             ); //pemberi
-<<<<<<< HEAD
             $table->string('budget_purchase_no')->nullable();
             $table->foreign('budget_purchase_no')
                 ->references('purchase_no')
                 ->on('purchases')
                 ->onDelete('cascade'); //no purchasing
-=======
-            $table->foreignId('budget_purchase_no')
-                ->nullable()    
-                ->constrained(
-                table:'purchases',
-                indexName:'fk_budgetPurchases_purchases'
-            ); //no purchasing
->>>>>>> ryan
             $table->decimal('amount',18,2); // jumlah diminta
             $table->text('reason'); // alasan permintaan
             $table->enum('status', ['pending','approved','rejected'])->default('pending');
