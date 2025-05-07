@@ -30,4 +30,11 @@ class BudgetRequest extends Model
     {
         return $this->belongsTo(Department::class, 'to_department_id');
     }
+
+    
+
+    public function approval()
+    {
+        return $this->hasMany(BudgetApproval::class, 'budget_req_no');
+    }
 }

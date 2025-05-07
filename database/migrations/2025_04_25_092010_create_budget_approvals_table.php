@@ -13,8 +13,10 @@ return new class extends Migration
     {
         Schema::create('budget_approvals', function (Blueprint $table) {
             $table->id();
+            $table->string('budget_req_no');
             $table->string('nik');
             $table->string('status');
+            $table->string('feedback')->nullable();
             $table->text('token')->nullable();
             $table->timestamps();
         });

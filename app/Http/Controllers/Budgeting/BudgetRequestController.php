@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Budgeting;
 
 use App\Http\Controllers\Controller;
+use App\Models\Budgeting\BudgetApproval;
 use App\Models\Budgeting\BudgetApprover;
 use App\Models\Budgeting\BudgetRequest;
 use App\Models\Department;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class BudgetRequestController extends Controller
@@ -64,6 +66,14 @@ class BudgetRequestController extends Controller
                 'to_department_id' => $validatedData['to_department'],
                 'amount' => $validatedData['amount'],
                 'reason' => $validatedData['reason']
+            ]);
+
+            $approverNik = BudgetApprover::where('department_id',$validatedData['to_department'])->first();
+            BudgetApproval::create([
+                'budget_req_no' => $validatedData['no'],
+                'nik' => $approverNik->nik,
+                'status' => 'pending',
+                'token' => Str::uuid()
             ]);
 
             activity()
@@ -131,6 +141,7 @@ class BudgetRequestController extends Controller
             ]);
 
             $budget = BudgetRequest::findOrFail($id);
+            $approval = BudgetApproval::where('budget_req_no', $budget->budget_req_no)->first();
 
             $fromDept = Department::findOrFail($budget->from_department_id);
             $toDept = Department::findOrFail($budget->to_department_id);
@@ -163,6 +174,12 @@ class BudgetRequestController extends Controller
             $budget->update([
                 'status' => $status,
                 'feedback' => $review
+            ]);
+
+            $approval->update([
+                'status' => $status,
+                'feedback' => $review,
+                'token' => null
             ]);
 
             activity()
