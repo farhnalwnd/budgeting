@@ -94,7 +94,13 @@ Route::middleware('auth')->group(function () {
 
 });
 
+route::prefix('page')->group(function () {
+    Route::get('/budgetin/request/approve', [PurchaseController::class, 'approved'])->name('budgeting.request.approved');
+    Route::get('/budgetin/request/reject', [PurchaseController::class, 'rejected'])->name('budgeting.request.reject');
+    Route::get('/budgetin/request/endview', [PurchaseController::class, 'endview'])->name('budgeting.request.endview');
+    Route::post('/budgetin/request/reject-feedback', [PurchaseController::class, 'submitRejectFeedback'])->name('budgeting.request.reject.feedback');
 
+});
 
 Route::group(['middleware' => ['role:super-admin|admin']], function () {
 
