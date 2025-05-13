@@ -236,8 +236,8 @@
                     { data: 'status', name: 'status' },
                     { data: null, name: 'action', orderable: false, searchable: false,
                         render: function(data, type, row, meta) {
-                            var id = row.id;
-                            var deleteUrl = "{{ route('budget-request.destroy', ':id') }}".replace(':id', id); 
+                            var id = row.budget_req_no;
+                            var deleteUrl = "{{ route('budget-request.destroy', ':id') }}".replace(':id', id.replaceAll("/", "-")); 
                             return `
                             <div class="d-flex action-btn">
                                 <a href="javascript:void(0)" class="text-primary edit" onClick="openEditModal(${meta.row})">
@@ -297,7 +297,7 @@
                     <div class="relative p-4 w-full max-w-4xl max-h-full">
                         <div class="relative bg-white rounded-lg shadow dark:bg-gray-700" style="margin-top: 10%;">
                             <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-                                <h3 class="text-3xl font-semibold text-white">Update Budget</h3>
+                                <h3 class="text-3xl font-semibold text-white">Detail Budget</h3>
                                 <button type="button"
                                     class="end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
                                     data-modal-hide="editContactModal${id}" onClick="openEditModal(${id})">

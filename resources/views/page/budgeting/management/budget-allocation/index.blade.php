@@ -200,8 +200,8 @@
                     { data: 'allocated_by', name: 'allocated' },
                     { data: null, name: 'action', orderable: false, searchable: false,
                         render: function(data, type, row, meta) {
-                            var id = row.id;
-                            var deleteUrl = "{{ route('budget-allocation.destroy', ':id') }}".replace(':id', id); 
+                            var id = row.budget_allocation_no;
+                            var deleteUrl = "{{ route('budget-allocation.destroy', ':id') }}".replace(':id', id.replaceAll("/", "-")); 
                             return `
                             <div class="d-flex action-btn">
                                 <a href="javascript:void(0)" class="text-primary edit" onClick="openEditModal(${meta.row})">
@@ -255,7 +255,7 @@
             var modalDiv = document.getElementById('editModalDiv');
             var newEditModal = '';
             var budget = budgets[id];
-            var updateUrl = "{{ route('budget-allocation.update', ':id') }}".replace(':id', budget.id); 
+            var updateUrl = "{{ route('budget-allocation.update', ':id') }}".replace(':id', budget.budget_allocation_no.replaceAll("/", "-")); 
             newEditModal = `
                 <div id="editContactModal${id}" tabindex="-1" aria-modal="true" role="dialog"
                     class="flex overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
@@ -280,7 +280,7 @@
                                 @method('PUT')
                                     <div class="form-group">
                                         <label class="form-label text-white text-xl">Budget No<span
-                                                class="text-danger">*</span></label>
+                                                class="text-danger">(readonly)</span></label>
                                         <div class="controls">
                                             <input type="text" name="no"
                                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-xl rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
@@ -291,9 +291,9 @@
                                     
                                     <div class="form-group">
                                         <label class="form-label text-white text-xl">Department<span
-                                                class="text-danger">*</span></label>
+                                                class="text-danger">(readonly)</span></label>
                                         <div class="controls">
-                                            <select name="department" required
+                                            <select name="department" required readonly disabled
                                                 class="form-select w-full text-xl" aria-invalid="false"
                                                 placeholder="Department">
                                                 `;

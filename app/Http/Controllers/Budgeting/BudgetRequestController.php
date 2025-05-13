@@ -218,7 +218,51 @@ class BudgetRequestController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        // Mulai transaction untuk memastikan integritas data
+        DB::beginTransaction();
+
+        try{
+            $user = Auth::user();
+
+            $budget = BudgetRequest::where('budget_req_no', str_replace('-', '/', $id))->firstOrFail();
+            if($budget->status == 'pending')
+            {
+                $budget->delete();
+            }
+            else
+            {
+                throw new \Exception("Budget-Request status is not pending.");
+            }
+            
+            activity()
+                ->performedOn($budget)
+                ->inLog('budget-request')
+                ->event('Delete')
+                ->causedBy($user)
+                ->withProperties(['no' => $budget->budget_req_no, 'action' => 'delete',
+                'data' => [
+                    'budget_req_no' => $budget->budget_req_no,
+                    'from_department' => $budget->from_department,
+                    'budget_purchase_no' => $budget->budget_purchase_no,
+                    'to_department' => $budget->to_department,
+                    'amount' => $budget->amount,
+                    'reason' => $budget->reason,
+                    'status' => $budget->status,
+                    'feedback' => $budget->feedback
+                ]])
+                ->log('Delete budget-request ' . $budget->budget_req_no . ' by ' . $user->name . ' at ' . now());
+                
+            // Commit transaksi
+            DB::commit();
+            Alert::toast('Budget-request successfully deleted!', 'success');
+            return redirect()->route('budget-request.index');
+
+        } catch (\Exception $e) {
+            // Rollback transaksi jika terjadi kesalahan
+            DB::rollback();
+            Alert::toast('There was an error deleting the budget-request. '.$e->getMessage(), 'error');
+            return back();
+        }
     }
 
     public function getBudgetRequestList(){

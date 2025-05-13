@@ -105,18 +105,14 @@ class BudgetAllocationController extends Controller
 
         try{
             $validatedData = $request->validate([
-                'no' => 'required|string|max:255',
-                'department' => 'required|exists:departments,id',
                 'description' => 'nullable|string|max:255',
             ]);
 
             $user = Auth::user();
 
-            $budget = BudgetAllocation::find($id);
+            $budget = BudgetAllocation::where('budget_allocation_no', str_replace('-', '/', $id))->firstOrFail();
             $budgetOld = clone $budget;
             $budget->update([
-                'budget_allocation_no' => $validatedData['no'],
-                'department_id' => $validatedData['department'],
                 'description' => $validatedData['description'] ?? null
             ]);
             
@@ -162,7 +158,7 @@ class BudgetAllocationController extends Controller
         try{
             $user = Auth::user();
 
-            $budget = BudgetAllocation::findOrFail($id);
+            $budget = BudgetAllocation::where('budget_allocation_no', str_replace('-', '/', $id))->firstOrFail();
             $budget->delete();
             
             activity()
