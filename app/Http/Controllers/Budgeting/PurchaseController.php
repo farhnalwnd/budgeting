@@ -6,6 +6,8 @@ namespace App\Http\Controllers\Budgeting;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Jobs\sendApprovalRequest;
+use App\Jobs\SendApprovedPurchase;
+use App\Jobs\SendApprovedPurchaseNotification;
 use App\Models\Budgeting\BudgetAllocation;
 use App\Models\Budgeting\BudgetApproval;
 use App\Models\Budgeting\BudgetApprover;
@@ -102,7 +104,27 @@ class PurchaseController extends Controller
                 'updated_at' => now(),
             ];
         }
+        // dd($purchases);
         Purchase::insert($purchases);
+
+        $approvedPurchases = array_filter($purchases, fn($item) => $item['status'] === 'approved');
+        // dd($approvedPurchases);
+        $admin = User::where('username', 'admin')->first();
+        if ($admin && count($approvedPurchases) > 0) {
+            $mailData = []; {
+            foreach ($approvedPurchases as $purchases) {
+                $mailData [] = [
+                    'item_name' => $purchases['item_name'],
+                    'amount' => number_format($purchases['amount'], 0, ',', '.'),
+                    'quantity' => $purchases['quanitity'],
+                    'total' => number_format($purchases['total_amount'], 0, ',', '.'),
+                    'purchase_no' => $purchases['purchase_no']
+                ];
+                // dd($mailData);
+                SendApprovedPurchaseNotification::dispatch($admin, $mailData, $department);
+            }
+            }
+        }
 
         //* ganti format amount
         $amount = Purchase::parseRupiah($validatedData['amount']);
@@ -170,9 +192,8 @@ class PurchaseController extends Controller
                 return back();
             }
         }
-
+    
         $department->withdraw($grandTotal);
-
         DB::commit();
         Alert::success('Berhasil', 'Data pembelian berhasil disimpan.');
         return redirect()->route('PurchaseRequest.index');
@@ -184,7 +205,6 @@ class PurchaseController extends Controller
             return back()->withInput();
         }
     }
-
 
     /**
      * Display the specified resource.
@@ -282,6 +302,19 @@ class PurchaseController extends Controller
 
                 Purchase::where('purchase_no', $budgetRequest->budget_purchase_no)
                     ->update(['status' => 'approved']);
+
+                    $admin = User::where('username', 'admin')->first();
+                    if($admin){
+                        $mailData=[
+                            'from_department'=> $fromDept,
+                            'to_department'=>$toDept,
+                            'balannce'=>$toDept->balanceInt,
+                            'amount'=>$amount
+                        ];
+                        // dd($mailData);
+                        SendApprovedPurchase::dispatch($admin, $mailData);
+                    }
+
             }
             DB::commit();
             return view('emails.finishProcces');

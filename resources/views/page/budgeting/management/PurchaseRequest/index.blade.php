@@ -13,9 +13,6 @@
         <div class="flex items-center justify-between">
             <h4 class="page-title text-2xl font-lg"></h4>
             <div class="inline-flex items-center">
-                <div>
-                    <h1>testetsest</h1>
-                </div>
                 <nav>
                     <ol class="breadcrumb flex items-center">
                         <li class="breadcrumb-item pr-1"><a href="{{ route('dashboard') }}"><i

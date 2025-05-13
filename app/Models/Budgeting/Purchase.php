@@ -19,6 +19,7 @@ class Purchase extends Model
         'quanitity',
         'status',
         'total_amount',
+        'actual_amount',
         'remarks'
     ];
 

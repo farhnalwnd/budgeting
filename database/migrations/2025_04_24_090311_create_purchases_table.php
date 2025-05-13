@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('um')->nullable(); // unit measure
             $table->decimal('amount',18,2); //budget awal / estimasi
             $table->decimal('total_amount',18,2); //total budget awal / total estimasi
-            // $table->decimal('actual_amount',18,2); //biaya aktual pembelian
+            $table->decimal('actual_amount',18,2)->nullable(); //biaya aktual pembelian
             $table->integer('PO')->nullable();
             $table->text('remarks')->nullable(); //keterangan
             // $table->foreignId('category_id')->constrained(
