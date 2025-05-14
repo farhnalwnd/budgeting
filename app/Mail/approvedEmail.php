@@ -15,21 +15,27 @@ class approvedEmail extends Mailable
 
     protected $admin;
     protected $mailData;
+    protected $budgetRequest;
+    protected $purchase;
     /**
      * Create a new message instance.
      */
-    public function __construct($admin, $mailData)
+    public function __construct($admin, $mailData, $budgetRequest, $purchase)
     {
         $this->admin= $admin;
         $this->mailData=$mailData;
+        $this->budgetRequest=$budgetRequest;
+        $this->purchase=$purchase;
     }
 
     public function build(){
         return $this->subject("list budgeting approved")
-        ->markdown('emails.editRequestApproved')
+        ->markdown('emails.requestApproved')
         ->with([
             'admin'=> $this->admin,
-            'mailData'=>$this->mailData
+            'mailData'=>$this->mailData,
+            'budgetRequest'=>$this->budgetRequest,
+            'purchase'=>$this->purchase
             ]);
 
     }

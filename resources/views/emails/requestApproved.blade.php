@@ -41,37 +41,38 @@
         <tbody>
             <tr>
                 <th colspan="3">
-                    <h5 class="text-center">data approved baru yang masuk</h5>
+                    <h5 class="text-center">data approved baru yang masuk setelah dipinjamkan oleh {{$mailData['from_department']->department_name}}</h5>
                 </th>
             </tr>
             <tr>
                 <td colspan="2">penganggar:</td>
-                <td>{{ $department->department_name }}</td>
+                <td>{{ $mailData['to_department']->department_name}}</td>
             </tr>
-
-            @foreach ($mailData as $purchase)
             <tr class="tr-odd">
-                <td style="width:auto">{{$loop->iteration}}</td>
+                <td style="width:auto">1</td>
                 <td>Item:</td>
-                <td>{{ $purchase['item_name'] }}</td>
+                <td>{{$purchase->item_name }}</td>
             </tr>
             <tr>
                 <td style="width:auto"></td>
                 <td>Purchase No:</td>
-                <td>{{ $purchase['purchase_no'] }}</td>
+                <td>{{$purchase->purchase_no }}</td>
             </tr>
             <tr class="tr-odd">
                 <td style="width:auto"></td>
                 <td>Jumlah:</td>
-                <td>{{ $purchase['quantity'] }}</td>
+                <td>{{$purchase->quanitity }}</td>
             </tr>
             <tr>
                 <td style="width:auto"></td>
                 <td>Total:</td>
-                <td>{{ $purchase['total'] }}</td>
+                <td>{{$purchase->total_amount }}</td>
             </tr>
-            @endforeach
-
+            <tr>
+                <td style="width:auto"></td>
+                <td>saldo department:</td>
+                <td>{{$mailData['balance'] }}</td>
+            </tr>
             <tr>
                 <th colspan="3">
                     <a href=""

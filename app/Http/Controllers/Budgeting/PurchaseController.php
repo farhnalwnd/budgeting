@@ -121,9 +121,9 @@ class PurchaseController extends Controller
                     'purchase_no' => $purchases['purchase_no']
                 ];
                 // dd($mailData);
-                SendApprovedPurchaseNotification::dispatch($admin, $mailData, $department);
             }
-            }
+        }
+        SendApprovedPurchaseNotification::dispatch($admin, $mailData, $department);
         }
 
         //* ganti format amount
@@ -262,7 +262,7 @@ class PurchaseController extends Controller
         }
 
         if ($status !== $expectedStatus) {
-            return response()->view('emails.invalidAttempt', [], 400);
+            return response()->view('emails.invalidStatus', [], 400);
         }
 
         DB::beginTransaction();
@@ -300,7 +300,9 @@ class PurchaseController extends Controller
                 $budgetRequest->status = 'approved';
                 $budgetRequest->save();
 
-                Purchase::where('purchase_no', $budgetRequest->budget_purchase_no)
+                $purchase = Purchase::where('purchase_no', $budgetRequest->budget_purchase_no)->first();
+                if($purchase){
+                    Purchase::where('purchase_no', $budgetRequest->budget_purchase_no)
                     ->update(['status' => 'approved']);
 
                     $admin = User::where('username', 'admin')->first();
@@ -308,13 +310,13 @@ class PurchaseController extends Controller
                         $mailData=[
                             'from_department'=> $fromDept,
                             'to_department'=>$toDept,
-                            'balannce'=>$toDept->balanceInt,
+                            'balance'=>$toDept->balanceInt,
                             'amount'=>$amount
                         ];
                         // dd($mailData);
-                        SendApprovedPurchase::dispatch($admin, $mailData);
+                        SendApprovedPurchase::dispatch($admin, $mailData, $budgetRequest, $purchase);
                     }
-
+                }
             }
             DB::commit();
             return view('emails.finishProcces');

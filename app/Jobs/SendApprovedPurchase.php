@@ -17,13 +17,17 @@ class SendApprovedPurchase implements ShouldQueue
 
     protected $admin;
     protected $mailData;
+    protected $budgetRequest;
+    protected $purchase;
     /**
      * Create a new job instance.
      */
-    public function __construct($admin, $mailData)
+    public function __construct($admin, $mailData, $budgetRequest, $purchase)
     {
         $this->admin=$admin;
         $this->mailData=$mailData;
+        $this->budgetRequest=$budgetRequest;
+        $this->purchase=$purchase;
     }
 
     /**
@@ -31,6 +35,6 @@ class SendApprovedPurchase implements ShouldQueue
      */
     public function handle(): void
     {
-        Mail::to($this->admin->email)->send(new approvedEmail($this->admin, $this->mailData));
+        Mail::to($this->admin->email)->send(new approvedEmail($this->admin, $this->mailData, $this->budgetRequest, $this->purchase));
     }
 }

@@ -44,6 +44,12 @@ class Purchase extends Model
         return $this->belongsTo(BudgetAllocation::class);
     }
 
+    public function budgetRequest()
+{
+    return $this->hasMany(BudgetRequest::class, 'budget_purchase_no', 'purchase_no');
+}
+
+
 
     //     protected static function boot()
     // {
