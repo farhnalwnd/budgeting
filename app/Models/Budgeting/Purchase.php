@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Casts\AsDecimal;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\department;
+use App\Models\PurchaseDetail;
 
 class Purchase extends Model
 {
@@ -18,7 +19,7 @@ class Purchase extends Model
         'department_id',
         'quanitity',
         'status',
-        'total_amount',
+        'grand_total',
         'actual_amount',
         'remarks'
     ];
@@ -42,6 +43,10 @@ class Purchase extends Model
 
     public function BudgetAllocation(){
         return $this->belongsTo(BudgetAllocation::class);
+    }
+
+    public function detail(){
+        return $this->hasMany(PurchaseDetail::class);
     }
 
     public function budgetRequest()
