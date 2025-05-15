@@ -31,6 +31,10 @@ class BudgetRequest extends Model
         return $this->belongsTo(Department::class, 'to_department_id');
     }
 
+        public function purchase()
+    {
+        return $this->hasOne(Purchase::class, 'purchase_no', 'budget_purchase_no');
+    }
     
 
     public function approval()

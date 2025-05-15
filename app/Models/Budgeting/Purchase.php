@@ -13,11 +13,13 @@ class Purchase extends Model
 
         protected $fillable = [
         'item_name',
-        'budget_no',
+        'purchase_no',
         'amount',
         'department_id',
         'quanitity',
+        'status',
         'total_amount',
+        'actual_amount',
         'remarks'
     ];
 
@@ -41,6 +43,12 @@ class Purchase extends Model
     public function BudgetAllocation(){
         return $this->belongsTo(BudgetAllocation::class);
     }
+
+    public function budgetRequest()
+{
+    return $this->hasMany(BudgetRequest::class, 'budget_purchase_no', 'purchase_no');
+}
+
 
 
     //     protected static function boot()

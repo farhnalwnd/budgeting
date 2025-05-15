@@ -5,10 +5,21 @@ namespace App\Http\Controllers\Budgeting;
 
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Jobs\sendApprovalRequest;
+use App\Jobs\SendApprovedPurchase;
+use App\Jobs\SendApprovedPurchaseNotification;
 use App\Models\Budgeting\BudgetAllocation;
+use App\Models\Budgeting\BudgetApproval;
+use App\Models\Budgeting\BudgetApprover;
+use App\Models\Budgeting\BudgetRequest;
 use App\Models\Budgeting\Purchase;
 use App\Models\Department;
+use App\Models\User;
+use Illuminate\Auth\Events\Validated;
+use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 
 class PurchaseController extends Controller
@@ -47,45 +58,13 @@ class PurchaseController extends Controller
      */
     public function store(Request $request)
     {
+        DB::beginTransaction();
+        try {
+            $user = auth()->user();
+            $department = $user->department;
+            $departmentId = $department->id;
 
-    $validatedData = $this->validateRequest($request);
-    $department = auth()->user()->department;
-    $walletBalance = $department->balance;
-
-    // Hitung grand total
-    $grandTotal = 0;
-    foreach ($validatedData['price'] as $index => $priceStr) {
-        $price = max(0, Purchase::parseRupiah($priceStr)); // Pastikan harga tidak negatif
-        $quantity = $validatedData['quantity'][$index];
-        $grandTotal += $price * $quantity;
-    }
-
-    // Validasi saldo
-    if ($grandTotal > $walletBalance) {
-        return back()->with('error', 'Saldo departemen tidak mencukupi!');
-    }
-
-    // Siapkan data + nomor budget
-    $purchases = $this->preparePurchaseData($validatedData, $department->id);
-    $purchases = $this->addBudgetNumbers($purchases);
-
-    // Eksekusi dalam transaksi
-    try {
-        DB::transaction(function () use ($purchases, $department, $grandTotal) {
-            $department->withdraw($grandTotal); // Kurangi saldo
-            Purchase::insert($purchases); // Simpan data
-        });
-    } catch (\Exception $e) {
-        return back()->with('error', 'Gagal menyimpan data: ' . $e->getMessage());
-    }
-
-    return redirect()->route('PurchaseRequest.index')
-           ->with('success', 'Data pembelian berhasil disimpan');
-}
-
-    protected function validateRequest(Request $request)
-    {
-        return $request->validate([
+            $validatedData = $request->validate([
             'description' => 'required|array|min:1',
             'description.*' => 'required|string|max:100',
             'price' => 'required|array|min:1',
@@ -93,42 +72,139 @@ class PurchaseController extends Controller
             'quantity' => 'required|array|min:1',
             'quantity.*' => 'required|integer|min:1',
             'remark' => 'nullable|array',
-            'remark.*' => 'nullable|string|max:500'
-        ]);
-    }
+            'remark.*' => 'nullable|string|max:500',
+            'from_department' => 'nullable|string|exists:departments,id',
+            'to_department' => 'nullable|string|exists:departments,id',
+            'amount' => 'nullable|string|min:0',
+            'reason' => 'nullable|string|max:250',
+            ]);
 
-    protected function preparePurchaseData(array $validatedData, $departmentId)
-    {
+        //* looping data & kalkulasi harga
+        $grandTotal = 0;
         $purchases = [];
-        
+        $budgetNumbers = generateMultipleDocumentNumbers(count($validatedData['description']));
         foreach ($validatedData['description'] as $index => $desc) {
-            $price = Purchase::parseRupiah($validatedData['price'][$index]);
+            $price = max(0, Purchase::parseRupiah($validatedData['price'][$index]));
             $quantity = $validatedData['quantity'][$index];
-            
+            $total = $price * $quantity;
+            $grandTotal += $total;
+
+            $isBalanceEnough = $department->balance >= $grandTotal;
+
             $purchases[] = [
                 'item_name' => $desc,
                 'amount' => $price,
                 'quanitity' => $quantity,
-                'total_amount' => $price * $quantity,
+                'total_amount' => $total,
                 'remarks' => $validatedData['remark'][$index] ?? null,
-                'department_id'=> $departmentId,
+                'department_id' => $departmentId,
+                'purchase_no' => $budgetNumbers[$index],
+                'status' => $isBalanceEnough ? 'approved' : 'pending',
                 'created_at' => now(),
-                'updated_at' => now()
+                'updated_at' => now(),
             ];
         }
-        return $purchases;
+        // dd($purchases);
+        Purchase::insert($purchases);
 
+        $approvedPurchases = array_filter($purchases, fn($item) => $item['status'] === 'approved');
+        // dd($approvedPurchases);
+        $admin = User::where('username', 'admin')->first();
+        if ($admin && count($approvedPurchases) > 0) {
+            $mailData = []; {
+            foreach ($approvedPurchases as $purchases) {
+                $mailData [] = [
+                    'item_name' => $purchases['item_name'],
+                    'amount' => number_format($purchases['amount'], 0, ',', '.'),
+                    'quantity' => $purchases['quanitity'],
+                    'total' => number_format($purchases['total_amount'], 0, ',', '.'),
+                    'purchase_no' => $purchases['purchase_no']
+                ];
+                // dd($mailData);
+            }
+        }
+        SendApprovedPurchaseNotification::dispatch($admin, $mailData, $department);
+        }
+
+        //* ganti format amount
+        $amount = Purchase::parseRupiah($validatedData['amount']);
+
+        //* kondisi balance kurang
+        if ($grandTotal > $department->balance) {
+            if (
+                $validatedData['from_department'] &&
+                $validatedData['to_department'] &&
+                $validatedData['amount'] &&
+                $validatedData['reason']
+            ) {
+                $toDept = Department::findorfail($validatedData['to_department']);
+
+                //* cancel peminjaman kedept lain yang balancenya tetap kurang
+                if($toDept->balance < $amount){
+                    DB::rollback();
+                    Alert::toast("The selected department's budget is insufficient.", 'error');
+                    return back();
+                }
+
+                $budgetReqNo = $this->getBudgetRequestNo($validatedData['from_department']);
+
+                $budgetRequest = BudgetRequest::create([
+                    'budget_req_no' => $budgetReqNo,
+                    'from_department_id' => $validatedData['from_department'],
+                    'to_department_id' => $validatedData['to_department'],
+                    'budget_purchase_no' => $budgetNumbers[0],
+                    'amount' => Purchase::parseRupiah($validatedData['amount']),
+                    'reason' => $validatedData['reason'],
+                    'status'=> 'pending',
+                ]);
+
+                //* validasi data untuk approval via email
+                $approver= null;
+                $approver= BudgetApprover::where('department_id', $validatedData['to_department'])
+                                        ->first();
+                $budgetApproval= BudgetApproval::create([
+                'budget_req_no' => $budgetRequest->budget_req_no,
+                'nik' => $approver->nik,
+                'status' => 'pending',
+                'token' => Str::uuid()
+            ]);
+            if($approver && $approver->user){
+                $approver = $approver->user;
+            }
+                if($approver && $approver->email){
+                    $requestData=[
+                        'to_department_name'=> $toDept->department_name,
+                        'from_department_name'=>$department->department_name,
+                        'budget_purchase_no'=>$budgetNumbers[0],
+                        'amount'=>$validatedData['amount'],
+                        'reason'=>$validatedData['reason']
+                    ];
+                    sendApprovalRequest::dispatch($approver, $requestData, $budgetApproval);
+                }
+                DB::commit();
+                Alert::toast('Saldo tidak mencukupi. Permintaan budget telah diajukan.', 'info');
+                return back();
+            }
+            //* rollback jika input table request ada yang kosong
+            else{
+                DB::rollback();
+                Alert::toast('lengkapi semua data yang diminta. Permintaan budget gagal diajukan.', 'info');
+                return back();
+            }
+        }
+    
+        $department->withdraw($grandTotal);
+        DB::commit();
+        Alert::success('Berhasil', 'Data pembelian berhasil disimpan.');
+        return redirect()->route('PurchaseRequest.index');
+
+        }catch(\Exception $e){
+            DB::rollBack();
+            dd($e->getMessage());
+            Alert::toast('Terjadi kesalahan: ' . $e->getMessage(), 'error');
+            return back()->withInput();
+        }
     }
-protected function addBudgetNumbers(array $purchases)
-{
-    $budgetNumbers = generateMultipleDocumentNumbers(count($purchases), 'SURAT', 'CAPEX');
-
-    foreach ($purchases as $index => &$purchase) {
-        $purchase['budget_no'] = $budgetNumbers[$index];
-    }
-
-    return $purchases;
-}
 
     /**
      * Display the specified resource.
@@ -160,5 +236,156 @@ protected function addBudgetNumbers(array $purchases)
     public function destroy(string $id)
     {
         //
+    }
+
+    //* email diapprove
+    public function approved(Request $request)
+    {
+        return $this->handleApprovalStatusUpdate($request, 'approve');
+    }
+
+    public function rejected(Request $request)
+    {
+        return $this->handleApprovalStatusUpdate($request, 'reject');
+    }
+
+    private function handleApprovalStatusUpdate(Request $request, $expectedStatus)
+    {
+        $budget_no = $request->query('budget_req_no');
+        $status = $request->query('status');
+        $token = $request->query('token');
+        $nik = $request->query('nik');
+
+        // Validasi awal status dan URL
+        if (!in_array($status, ['approve', 'reject'])) {
+            return response()->view('emails.invalidStatus', [], 400);
+        }
+
+        if ($status !== $expectedStatus) {
+            return response()->view('emails.invalidStatus', [], 400);
+        }
+
+        DB::beginTransaction();
+        try {
+            $requestApprove = BudgetApproval::where('budget_req_no', $budget_no)
+                ->where('nik', $nik)
+                ->where('token', $token)->first();
+
+            if (!$requestApprove) {
+                return response()->view('emails.alreadyprocessed', [], 404); // Tidak ditemukan
+            }
+
+            if ($requestApprove->status !== 'pending') {
+                return response()->view('emails.alreadyprocessed', [], 400);
+            }
+
+        if ($status === 'approve') {
+            // Langsung simpan dan tampilkan konfirmasi
+            $requestApprove->status = 'approve';
+            $requestApprove->token = null;
+            $requestApprove->updated_at = now();
+            $requestApprove->save();
+
+            //* edit status purchase dan budgetrequest
+            $budgetRequest = BudgetRequest::where('budget_req_no', $budget_no)->first();
+            if ($budgetRequest) {
+                $toDept =$budgetRequest->fromDepartment;
+                $fromDept = $budgetRequest->toDepartment;
+                $amount = $budgetRequest->amount;
+
+                // Transfer saldo antar wallet
+                $fromDept->transfer($toDept, $amount);
+                $toDept->withdraw($toDept->balanceInt);
+
+                $budgetRequest->status = 'approved';
+                $budgetRequest->save();
+
+                $purchase = Purchase::where('purchase_no', $budgetRequest->budget_purchase_no)->first();
+                if($purchase){
+                    Purchase::where('purchase_no', $budgetRequest->budget_purchase_no)
+                    ->update(['status' => 'approved']);
+
+                    $admin = User::where('username', 'admin')->first();
+                    if($admin){
+                        $mailData=[
+                            'from_department'=> $fromDept,
+                            'to_department'=>$toDept,
+                            'balance'=>$toDept->balanceInt,
+                            'amount'=>$amount
+                        ];
+                        // dd($mailData);
+                        SendApprovedPurchase::dispatch($admin, $mailData, $budgetRequest, $purchase);
+                    }
+                }
+            }
+            DB::commit();
+            return view('emails.finishProcces');
+        }else{
+            DB::commit();
+                return view('emails.rejectForm', [
+                    'budget_req_no' => $budget_no,
+                    'nik' => $nik
+                ]);
+        }
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+            DB::rollback();
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    //* fungsi jika direject di email
+    public function submitRejectFeedback(Request $request)
+    {
+        $request->validate([
+            'budget_req_no' => 'required',
+            'nik' => 'required',
+            'feedback' => 'required|string|max:1000',
+        ]);
+
+        try {
+            $data = BudgetApproval::where('budget_req_no', $request->budget_req_no)
+                ->where('nik', $request->nik)
+                ->first();
+
+            if (!$data || $data->status !== 'pending') {
+                return response()->view('emails.alreadyprocessed', [], 400);
+            }
+
+            //* update table budgetapproval
+            $data->status = 'reject';
+            $data->token = null;
+            $data->feedback = $request->feedback;
+            $data->updated_at = now();
+            $data->save();
+
+            //*update budgetrequest dan pruchase
+            $budgetRequest = BudgetRequest::where('budget_req_no', $request->budget_req_no)->first();
+                if ($budgetRequest) {
+                    $budgetRequest->status = 'rejected';
+                    $budgetRequest->save();
+
+                    Purchase::where('purchase_no', $budgetRequest->budget_purchase_no)
+                        ->update(['status' => 'rejected']);
+                }
+                    return view('emails.finishProcces');
+                } catch (\Exception $e) {
+                    return back()->with('error', 'Gagal menyimpan alasan: ' . $e->getMessage());
+                }
+            }
+
+    protected function getBudgetRequestNo($departmentId)
+    {
+        $department = Department::findOrFail($departmentId);
+        $departmentCode = str_replace(" ","", strtoupper(substr($department->department_name, 0, 3)));
+
+        $lastAllocation = BudgetRequest::where('budget_req_no', 'like', 'REQCAPEX/'.$departmentCode.'/%')
+                                        ->latest()
+                                        ->first();
+
+        $lastNumber = $lastAllocation ? (int) substr($lastAllocation->budget_req_no, -4) : 0;
+        $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
+
+        return "REQCAPEX/{$departmentCode}/{$newNumber}";
     }
 }

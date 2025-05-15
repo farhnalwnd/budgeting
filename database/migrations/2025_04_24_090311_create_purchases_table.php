@@ -13,24 +13,18 @@ return new class extends Migration
     {
         Schema::create('purchases', function (Blueprint $table) {
             $table->id();
-            $table->string('budget_no')->unique();
+            $table->string('purchase_no')->unique();
             $table->foreignId('department_id')->constrained(
                 table:'departments',
                 indexName:'fk_purchases_department'
             );
-            $table->string('item_name');
-            $table->integer('quanitity');
-            $table->string('um')->nullable(); // unit measure
-            $table->decimal('amount',18,2); //budget awal / estimasi
-            $table->decimal('total_amount',18,2); //total budget awal / total estimasi
-            // $table->decimal('actual_amount',18,2); //biaya aktual pembelian
             $table->integer('PO')->nullable();
-            $table->text('remarks')->nullable(); //keterangan
+            $table->decimal('actual_amount',18,2)->nullable(); //biaya aktual pembelian
             // $table->foreignId('category_id')->constrained(
             //     table:'category_masters',
             //     indexName:'fk_purchases_categoryMasters'
             // )->nullable();
-            $table->enum('status', ['pending','approved','rejected'])->default('pending');
+            $table->enum('status', ['pending','approved','rejected'])->default('approved');
             $table->timestamps();
         });
     }
