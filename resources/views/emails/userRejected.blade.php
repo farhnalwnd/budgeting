@@ -32,61 +32,48 @@
             </tr>
             <tr>
                 <td colspan="3">
-                    @if($isAdmin)
                     <p>Dear <strong>{{$user->name}}</strong>,</p>
-                    <p>System mencatat adanya data budget approved baru yang masuk dengan rincian sebagai berikut:
+                    <p>System mencatat adanya penolakan peminjaman dana yang telah anda request sebelumnya dengan rincian sebagai berikut:
                     </p>
-                    @else
-                    <p>Dear <strong>{{$user->name}}</strong>,</p>
-                    <p>permohonan anda kepada department{{ $deptName[0] }} telah disetujui dan status purchases sudah menjadi approved.
-                    </p>
-                    <p>berikut rincianya:</p>
-                    @endif
                 </td>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <th colspan="3">
-                    @if($isAdmin)
-                    <h5 class="text-center">data purchases baru dengan status {{$purchases->status}}</h5>
-                    @else
-                    <h5 class="text-center">department {{ $deptName[0]}} menyetujui peminjaman dana oleh department {{$deptName[1]}}
-                        sehingga status purchases
-                        saat ini adalah {{$purchases->status}}</h5>
-                    @endif
+                    <h5 class="text-center">data yang ditolak oleh department {{ $deptName[0] }}</h5>
                 </th>
             </tr>
             <tr>
                 <td colspan="2">penganggar:</td>
                 <td>{{ $deptName[1] }}</td>
             </tr>
+            <tr>
+                <td colspan="2">Purchase No:</td>
+                <td>{{ $purchases->purchase_no }}</td>
+            </tr>
+
             @foreach ($purchaseDetails as $detail)
             <tr class="tr-odd">
                 <td style="width:auto">{{$loop->iteration}}</td>
                 <td>Item:</td>
-                <td>{{ $detail->item_name}}</td>
+                <td>{{ $detail->item_name }}</td>
             </tr>
-            <tr>
+            <tr class="tr-odd">
                 <td style="width:auto"></td>
                 <td>Jumlah:</td>
                 <td>{{ $detail->quanitity}}</td>
             </tr>
-            <tr class="tr-odd">
+            <tr>
                 <td style="width:auto"></td>
                 <td>Total:</td>
                 <td>{{ $detail->total_amount}}</td>
             </tr>
             @endforeach
+
             <tr>
-                <td style="width:auto"></td>
-                <td>total purchase:</td>
-                <td>{{$purchases->grand_total}}</td>
-            </tr>
-            <tr class="tr-odd">
-                <td style="width:auto"></td>
-                <td>saldo department:</td>
-                <td>{{$purchases->department->balance}}</td>
+                <td colspan="2">grand total:</td>
+                <td>{{ $purchases->grand_total }}</td>
             </tr>
             <tr>
                 <th colspan="3">

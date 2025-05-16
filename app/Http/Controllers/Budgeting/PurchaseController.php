@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Jobs\sendApprovalRequest;
 use App\Jobs\SendApprovedPurchase;
 use App\Jobs\SendApprovedPurchaseNotification;
+use App\Jobs\SendRejectedPurchaseNotification;
 use App\Models\Budgeting\BudgetAllocation;
 use App\Models\Budgeting\BudgetApproval;
 use App\Models\Budgeting\BudgetApprover;
@@ -22,6 +23,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class PurchaseController extends Controller
 {
@@ -186,15 +188,17 @@ class PurchaseController extends Controller
             }
         }
 
-        
-        // if($master){
-            
-        //     SendApprovedPurchaseNotification::dispatch($admin, $mailData, $department);
-        // }else{
-
-        // }
-    
         $department->withdraw($grandTotal);
+
+        //* email ke user
+        $data = purchase::with('detail')->where('purchase_no', $purchaseNumber)->firstOrFail();
+        $purchaseDetails = $data->detail;
+        $admin = user::where('username', 'admin')->first();
+        $user = user::where('department_id', $departmentId)->first();
+            // dd($user, $purchases , $deptName, $purchaseDetails);
+        SendApprovedPurchaseNotification::dispatch($user, $data, $purchaseDetails, false)->onQueue('emails');
+        SendApprovedPurchaseNotification::dispatch($admin, $data, $purchaseDetails, true)->onQueue('emails');
+
         DB::commit();
         Alert::success('Berhasil', 'Data pembelian berhasil disimpan.');
         return redirect()->route('PurchaseRequest.index');
@@ -301,22 +305,19 @@ class PurchaseController extends Controller
                 $budgetRequest->status = 'approved';
                 $budgetRequest->save();
 
-                $purchase = Purchase::where('purchase_no', $budgetRequest->budget_purchase_no)->first();
-                if($purchase){
-                    Purchase::where('purchase_no', $budgetRequest->budget_purchase_no)
-                    ->update(['status' => 'approved']);
-
-                    $admin = User::where('username', 'admin')->first();
-                    if($admin){
-                        $mailData=[
-                            'from_department'=> $fromDept,
-                            'to_department'=>$toDept,
-                            'balance'=>$toDept->balanceInt,
-                            'amount'=>$amount
-                        ];
-                        // dd($mailData);
-                        SendApprovedPurchase::dispatch($admin, $mailData, $budgetRequest, $purchase);
-                    }
+                $purchases = $budgetRequest->purchase;
+                if($purchases){
+                    $purchases->update(['status'=> 'approved']);
+                    
+                    $purchaseDetails = $purchases->detail;
+                    $toDept = $budgetRequest->toDepartment->department_name;
+                    $fromDept = $budgetRequest->fromDepartment->department_name;
+                    $deptName = [$toDept,$fromDept];
+                    $admin = user::where('username', 'admin')->first();
+                    $user = user::where('department_id', $budgetRequest->from_department_id)->first();
+                    // dd($user, $purchases , $budgetRequest, $deptName, $purchaseDetails);
+                    SendApprovedPurchase::dispatch($user, $purchases , $budgetRequest, $deptName, $purchaseDetails, false)->onQueue('emails');
+                    SendApprovedPurchase::dispatch($admin, $purchases , $budgetRequest, $deptName, $purchaseDetails, true)->onQueue('emails');
                 }
             }
             DB::commit();
@@ -361,13 +362,23 @@ class PurchaseController extends Controller
             $data->save();
 
             //*update budgetrequest dan pruchase
-            $budgetRequest = BudgetRequest::where('budget_req_no', $request->budget_req_no)->first();
+            $budgetRequest = BudgetRequest::with(['purchase', 'toDepartment', 'fromDepartment'])->where('budget_req_no', $request->budget_req_no)->first();
                 if ($budgetRequest) {
                     $budgetRequest->status = 'rejected';
                     $budgetRequest->save();
 
-                    Purchase::where('purchase_no', $budgetRequest->budget_purchase_no)
-                        ->update(['status' => 'rejected']);
+                    $purchases = $budgetRequest->purchase;
+                    if($purchases){
+                        $purchases->update(['status'=> 'rejected']);
+                        
+                        $purchaseDetails = $purchases->detail;
+                        $toDept = $budgetRequest->toDepartment->department_name;
+                        $fromDept = $budgetRequest->fromDepartment->department_name;
+                        $deptName = [$toDept,$fromDept];
+                        $user = user::where('department_id', $budgetRequest->from_department_id)->first();
+                        // dd($user, $purchases , $budgetRequest, $deptName, $purchaseDetails);
+                        SendRejectedPurchaseNotification::dispatch($user, $purchases , $budgetRequest, $deptName, $purchaseDetails);
+                    }
                 }
                     return view('emails.finishProcces');
                 } catch (\Exception $e) {

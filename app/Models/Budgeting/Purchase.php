@@ -13,15 +13,12 @@ class Purchase extends Model
     use HasFactory;
 
         protected $fillable = [
-        'item_name',
         'purchase_no',
-        'amount',
         'department_id',
-        'quanitity',
         'status',
         'grand_total',
+        'PO',
         'actual_amount',
-        'remarks'
     ];
 
     protected $casts = [
@@ -46,7 +43,7 @@ class Purchase extends Model
     }
 
     public function detail(){
-        return $this->hasMany(PurchaseDetail::class);
+        return $this->hasMany(PurchaseDetail::class, 'purchase_no', 'purchase_no');
     }
 
     public function budgetRequest()

@@ -14,18 +14,20 @@ class SendApprovedPurchaseNotification implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $admin;
-    protected $mailData;
-    protected $department;
+    protected $user; 
+    protected $data; 
+    protected $purchaseDetails;
+    protected $isAdmin;
     /**
      * Create a new job instance.
      */
-    public function __construct($admin, $mailData, $department)
+    public function __construct($user, $data, $purchaseDetails, bool $isAdmin)
     {
 
-        $this->admin=$admin;
-        $this->mailData=$mailData;
-        $this->department=$department;
+        $this->user=$user;
+        $this->data=$data;
+        $this->purchaseDetails=$purchaseDetails;
+        $this->isAdmin=$isAdmin;
     }
 
     /**
@@ -33,6 +35,11 @@ class SendApprovedPurchaseNotification implements ShouldQueue
      */
     public function handle(): void
     {
-        Mail::to($this->admin->email)->send(new defaultEmail($this->admin, $this->mailData, $this->department));
+        Mail::to($this->user->email)->send(new defaultEmail(
+            $this->user,
+            $this->data,
+            $this->purchaseDetails,
+            $this->isAdmin,
+        ));
     }
 }
