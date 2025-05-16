@@ -8,12 +8,14 @@ use App\Http\Controllers\Controller;
 use App\Jobs\sendApprovalRequest;
 use App\Jobs\SendApprovedPurchase;
 use App\Jobs\SendApprovedPurchaseNotification;
+use App\Jobs\SendRejectedPurchaseNotification;
 use App\Models\Budgeting\BudgetAllocation;
 use App\Models\Budgeting\BudgetApproval;
 use App\Models\Budgeting\BudgetApprover;
 use App\Models\Budgeting\BudgetRequest;
 use App\Models\Budgeting\Purchase;
 use App\Models\Department;
+use App\Models\PurchaseDetail;
 use App\Models\User;
 use Illuminate\Auth\Events\Validated;
 use RealRashid\SweetAlert\Facades\Alert;
@@ -21,6 +23,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class PurchaseController extends Controller
 {
@@ -82,52 +85,43 @@ class PurchaseController extends Controller
         //* looping data & kalkulasi harga
         $grandTotal = 0;
         $purchases = [];
-        $budgetNumbers = generateMultipleDocumentNumbers(count($validatedData['description']));
+        $purchaseNumber = generateDocumentNumber();
+
+        $master = Purchase::create([
+            'department_id'=>$departmentId,
+            'purchase_no'=>$purchaseNumber,
+        ]);
+        
         foreach ($validatedData['description'] as $index => $desc) {
             $price = max(0, Purchase::parseRupiah($validatedData['price'][$index]));
             $quantity = $validatedData['quantity'][$index];
             $total = $price * $quantity;
             $grandTotal += $total;
 
-            $isBalanceEnough = $department->balance >= $grandTotal;
+            // $isBalanceEnough = $department->balance >= $grandTotal;
 
             $purchases[] = [
+                'purchase_no'=> $master->purchase_no,
                 'item_name' => $desc,
                 'amount' => $price,
                 'quanitity' => $quantity,
                 'total_amount' => $total,
                 'remarks' => $validatedData['remark'][$index] ?? null,
-                'department_id' => $departmentId,
-                'purchase_no' => $budgetNumbers[$index],
-                'status' => $isBalanceEnough ? 'approved' : 'pending',
+                // 'status' => $isBalanceEnough ? 'approved' : 'pending',
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
         }
-        // dd($purchases);
-        Purchase::insert($purchases);
+        // dd($purchases, $grandTotal);
+        PurchaseDetail::insert($purchases);
 
-        $approvedPurchases = array_filter($purchases, fn($item) => $item['status'] === 'approved');
-        // dd($approvedPurchases);
-        $admin = User::where('username', 'admin')->first();
-        if ($admin && count($approvedPurchases) > 0) {
-            $mailData = []; {
-            foreach ($approvedPurchases as $purchases) {
-                $mailData [] = [
-                    'item_name' => $purchases['item_name'],
-                    'amount' => number_format($purchases['amount'], 0, ',', '.'),
-                    'quantity' => $purchases['quanitity'],
-                    'total' => number_format($purchases['total_amount'], 0, ',', '.'),
-                    'purchase_no' => $purchases['purchase_no']
-                ];
-                // dd($mailData);
-            }
-        }
-        SendApprovedPurchaseNotification::dispatch($admin, $mailData, $department);
-        }
+        $master-> update([
+            'grand_total'=>$grandTotal,
+        ]);
+        // dd($master);
 
-        //* ganti format amount
         $amount = Purchase::parseRupiah($validatedData['amount']);
+        // dd($grandTotal,$department->balance);
 
         //* kondisi balance kurang
         if ($grandTotal > $department->balance) {
@@ -138,27 +132,28 @@ class PurchaseController extends Controller
                 $validatedData['reason']
             ) {
                 $toDept = Department::findorfail($validatedData['to_department']);
-
-                //* cancel peminjaman kedept lain yang balancenya tetap kurang
-                if($toDept->balance < $amount){
+                // dd($toDept, $toDept->balance, $department->balance);
+                if ($toDept->balance < $amount) {
                     DB::rollback();
                     Alert::toast("The selected department's budget is insufficient.", 'error');
                     return back();
                 }
 
-                $budgetReqNo = $this->getBudgetRequestNo($validatedData['from_department']);
+                $master->update([
+                    'status'=>'pending'
+                ]);
 
+                $budgetReqNo = $this->getBudgetRequestNo($validatedData['from_department']);
                 $budgetRequest = BudgetRequest::create([
                     'budget_req_no' => $budgetReqNo,
                     'from_department_id' => $validatedData['from_department'],
                     'to_department_id' => $validatedData['to_department'],
-                    'budget_purchase_no' => $budgetNumbers[0],
+                    'budget_purchase_no' => $purchaseNumber,
                     'amount' => Purchase::parseRupiah($validatedData['amount']),
                     'reason' => $validatedData['reason'],
                     'status'=> 'pending',
                 ]);
 
-                //* validasi data untuk approval via email
                 $approver= null;
                 $approver= BudgetApprover::where('department_id', $validatedData['to_department'])
                                         ->first();
@@ -175,7 +170,7 @@ class PurchaseController extends Controller
                     $requestData=[
                         'to_department_name'=> $toDept->department_name,
                         'from_department_name'=>$department->department_name,
-                        'budget_purchase_no'=>$budgetNumbers[0],
+                        'budget_purchase_no'=>$purchaseNumber,
                         'amount'=>$validatedData['amount'],
                         'reason'=>$validatedData['reason']
                     ];
@@ -192,8 +187,18 @@ class PurchaseController extends Controller
                 return back();
             }
         }
-    
+
         $department->withdraw($grandTotal);
+
+        //* email ke user
+        $data = purchase::with('detail')->where('purchase_no', $purchaseNumber)->firstOrFail();
+        $purchaseDetails = $data->detail;
+        $admin = user::where('username', 'admin')->first();
+        $user = user::where('department_id', $departmentId)->first();
+            // dd($user, $purchases , $deptName, $purchaseDetails);
+        SendApprovedPurchaseNotification::dispatch($user, $data, $purchaseDetails, false)->onQueue('emails');
+        SendApprovedPurchaseNotification::dispatch($admin, $data, $purchaseDetails, true)->onQueue('emails');
+
         DB::commit();
         Alert::success('Berhasil', 'Data pembelian berhasil disimpan.');
         return redirect()->route('PurchaseRequest.index');
@@ -300,22 +305,19 @@ class PurchaseController extends Controller
                 $budgetRequest->status = 'approved';
                 $budgetRequest->save();
 
-                $purchase = Purchase::where('purchase_no', $budgetRequest->budget_purchase_no)->first();
-                if($purchase){
-                    Purchase::where('purchase_no', $budgetRequest->budget_purchase_no)
-                    ->update(['status' => 'approved']);
-
-                    $admin = User::where('username', 'admin')->first();
-                    if($admin){
-                        $mailData=[
-                            'from_department'=> $fromDept,
-                            'to_department'=>$toDept,
-                            'balance'=>$toDept->balanceInt,
-                            'amount'=>$amount
-                        ];
-                        // dd($mailData);
-                        SendApprovedPurchase::dispatch($admin, $mailData, $budgetRequest, $purchase);
-                    }
+                $purchases = $budgetRequest->purchase;
+                if($purchases){
+                    $purchases->update(['status'=> 'approved']);
+                    
+                    $purchaseDetails = $purchases->detail;
+                    $toDept = $budgetRequest->toDepartment->department_name;
+                    $fromDept = $budgetRequest->fromDepartment->department_name;
+                    $deptName = [$toDept,$fromDept];
+                    $admin = user::where('username', 'admin')->first();
+                    $user = user::where('department_id', $budgetRequest->from_department_id)->first();
+                    // dd($user, $purchases , $budgetRequest, $deptName, $purchaseDetails);
+                    SendApprovedPurchase::dispatch($user, $purchases , $budgetRequest, $deptName, $purchaseDetails, false)->onQueue('emails');
+                    SendApprovedPurchase::dispatch($admin, $purchases , $budgetRequest, $deptName, $purchaseDetails, true)->onQueue('emails');
                 }
             }
             DB::commit();
@@ -360,13 +362,23 @@ class PurchaseController extends Controller
             $data->save();
 
             //*update budgetrequest dan pruchase
-            $budgetRequest = BudgetRequest::where('budget_req_no', $request->budget_req_no)->first();
+            $budgetRequest = BudgetRequest::with(['purchase', 'toDepartment', 'fromDepartment'])->where('budget_req_no', $request->budget_req_no)->first();
                 if ($budgetRequest) {
                     $budgetRequest->status = 'rejected';
                     $budgetRequest->save();
 
-                    Purchase::where('purchase_no', $budgetRequest->budget_purchase_no)
-                        ->update(['status' => 'rejected']);
+                    $purchases = $budgetRequest->purchase;
+                    if($purchases){
+                        $purchases->update(['status'=> 'rejected']);
+                        
+                        $purchaseDetails = $purchases->detail;
+                        $toDept = $budgetRequest->toDepartment->department_name;
+                        $fromDept = $budgetRequest->fromDepartment->department_name;
+                        $deptName = [$toDept,$fromDept];
+                        $user = user::where('department_id', $budgetRequest->from_department_id)->first();
+                        // dd($user, $purchases , $budgetRequest, $deptName, $purchaseDetails);
+                        SendRejectedPurchaseNotification::dispatch($user, $purchases , $budgetRequest, $deptName, $purchaseDetails);
+                    }
                 }
                     return view('emails.finishProcces');
                 } catch (\Exception $e) {

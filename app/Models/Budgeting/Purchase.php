@@ -6,21 +6,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Casts\AsDecimal;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\department;
+use App\Models\PurchaseDetail;
 
 class Purchase extends Model
 {
     use HasFactory;
 
         protected $fillable = [
-        'item_name',
         'purchase_no',
-        'amount',
         'department_id',
-        'quanitity',
         'status',
-        'total_amount',
+        'grand_total',
+        'PO',
         'actual_amount',
-        'remarks'
     ];
 
     protected $casts = [
@@ -42,6 +40,10 @@ class Purchase extends Model
 
     public function BudgetAllocation(){
         return $this->belongsTo(BudgetAllocation::class);
+    }
+
+    public function detail(){
+        return $this->hasMany(PurchaseDetail::class, 'purchase_no', 'purchase_no');
     }
 
     public function budgetRequest()

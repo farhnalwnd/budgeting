@@ -9,35 +9,16 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class defaultEmail extends Mailable
+class rejectedPurchaseNotification extends Mailable
 {
     use Queueable, SerializesModels;
 
-    protected $user;
-    protected $data;
-    protected $purchaseDetails;
-    protected $isAdmin;
     /**
      * Create a new message instance.
      */
-    public function __construct($user, $data, $purchaseDetails, bool $isAdmin)
+    public function __construct()
     {
-        $this->user=$user;
-        $this->data=$data;
-        $this->purchaseDetails=$purchaseDetails;
-        $this->isAdmin=$isAdmin;
-    }
-
-    public function build(){
-        $subject = $this->isAdmin ? 'notifikasi data baru yang memiliki status approved':'purchases anda sudah berstatus approved';
-        return $this->subject($subject)
-        ->markdown('emails.approved')
-        ->with([
-            'user'=>$this->user,
-            'data'=> $this->data,
-            'purchaseDetails' => $this->purchaseDetails,
-            'isAdmin' => $this->isAdmin,
-        ]);
+        //
     }
 
     /**
@@ -46,7 +27,7 @@ class defaultEmail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Defaul Email',
+            subject: 'Rejected Purchase Notification',
         );
     }
 

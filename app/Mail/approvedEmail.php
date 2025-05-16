@@ -13,29 +13,36 @@ class approvedEmail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    protected $admin;
-    protected $mailData;
+    protected $user;
+    protected $purchases;
     protected $budgetRequest;
-    protected $purchase;
+    protected $deptName;
+    protected $purchaseDetails;
+    protected $isAdmin;
     /**
      * Create a new message instance.
      */
-    public function __construct($admin, $mailData, $budgetRequest, $purchase)
+    public function __construct($user, $purchases , $budgetRequest, $deptName, $purchaseDetails, bool $isAdmin)
     {
-        $this->admin= $admin;
-        $this->mailData=$mailData;
-        $this->budgetRequest=$budgetRequest;
-        $this->purchase=$purchase;
+        $this->user = $user;
+        $this->purchases = $purchases;
+        $this->budgetRequest = $budgetRequest;
+        $this->deptName = $deptName;
+        $this->purchaseDetails = $purchaseDetails;
+        $this->isAdmin = $isAdmin;
     }
 
     public function build(){
-        return $this->subject("list budgeting approved")
+        $subject = $this->isAdmin ? 'notifikasi data baru yang memiliki status approved':'budget request disetujui dan sudah berstatus approved';
+        return $this->subject($subject)
         ->markdown('emails.requestApproved')
         ->with([
-            'admin'=> $this->admin,
-            'mailData'=>$this->mailData,
-            'budgetRequest'=>$this->budgetRequest,
-            'purchase'=>$this->purchase
+            'user'=>$this->user,
+            'purchases'=> $this->purchases,
+            'budgetRequest'=> $this->budgetRequest,
+            'deptName'=> $this->deptName,
+            'purchaseDetails'=> $this->purchaseDetails,
+            'isAdmin'=> $this->isAdmin
             ]);
 
     }
