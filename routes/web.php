@@ -11,6 +11,7 @@ use App\Http\Controllers\Budgeting\PurchaseController;
 use App\Http\Controllers\Budgeting\BudgetListController;
 use App\Http\Controllers\Budgeting\BudgetRequestController;
 use App\Http\Controllers\Budgeting\CategoryController;
+use App\Http\Controllers\Budgeting\ReportController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\ProfileController;
@@ -45,6 +46,8 @@ Route::middleware('auth')->group(function () {
     /* Dashboard */
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard-finance', [DashboardController::class, 'index-finance'])->name('dashboard-finance');
+    Route::resource('/dashboard/report', ReportController::class);
+    Route::get('/dashboard/getReportData', [ReportController::class, 'getReportData'])->name('get.report.data');
     Route::get('/api/requisitions/{year}', [DashboardController::class, 'getRequisitionsByYear'])->name('dashboard.requisitions.byYear');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

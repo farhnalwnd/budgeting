@@ -12,7 +12,9 @@
                 style="font-size: 18px;"><i data-feather="home" style="width: 18px; height: 18px;"><span
                         class="path1"></span><span class="path2"></span></i>Dashboard</a>
             <ul>
-                
+                <li><a href="{{ route('report.index') }}"
+                    class="{{ request()->is('dashboard/report') ? 'current' : '' }}"><i class="icon-Commit"><span
+                            class="path1"></span><span class="path2"></span></i>Report </a></li>
             </ul>
         </li>
         <li><a href="#" style="font-size: 18px;" class="{{ request()->is('management/*') ? 'current' : '' }}"><i

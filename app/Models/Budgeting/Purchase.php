@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Casts\AsDecimal;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\department;
+use App\Models\PurchaseDetail;
 
 class Purchase extends Model
 {
@@ -45,9 +46,14 @@ class Purchase extends Model
     }
 
     public function budgetRequest()
-{
-    return $this->hasMany(BudgetRequest::class, 'budget_purchase_no', 'purchase_no');
-}
+    {
+        return $this->hasMany(BudgetRequest::class, 'budget_purchase_no', 'purchase_no');
+    }
+
+    public function details()
+    {
+        return $this->hasMany(PurchaseDetail::class, 'purchase_no', 'purchase_no');
+    }
 
 
 
