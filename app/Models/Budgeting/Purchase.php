@@ -55,6 +55,11 @@ class Purchase extends Model
         return $this->hasMany(PurchaseDetail::class, 'purchase_no', 'purchase_no');
     }
 
+    public function category()
+    {
+        return $this->belongsTo(CategoryMaster::class);
+    }
+
 
 
     //     protected static function boot()

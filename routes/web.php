@@ -48,6 +48,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard-finance', [DashboardController::class, 'index-finance'])->name('dashboard-finance');
     Route::resource('/dashboard/report', ReportController::class);
     Route::get('/dashboard/getReportData', [ReportController::class, 'getReportData'])->name('get.report.data');
+    Route::get('/dashboard/getReportYear', [ReportController::class, 'getReportYear'])->name('get.report.year');
     Route::get('/api/requisitions/{year}', [DashboardController::class, 'getRequisitionsByYear'])->name('dashboard.requisitions.byYear');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

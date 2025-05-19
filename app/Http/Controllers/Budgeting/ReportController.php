@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Budgeting;
 use App\Http\Controllers\Controller;
 use App\Models\Budgeting\Purchase;
 use App\Models\PurchaseDetail;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
 {
@@ -67,20 +69,36 @@ class ReportController extends Controller
         //
     }
 
+    public function getReportYear()
+    {
+        $years = Purchase::select(DB::raw('YEAR(created_at) as year'))
+                ->distinct()
+                ->orderBy('year', 'desc')
+                ->pluck('year');
+
+        return response()->json($years);
+    }
+
     public function getReportData(Request $request)
     {
         try{
             $user = Auth::user();
-            
+            $year = $request->has('year') && $request->year != '' 
+            ? $request->year 
+            : Carbon::now()->year;
             if($user->hasRole(['super-admin', 'admin']))
             {
-                $query = PurchaseDetail::with('master.department');
+                $query = PurchaseDetail::with('master.department', 'master.category');
                 // Cek apakah ada department yang dipilih
                 if ($request->has('department_name') && $request->department_name != '') {
                     $query->whereHas('master.department', function ($query) use ($request) {
                         $query->where('department_name', $request->department_name);
                     });
                 }
+                $query->whereHas('master', function ($query) use ($request) {
+                    $query->where('status', 'approved');
+                });
+                $query->whereYear('created_at', $year);
                 $raw = $query->get();
 
                 // Jika empty return kosong
@@ -96,6 +114,7 @@ class ReportController extends Controller
                     $final[] = (object)[ // membuat Nama department
                         'department_name' => $dept,
                         'is_subtotal' => true,
+                        'is_subcategory' => false,
                         'purchase_no' => $dept,
                         'item_name' => '',
                         'amount' => '',
@@ -104,10 +123,28 @@ class ReportController extends Controller
                         'remarks' => ''
                     ];
 
-                    foreach ($rows as $row) {
-                        $row->department_name = $dept;
-                        $row->is_subtotal = false;
-                        $final[] = $row;
+                    $categoryGrouped = $rows->groupBy(fn($item) => $item->master->category->name);
+
+                    foreach ($categoryGrouped as $cat => $catRows) {
+                        // Tambahkan baris sub-subtotal kategori
+                        $final[] = (object)[
+                            'department_name' => $dept,
+                            'is_subtotal' => false,
+                            'is_subcategory' => true,
+                            'purchase_no' => $cat,
+                            'item_name' => '',
+                            'amount' => '',
+                            'quantity' => '',
+                            'total_amount' => '',
+                            'remarks' => ''
+                        ];
+
+                        foreach ($catRows as $row) {
+                            $row->department_name = $dept;
+                            $row->is_subtotal = false;
+                            $row->is_subcategory = false;
+                            $final[] = $row;
+                        }
                     }
 
                     // Jika tidak pilih department
@@ -115,6 +152,7 @@ class ReportController extends Controller
                         $final[] = (object)[ // Membuat Subtotal per department
                             'department_name' => $dept,
                             'is_subtotal' => true,
+                            'is_subcategory' => false,
                             'purchase_no' => 'Subtotal for ' . $dept,
                             'item_name' => '',
                             'amount' => 0,
@@ -129,6 +167,7 @@ class ReportController extends Controller
                 $final[] = (object)[ // Membuat grand total setiap department
                     'department_name' => 'ALL',
                     'is_subtotal' => true,
+                    'is_subcategory' => false,
                     'purchase_no' => 'GRAND TOTAL',
                     'item_name' => '',
                     'amount' => 0,
@@ -145,10 +184,11 @@ class ReportController extends Controller
             {
                 $raw = PurchaseDetail::with('master.department')
                     ->whereHas('master', function ($query) use ($user) {
-                        $query->where('department_id', $user->department_id); // Pastikan department_id ada pada user
+                        $query->where('department_id', $user->department_id)
+                        ->where('status', 'approved'); // Pastikan department_id ada pada user
                     })
+                    ->whereYear('created_at', $year)
                     ->get();
-
 
                 // Jika empty return kosong
                 if ($raw->isEmpty()) {

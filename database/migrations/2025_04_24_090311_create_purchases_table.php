@@ -18,6 +18,10 @@ return new class extends Migration
                 table:'departments',
                 indexName:'fk_purchases_department'
             );
+            $table->foreignId('category_id')->constrained(
+                table:'category_masters',
+                indexName:'fk_purchases_category'
+            );
             $table->integer('PO')->nullable();
             $table->decimal('actual_amount',18,2)->nullable(); //biaya aktual pembelian
             // $table->foreignId('category_id')->constrained(
