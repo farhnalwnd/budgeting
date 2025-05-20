@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Budgeting;
 use App\Http\Controllers\Controller;
 use App\Models\Budgeting\BudgetAllocation;
 use App\Models\Budgeting\BudgetList;
+use App\Models\Budgeting\Purchase;
 use App\Models\Department;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -35,30 +36,43 @@ class BudgetListController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request);
         // Mulai transaction untuk memastikan integritas data
         DB::beginTransaction();
 
         try{
             $validatedData = $request->validate([
                 'no' => 'required|exists:budget_allocations,budget_allocation_no',
-                'name' => 'required|string|max:255',
                 'category' => 'required|exists:category_masters,id',
-                'quantity' => 'required|numeric',
-                'um' => 'required|string|max:255',
-                'amount' => 'required|numeric',
-                'total' => 'required|numeric'
+                'name' => 'required|array|min:1',
+                'quantity' => 'required|array|min:1',
+                'um' => 'required|array|min:1',
+                'amount' => 'required|array|min:1',
+                'total' => 'required|array|min:1',
+                'name.*' => 'required|string|max:255',
+                'quantity.*' => 'required|integer|min:1',
+                'um.*' => 'required|string|max:255',
+                'amount.*' => 'required|string|min:0',
+                'total.*' => 'required|string|min:0'
             ]);
 
+            // dd('bisa ',$request);
+            $budget = null;
             $user = Auth::user();
-            $budget = BudgetList::create([
-                'budget_allocation_no' => $validatedData['no'],
-                'name' => $validatedData['name'],
-                'category_id' => $validatedData['category'],
-                'quantity' => $validatedData['quantity'],
-                'um' => $validatedData['um'],
-                'default_amount' => $validatedData['amount'],
-                'total_amount' => $validatedData['total']
-            ]);
+            foreach($validatedData['name'] as $index => $name)
+            {
+                $amount =  max(0,Purchase::parseRupiah($validatedData['amount'][$index]));
+                $budget = BudgetList::create([
+                    'budget_allocation_no' => $validatedData['no'],
+                    'name' => $validatedData['name'][$index],
+                    'category_id' => $validatedData['category'],
+                    'quantity' => $validatedData['quantity'][$index],
+                    'um' => $validatedData['um'][$index],
+                    'default_amount' => $amount,
+                    'total_amount' => $amount * $validatedData['quantity'][$index]
+                ]);
+            }
+            
             
             $result = $this->calculateBudget($budget->budget_allocation_no);
             if($result instanceof \Exception){
@@ -70,16 +84,16 @@ class BudgetListController extends Controller
                 ->inLog('budget-list')
                 ->event('Create')
                 ->causedBy($user)
-                ->withProperties(['no' => $budget->budget_allocation_no, 'action' => 'create',
-                'data' => [
-                    'budget_allocation_no' => $budget->budget_allocation_no,
-                    'name' => $budget->budget_allocation_no,
-                    'category_id' => $budget->category_id,
-                    'quantity' => $budget->quantity,
-                    'um' => $budget->um,
-                    'default_amount' => $budget->default_amount,
-                    'total_amount' => $budget->total_amount
-                ]])
+                ->withProperties(['no' => $budget->budget_allocation_no, 'action' => 'create'])
+                // 'data' => [
+                //     'budget_allocation_no' => $budget->budget_allocation_no,
+                //     'name' => $budget->budget_allocation_no,
+                //     'category_id' => $budget->category_id,
+                //     'quantity' => $budget->quantity,
+                //     'um' => $budget->um,
+                //     'default_amount' => $budget->default_amount,
+                //     'total_amount' => $budget->total_amount
+                // ]
                 ->log('Create budget-list ' . $budget->budget_allocation_no . ' by ' . $user->name . ' at ' . now());
 
             // Commit transaksi

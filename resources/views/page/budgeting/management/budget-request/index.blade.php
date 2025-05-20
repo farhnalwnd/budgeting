@@ -25,12 +25,11 @@
         </div>
     </div>
 
-    <section class="content">
+    <section x-data="{open : false}" class="content">
         <!-- Add Budget Request Button -->
         <div class="mb-4 flex justify-end">
-            <button type="button"
-                class="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80 font-medium rounded-lg text-base px-3 py-3 text-center me-2 mb-2 float-right"
-                data-modal-target="createRequestModal" data-modal-toggle="createRequestModal">
+            <button type="button" @click="open = ! open"
+                class="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80 font-medium rounded-lg text-base px-3 py-3 text-center me-2 mb-2 float-right">
                 Add Budget-Request
             </button>
         </div>
@@ -61,12 +60,99 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal -->
+        <div x-show="open" x-on:keydown.escape.window="open = false" x-transition.duration.400ms
+            class="fixed inset-0 z-[900] flex items-center justify-center bg-black bg-opacity-50">
+            <div class="absolute bg-white text-black p-6 rounded-lg shadow-lg w-2/3 max-h-[800px] card">
+                <!-- Header -->
+                <div class="flex justify-start">
+                    <div class="flex items-center">
+                        <h1 class="text-6xl font-bold text-yellow-700 font-mono">Create Category</h1>
+                    </div>
+                    
+                    <div class="w-72 h-32 ml-auto">
+                        <img src="{{ asset('assets/images/logo/logowhite.png')  }}" class="dark-logo" alt="Logo-Dark">
+                        <img src="{{ asset('assets/images/logo/logo.png') }}" class="light-logo" alt="Logo-light">
+                    </div>
+                </div>
+                <hr class="my-10 border-t-2 rounded-md border-slate-900 opacity-90">
+
+                <form method="POST" action="{{ route('budget-request.store') }}">
+                    <!-- Keterangan -->
+                    <div>
+                        <div class="flex items-center mt-2">
+                            <div class="form-group">
+                                <h1 class="form-label font-bold text-lg">From Department</h1>
+                                <input type="text" name="from_department" id="from_department" readonly
+                                    class="w-full p-2 border focus:ring-0 text-center text-body bg-secondary-light"
+                                    placeholder="From Department" required>
+                            </div>
+                            <div class="ml-auto form-group">
+                                <h1 class="form-label font-bold text-lg">Budget No</h1>
+                                <input type="text" name="no" id="no" readonly
+                                    class="w-full p-2 border focus:ring-0 text-center text-body bg-secondary-light"
+                                    placeholder="Auto Fill" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="container mt-10">
+                        @csrf
+                        <div x-data="{ scrolled: false }" @scroll="scrolled = $el.scrollTop > 0 || false"
+                            class="overflow-y-auto max-h-[250px] mt-6">
+                            <table class="table-auto w-full border-collapse" id="testTable">
+                                <thead :class="scrolled ? 'bg-white shadow-md border-none' : ''" class="sticky top-0 z-10">
+                                    <tr>
+                                        <th class="text-center w-fit">
+                                            <h2>To Department</h2>
+                                        </th>
+                                        <th class="text-center w-fit">
+                                            <h2>Amount</h2>
+                                        </th>
+                                        <th class="text-center w-fit">
+                                            <h2>Reason</h2>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="max-h-[50vh] overflow-y-auto">
+                                    <tr>
+                                        <td>
+                                            <select name="to_department" id="to_department" required
+                                                class="form-select w-full text-lg text-body bg-secondary-light border" aria-invalid="false" style="padding: 5px;"
+                                                placeholder="To Department">
+                                                <option value="" selected disabled>Select Department</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="number" name="amount" id="amount"
+                                            class="w-full p-2 border focus:ring-0 text-center text-body bg-secondary-light" 
+                                                placeholder="Input Number" required>
+                                        </td>
+                                        <td>
+                                            <input type="text" name="reason" id="reason"
+                                                class="w-full p-2 border focus:ring-0 text-center text-body bg-secondary-light" 
+                                                placeholder="Input reason" required>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="flex items-center justify-end mx-4 mt-4 gap-2">
+                            <button type="submit" class="btn btn-success">Simpan</button>
+                            <button @click="open = !open" type="button" class="btn btn-danger">Exit</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
     </section>
 
     
 
     {{-- {-- Create Budget-Request Modal --} --}}
-    <div id="createRequestModal" tabindex="-1" aria-hidden="true"
+    {{-- <div id="createRequestModal" tabindex="-1" aria-hidden="true"
         class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
         <div class="relative p-4 w-full max-w-4xl max-h-full">
             <!-- Modal content -->
@@ -144,7 +230,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 
     <!-- Modal Edit User -->
     <div id="editModalDiv">

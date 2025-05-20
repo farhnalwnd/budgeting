@@ -129,7 +129,44 @@ class CategoryController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        DB::beginTransaction();
+
+        try{
+            $user = Auth::user();
+
+            $category = CategoryMaster::find($id);
+            if($category)
+            {
+                $category->delete();
+            }
+            else
+            {
+                throw new \Exception("Category is not found.");
+            }
+            
+            activity()
+                ->performedOn($category)
+                ->inLog('category')
+                ->event('Delete')
+                ->causedBy($user)
+                ->withProperties(['no' => $category->id, 'action' => 'delete',
+                'data' => [
+                    'no' => $category->id,
+                    'name' => $category->name,
+                ]])
+                ->log('Delete category ' . $category->name . ' by ' . $user->name . ' at ' . now());
+                
+            // Commit transaksi
+            DB::commit();
+            Alert::toast('Category successfully deleted!', 'success');
+            return redirect()->route('category.index');
+
+        } catch (\Exception $e) {
+            // Rollback transaksi jika terjadi kesalahan
+            DB::rollback();
+            Alert::toast('There was an error deleting the Category. '.$e->getMessage(), 'error');
+            return back();
+        }
     }
 
     public function getCategoryData(){

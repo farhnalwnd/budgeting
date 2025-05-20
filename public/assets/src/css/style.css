@@ -47452,3 +47452,19 @@ table.dataTable thead .sorting_desc_disabled:after {
   content: "\2193";
   margin-bottom: 0.4566rem;
 }
+
+.dark-logo {
+  display: none;
+}
+
+.light-logo {
+  display: block;
+}
+
+.dark-skin .dark-logo {
+  display: block;
+}
+
+.dark-skin .light-logo {
+  display: none;
+}
