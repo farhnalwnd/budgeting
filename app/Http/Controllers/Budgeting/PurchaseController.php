@@ -32,10 +32,11 @@ class PurchaseController extends Controller
      */
     public function index()
     {
-        $purchases = Purchase::with('department')->paginate(5);
+        $purchases = Purchase::with('department', 'detail', 'budgetRequest')->paginate(5);
         $user = Auth::user();
         $departments = Department::all();
         $department= $user->department;
+        $feedback=BudgetApproval::where('feedback', '');
         $budget = BudgetAllocation::where('department_id', $user->department_id)->latest()->first();
 
         return view(".page.budgeting.management.PurchaseRequest.index", [
@@ -365,6 +366,7 @@ class PurchaseController extends Controller
             $budgetRequest = BudgetRequest::with(['purchase', 'toDepartment', 'fromDepartment'])->where('budget_req_no', $request->budget_req_no)->first();
                 if ($budgetRequest) {
                     $budgetRequest->status = 'rejected';
+                    $budgetRequest->feedback = $data->feedback;
                     $budgetRequest->save();
 
                     $purchases = $budgetRequest->purchase;

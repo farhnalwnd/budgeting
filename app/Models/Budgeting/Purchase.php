@@ -48,7 +48,7 @@ class Purchase extends Model
 
     public function budgetRequest()
 {
-    return $this->hasMany(BudgetRequest::class, 'budget_purchase_no', 'purchase_no');
+    return $this->hasOne(BudgetRequest::class, 'budget_purchase_no', 'purchase_no');
 }
 
 
