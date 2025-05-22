@@ -9,45 +9,46 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class defaultEmail extends Mailable
+class rejectStatus extends Mailable
 {
     use Queueable, SerializesModels;
 
     protected $user;
-    protected $data;
+    protected $purchases;
+    protected $budgetRequest;
+    protected $deptName;
     protected $purchaseDetails;
-    protected $isAdmin;
     /**
      * Create a new message instance.
      */
-    public function __construct($user, $data, $purchaseDetails, bool $isAdmin)
+    public function __construct($user, $purchases , $budgetRequest, $deptName, $purchaseDetails)
     {
         $this->user=$user;
-        $this->data=$data;
+        $this->purchases=$purchases;
+        $this->budgetRequest=$budgetRequest;
+        $this->deptName=$deptName;
         $this->purchaseDetails=$purchaseDetails;
-        $this->isAdmin=$isAdmin;
     }
 
-    public function build(){
-        $subject = $this->isAdmin ? 'notifikasi data baru yang memiliki status approved':'purchases anda sudah berstatus approved';
-        return $this->subject($subject)
-        ->markdown('emails.approved')
-        ->with([
-            'user'=>$this->user,
-            'data'=> $this->data,
-            'purchaseDetails' => $this->purchaseDetails,
-            'isAdmin' => $this->isAdmin,
-        ]);
-    }
-
+    public function build()
+{
+    return $this->subject("peminjaman dana direject oleh")
+    ->markdown('emails.userRejected')
+    ->with([
+        'user'=> $this->user,
+        'purchases'=> $this->purchases,
+        'budgetRequest'=> $this->budgetRequest,
+        'deptName'=> $this->deptName,
+        'purchaseDetails'=>$this->purchaseDetails
+    ]);
+}
     /**
      * Get the message envelope.
      */
     public function envelope(): Envelope
     {
-        $subject = $this->isAdmin ? 'notifikasi data baru yang memiliki status approved':'purchases anda sudah berstatus approved';
         return new Envelope(
-            subject: $subject
+            subject: 'peminjaman dana direject oleh '. $this->deptName[0],
         );
     }
 

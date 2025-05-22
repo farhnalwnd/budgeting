@@ -34,32 +34,27 @@
                 <td colspan="3">
                     @if($isAdmin)
                     <p>Dear <strong>{{$user->name}}</strong>,</p>
-                    <p>System mencatat adanya data budget approved baru yang masuk dengan rincian sebagai berikut:
-                    </p>
                     @else
                     <p>Dear <strong>{{$user->name}}</strong>,</p>
-                    <p>permohonan anda kepada department{{ $deptName[0] }} telah disetujui dan status purchases sudah menjadi approved.
-                    </p>
-                    <p>berikut rincianya:</p>
                     @endif
+                    <p>Data purchases baru sudah approved</p>
+                    <p>berikut rincianya:</p>
                 </td>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <th colspan="3">
-                    @if($isAdmin)
-                    <h5 class="text-center">data purchases baru dengan status {{$purchases->status}}</h5>
-                    @else
-                    <h5 class="text-center">department {{ $deptName[0]}} menyetujui peminjaman dana oleh department {{$deptName[1]}}
-                        sehingga status purchases
-                        saat ini adalah {{$purchases->status}}</h5>
-                    @endif
+                    <h5 class="text-center">data purchases baru dengan status {{$data->status}}</h5>
                 </th>
             </tr>
-            <tr>
+            <tr class="tr-odd">
                 <td colspan="2">penganggar:</td>
-                <td>{{ $deptName[1] }}</td>
+                <td>{{ $data->department->department_name }}</td>
+            </tr>
+            <tr>
+                <td colspan="2">no purchase:</td>
+                <td>{{ $data->department_id }}</td>
             </tr>
             @foreach ($purchaseDetails as $detail)
             <tr class="tr-odd">
@@ -81,23 +76,24 @@
             <tr>
                 <td style="width:auto"></td>
                 <td>total purchase:</td>
-                <td>{{$purchases->grand_total}}</td>
+                <td>{{$data->grand_total}}</td>
             </tr>
             <tr class="tr-odd">
                 <td style="width:auto"></td>
                 <td>saldo department:</td>
-                <td>{{$purchases->department->balance}}</td>
+                <td>{{$data->department->balance}}</td>
             </tr>
-            @if($isAdmin)
             <tr>
+                @if($isAdmin)
                 <th colspan="3">
                     <a href=""
                         style="text-decoration: none; color: green; font-size: 24px; font-weight: bold; margin-right: 20px;">
                         Edit
                     </a>
                 </th>
+                @endif
             </tr>
-            @endif
+
             <tr>
                 <td colspan="3">
                     <p style="text-align: center;">Kindly approve it at your earliest convenience so we can proceed.</p>

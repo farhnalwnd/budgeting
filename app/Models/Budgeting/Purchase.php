@@ -13,15 +13,13 @@ class Purchase extends Model
     use HasFactory;
 
         protected $fillable = [
-        'item_name',
         'purchase_no',
-        'amount',
         'department_id',
-        'quanitity',
         'status',
-        'total_amount',
+        'grand_total',
+        'category_id',
+        'PO',
         'actual_amount',
-        'remarks'
     ];
 
     protected $casts = [
@@ -45,20 +43,18 @@ class Purchase extends Model
         return $this->belongsTo(BudgetAllocation::class);
     }
 
-    public function budgetRequest()
-    {
-        return $this->hasMany(BudgetRequest::class, 'budget_purchase_no', 'purchase_no');
-    }
-
-    public function details()
-    {
+    public function detail(){
         return $this->hasMany(PurchaseDetail::class, 'purchase_no', 'purchase_no');
     }
 
-    public function category()
-    {
-        return $this->belongsTo(CategoryMaster::class);
-    }
+    public function budgetRequest()
+{
+    return $this->hasOne(BudgetRequest::class, 'budget_purchase_no', 'purchase_no');
+}
+public function category()
+{
+    return $this->hasOne(CategoryMaster::class, 'category_id');
+}
 
 
 

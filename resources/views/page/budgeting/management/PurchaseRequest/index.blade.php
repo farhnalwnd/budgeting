@@ -51,27 +51,133 @@
                     <table id="usersTable" class="table table-striped w-full text-left rtl:text-right table-bordered">
                         <thead class="uppercase border-b">
                             <tr>
-                                <th class="px-6 py-3 text-lg text-center w-5">#</th>
+                                <th class="px-6 py-3 text-lg text-center max-w-5">#</th>
                                 <th class="px-6 py-3 text-lg text-center whitespace-nowrap w-10">PO Number</th>
-                                <th class="px-6 py-3 text-lg text-center">Item Name</th>
                                 <th class="px-6 py-3 text-lg text-center w-56">department</th>
-                                <th class="px-6 py-3 text-lg text-center w-48">Amount</th>
-                                <th class="px-6 py-3 text-lg text-center w-5">Quantity</th>
+                                <th class="px-6 py-3 text-lg text-center w-48">grand total</th>
                                 <th class="px-6 py-3 text-lg text-center w-5">status</th>
-                                <th class="px-6 py-3 text-lg text-center w-1/6">remarks</th>
+                                <th class="px-6 py-3 text-lg text-center w-10">details</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($purchases as $purchase)
-                            <tr>
+                            <tr x-data="{openModal : false}">
                                 <td class="px-6 py-4 text-lg text-center w-5">{{ $purchase->id }}</td>
                                 <td class="px-6 py-4 text-lg text-center whitespace-nowrap w-10">{{ $purchase->purchase_no }}</td>
-                                <td class="px-6 py-4 text-lg">{{ $purchase->item_name }}</td>
                                 <td class="px-6 py-4 text-lg w-56 text-center">{{ $purchase->department->department_name }}</td>
-                                <td class="px-6 py-4 text-lg text-center w-48">Rp. {{ number_format($purchase->amount, 0, ',', '.') }}</td>
-                                <td class="px-6 py-4 text-lg text-center">{{ $purchase->quanitity }}</td>
+                                <td class="px-6 py-4 text-lg text-center w-48">Rp. {{ number_format($purchase->grand_total) }}</td>
                                 <td class="px-6 py-4 text-lg text-center w-5">{{ $purchase->status }}</td>
-                                <td class="px-6 py-4 text-lg w-1/6">{{ $purchase->remarks }}</td>
+                                <td class="px-6 py-4 text-lg w-20 text-center">
+                                    <button @click="openModal = !openModal" class="py-1 px-3 rounded max-w-40">
+                                        <img src="/file.png" alt="details" class="w-full h-full scale-110">
+                                    </button>
+                                
+                                    <!-- Modal -->
+                                    <div x-show="openModal" x-on:keydown.escape.window="open = false" x-transition.duration.400ms
+                                        class="text-black fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+                                        <div class="bg-white p-6 rounded-lg w-2/3" @click.away="openModal = false">
+                                            <!-- Header -->
+                                            <div class="flex justify-start">
+                                                <div class="flex items-center">
+                                                    <h1 class="text-6xl font-bold text-yellow-700 font-mono">PURCHASE</h1>
+                                                </div>
+                                                <img src="/sinarlogo.png" alt="logo" class="w-72 h-32 ml-auto">
+                                            </div>
+                                            <hr class="my-10 border-t-2 rounded-md border-slate-900 opacity-90">
+                                            <!-- Keterangan -->
+                                            <div class="grid grid-cols-5 gap-2 text-left py-3">
+                                                <div class="col-span-4">
+                                                    <h1 class="font-bold text-lg">ON:</h1>
+                                                    <h2 class="font-semibold text-base">{{$purchase->department->department_name}}</h2>
+                                                </div>
+                                                <div class="pl-7">
+                                                    <h1 class="font-bold text-lg">Budget No:</h1>
+                                                    <span class="font-semibold text-base">{{$purchase->purchase_no}}</span>
+                                                </div>
+                                                <div class="col-span-4">
+                                                    <h1 class="font-bold text-lg mb-1">DATE:</h1>
+                                                    <span class="font-semibold text-base">{{
+                                                        \Carbon\Carbon::parse($purchase->updated_at)->format('d
+                                                        M
+                                                        y') }}</span>
+                                                </div>
+                                                <div class="pl-7">
+                                                    <h1 class="font-bold text-lg mb-1">Status:</h1>
+                                                    @if($purchase->status === 'approved')
+                                                    <span
+                                                        class="font-semibold text-lg rounded-md p-1 uppercase text-emerald-700 border-2 border-emerald-600 border-opacity-50">{{$purchase->status}}</span>
+                                                    @elseif($purchase->status === 'rejected')
+                                                    <span
+                                                        class="font-semibold text-lg rounded-md p-1 uppercase text-red-700 border-2 border-red-600 border-opacity-50">{{$purchase->status}}</span>
+                                                    @elseif($purchase->status === 'pending')
+                                                    <span
+                                                        class="font-semibold text-lg rounded-md p-1 uppercase text-yellow-700 border-2 border-yellow-600 border-opacity-50">{{$purchase->status}}</span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                
+                                            <!-- * table -->
+                                            <div class="container pt-10">
+                                                <div x-data="{ scrolled: false }" @scroll="scrolled = $el.scrollTop > 0 || false">
+                                                    <table class="table-auto w-full border-collapse">
+                                                        <thead :class="scrolled ? 'bg-white shadow-md border-none' : ''" class="sticky top-0 z-10">
+                                                            <tr>
+                                                                <th class="border-2 border-gray-800 text-center w-2/6">ITEM NAME</th>
+                                                                <th class="border-2 border-gray-800 text-center w-1/6">HARGA (RP)</th>
+                                                                <th class="border-2 border-gray-800 text-center w-1/6">JML</th>
+                                                                <th class="border-2 border-gray-800 text-center w-1/6">TOTAL</th>
+                                                                <th class="border-2 border-gray-800 text-center w-1/6">REMARK</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody class="overflow-y-auto">
+                                                            @foreach($purchase->detail as $detailtest)
+                                                            <tr>
+                                                                <td class="px-6 py-4 text-lg text-center border-2 border-gray-950 border-opacity-50">{{
+                                                                    $detailtest->item_name }}</td>
+                                                                <td class="px-6 py-4 text-lg text-center border-2 border-gray-950 border-opacity-50">Rp.
+                                                                    {{
+                                                                    number_format($detailtest->amount) }}</td>
+                                                                <td class="px-6 py-4 text-lg text-center border-2 border-gray-950 border-opacity-50 ">{{
+                                                                    $detailtest->quanitity }}</td>
+                                                                <td class="px-6 py-4 text-lg text-center border-2 border-gray-950 border-opacity-50">Rp.
+                                                                    {{
+                                                                    number_format($detailtest->total_amount)
+                                                                    }}</td>
+                                                                <td class="px-6 py-4 text-lg text-center border-2 border-gray-950 border-opacity-50">
+                                                                    {{$detailtest->remarks}}</td>
+                                                            </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                
+                                            <div class="grid grid-cols-4 gap-3 mt-20 text-left">
+                                                <div class="col-span-3">
+                                                    <p>note:</p>
+                                                    @if($purchase->status === 'approved')
+                                                    <p>-</p>
+                                                    @elseif($purchase->status === 'pending')
+                                                    <p>peminjaman dana belum mendapatkan respon</p>
+                                                    @elseif($purchase->status === 'rejected')
+                                                    <p>{{$purchase->budgetRequest->feedback ?? 'peminjaman ditolak'}}</p>
+                                                    @endif
+                                                </div>
+                                                <div class="flex justify-between">
+                                                    <p class="uppercase font-semibold text-lg px-5 text-right">grand total :</p>
+                                                    <p class="text-right"> Rp.
+                                                        {{number_format($purchase->grand_total)}}</p>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <a href="{{ route('purchase-request.edit', $purchase->id) }}">Edit</a>
+                                            </div>
+                                            <div class="flex justify-between items-center mb-4">
+                                                <button @click="openModal = false" class="text-red-500 font-bold text-2xl ml-auto">&times;</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -84,8 +190,9 @@
         </div>
 <!-- Modal -->
 <div x-show="open" x-on:keydown.escape.window="open = false" x-transition.duration.400ms
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-    <div class="absolute top-32 bg-white text-black p-6 rounded-lg shadow-lg w-2/3 max-h-[800px] overflow-y-scroll">
+    class="fixed inset-0 z-[999] flex items-center justify-center bg-black bg-opacity-50">
+    <div class="absolute bg-white text-black p-6 rounded-lg shadow-lg w-2/3 max-h-[800px] overflow-y-scroll"
+        @click.away="open = false">
         <!-- Header -->
         <div class="flex justify-start">
             <div class="flex items-center">
@@ -114,7 +221,7 @@
         <!-- Table -->
         <div class="container mt-10">
             <form x-on:keydown.enter.window="$el.submit()" method="POST"
-                action="{{ route('PurchaseRequest.store') }}">
+                action="{{ route('purchase-request.store') }}">
         <div x-data="{ scrolled: false }" @scroll="scrolled = $el.scrollTop > 0 || false"
             class="overflow-y-auto max-h-[250px] mt-6">
             @csrf
@@ -217,7 +324,7 @@
                     </div>
         <div class="flex gap-2">
             <button type="submit" class="btn btn-success">Simpan</button>
-            <button @click="open = !open" class="btn btn-danger">Exit</button>
+            <button @click="open = !open" type="button" class="btn btn-danger">Exit</button>
         </div>
         </div>
         </form>
@@ -404,7 +511,6 @@
             document.getElementById('wallet-after').innerText = toRupiah(walletBalance);
             updateGrandTotal();
     });
-
 </script>
 @endpush
 

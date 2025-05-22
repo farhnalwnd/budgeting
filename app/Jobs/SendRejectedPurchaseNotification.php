@@ -2,8 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Mail\approvedEmail;
-use App\Models\User;
+use App\Mail\rejectStatus;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -11,7 +10,8 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
 
-class SendApprovedPurchase implements ShouldQueue
+
+class SendRejectedPurchaseNotification implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -20,18 +20,16 @@ class SendApprovedPurchase implements ShouldQueue
     protected $budgetRequest;
     protected $deptName;
     protected $purchaseDetails;
-    protected $isAdmin;
     /**
      * Create a new job instance.
      */
-    public function __construct( $user, $purchases , $budgetRequest, $deptName, $purchaseDetails, bool $isAdmin)
+    public function __construct($user, $purchases , $budgetRequest, $deptName, $purchaseDetails)
     {
         $this->user=$user;
         $this->purchases=$purchases;
         $this->budgetRequest=$budgetRequest;
         $this->deptName=$deptName;
         $this->purchaseDetails=$purchaseDetails;
-        $this->isAdmin=$isAdmin;
     }
 
     /**
@@ -39,13 +37,12 @@ class SendApprovedPurchase implements ShouldQueue
      */
     public function handle(): void
     {
-        Mail::to($this->user->email)->send(new approvedEmail(
-            $this->user,
-            $this->purchases,
-            $this->budgetRequest,
+        Mail::to($this->user->email)->send(new rejectStatus(
+            $this->user, 
+            $this->purchases, 
+            $this->budgetRequest, 
             $this->deptName,
-            $this->purchaseDetails,
-            $this->isAdmin
+            $this->purchaseDetails
         ));
     }
 }
