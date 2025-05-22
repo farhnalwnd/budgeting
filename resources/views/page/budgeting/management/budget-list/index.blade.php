@@ -83,6 +83,7 @@
                 <hr class="my-10 border-t-2 rounded-md border-slate-900 opacity-90">
 
                 <form method="POST" action="{{ route('budget-list.store') }}">
+                    @csrf
                     <!-- Keterangan -->
                     <div>
                         <div class="flex items-center mt-2">
@@ -113,7 +114,6 @@
 
                     <!-- Table -->
                     <div class="container mt-10">
-                        @csrf
                         <div x-data="{ scrolled: false }" @scroll="scrolled = $el.scrollTop > 0 || false"
                             class="overflow-y-auto max-h-[250px] mt-6">
                             <table class="table-auto w-full border-collapse" id="testTable">
@@ -472,33 +472,200 @@
                     </div>
                 </div>
             `;
+            newEditModal = `
+                <div id="editContactModal${id}" tabindex="-1" aria-modal="true" role="dialog"
+                    class="flex overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                    <div class="absolute bg-white text-black p-6 rounded-lg shadow-lg w-2/3 max-h-[800px] card">
+                        <!-- Header -->
+                        <div class="flex justify-start">
+                            <div class="flex items-center">
+                                <h1 class="text-6xl font-bold text-yellow-700 font-mono">Update Budget-List</h1>
+                            </div>
+                            
+                            <div class="w-72 h-32 ml-auto">
+                                <img src="{{ asset('assets/images/logo/logowhite.png')  }}" class="dark-logo" alt="Logo-Dark">
+                                <img src="{{ asset('assets/images/logo/logo.png') }}" class="light-logo" alt="Logo-light">
+                            </div>
+                        </div>
+                        <hr class="my-10 border-t-2 rounded-md border-slate-900 opacity-90">
+
+                        <form method="POST" action="${updateUrl}">
+                            @csrf
+                            @method('PUT')
+                            <!-- Keterangan -->
+                            <div>
+                                <div class="flex items-center mt-2">
+                                    <div class="form-group">
+                                        <h1 class="font-bold text-lg">Budget No<span
+                                                class="text-danger">*</span></h1>
+                                        <div class="controls">
+                                            <select name="no" required
+                                                class="form-select w-full text-xl" aria-invalid="false"
+                                                placeholder="Budget No">`;
+                                                    allocations.forEach(function(allocation){
+                                                        newEditModal +=`
+                                                        <option value="${allocation.budget_allocation_no}" ${allocation.budget_allocation_no == budget.budget_allocation_no ? 'selected' : ''}>
+                                                            ${allocation.budget_allocation_no}
+                                                        </option>
+                                                        `;
+                                                    });
+                                                    newEditModal += `
+                                            </select>
+                                            <div class="help-block"></div>
+                                        </div>
+                                    </div>
+                                    <div class="ml-auto form-group">
+                                        <h1 class="font-bold text-lg">Category<span
+                                            class="text-danger">*</span></h1>
+                                        <div class="controls">
+                                            <select name="category" required
+                                                class="form-select w-full text-xl" aria-invalid="false"
+                                                placeholder="Category">`;
+                                                    categories.forEach(function(category){
+                                                        newEditModal +=`
+                                                        <option value="${category.id}" ${category.name == budget.category.name ? 'selected' : ''}>
+                                                            ${category.name}
+                                                        </option>
+                                                        `;
+                                                    });
+                                                    newEditModal += `
+                                            </select>
+                                            <div class="help-block"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Table -->
+                            <div class="container mt-10">
+                                <div x-data="{ scrolled: false }" @scroll="scrolled = $el.scrollTop > 0 || false"
+                                    class="overflow-y-auto max-h-[250px] mt-6">
+                                    <table class="table-auto w-full border-collapse">
+                                        <thead :class="scrolled ? 'bg-white shadow-md border-none' : ''" class="sticky top-0 z-10">
+                                            <tr>
+                                                <th class="text-center w-fit">
+                                                    <h2>Name</h2>
+                                                </th>
+                                                <th class="text-center w-48">
+                                                    <h2>Amount (RP)</h2>
+                                                </th>
+                                                <th class="text-center w-28">
+                                                    <h2>Qty</h2>
+                                                </th>
+                                                <th class="text-center w-48">
+                                                    <h2>Total</h2>
+                                                </th>
+                                                <th class="text-center w-56">
+                                                    <h2>UM</h2>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="max-h-[50vh] overflow-y-auto">
+                                            <tr>
+                                                <td><input type="text" name="name" value="${budget.name}"
+                                                    class="w-full p-2 border focus:ring-0 text-center text-body bg-secondary-light" 
+                                                    required>
+                                                </td>
+                                                <td>
+                                                    <input type="text" name="amount" value="${toRupiah(budget.default_amount)}" onKeydown="editOnPriceKeydown(event)" onBlur="editOnBlur(this)" onFocus="editOnFocus(this)" onInput="editOnPriceInput(this)"
+                                                        class="w-full p-2 border focus:ring-0 text-center text-body bg-secondary-light price-input" 
+                                                        maxlength="17" required>
+                                                </td>
+                                                <td>
+                                                    <input type="number" name="quantity" value="${budget.quantity}" onKeydown="editOnQuantityKeydown(event)" onInput="editOnQuantityInput(this)"
+                                                        class="w-full p-2 border focus:ring-0 text-center text-body bg-secondary-light quantity-input" 
+                                                        min="0" maxlength="2" required>
+                                                </td>
+                                                <td>
+                                                    <input type="text" name="total" value="${toRupiah(budget.total_amount)}"
+                                                        class="w-full p-2 border focus:ring-0 text-center text-body bg-secondary-light total-input" 
+                                                        readonly>
+                                                </td>
+                                                <td>
+                                                    <input type="text" name="um" value="${budget.um}"
+                                                        class="w-full p-2 border focus:ring-0 text-center text-body bg-secondary-light" 
+                                                        required>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="flex items-center justify-end mx-4 mt-4 gap-2">
+                                    <button type="submit" class="btn btn-success">Simpan</button>
+                                    <button type="button" class="btn btn-danger" data-modal-hide="editContactModal${id}" onClick="openEditModal(${id})">Exit</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
             
             modalDiv.innerHTML += newEditModal;
                 
         }
-        
-        function getTotalAmount(currInput)
-        {
-            var parent = currInput.parentNode.parentNode.parentNode;
-            var quantityInput = parent.querySelector('.quantity');
-            var amountInput = parent.querySelector('.amount');
-            var totalInput = parent.querySelector('.total');
-            // var totalInput = parent.lastElementChild.lastElementChild.firstElementChild;
-            console.log(quantityInput.value, amountInput.value, totalInput.value);
-            if(quantityInput.value <= 0)
-            {
-                quantityInput.value = 1;
-            }
-            if(amountInput.value <= 0)
-            {
-                amountInput.value = 1;
-            }
-            totalInput.value = parseFloat(quantityInput.value) * parseFloat(amountInput.value);
 
+            
+        function editOnPriceKeydown(e)
+        {
+            const allowedKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'];
+            if (!(e.key >= '0' && e.key <= '9') && !allowedKeys.includes(e.key)) {
+                e.preventDefault();
+            }
         }
 
+        function editOnBlur(input)
+        {
+            const numeric = parseRupiah(input.value) || 0;
+            input.value = toRupiah(numeric);
+            updateTotalEdit(input.closest('tr'));
+        }
 
+        function editOnFocus(input)
+        {
+            const numeric = parseRupiah(input.value);
+            input.value = numeric > 0 ? numeric.toString() : '';
+        }
 
+        function editOnPriceInput(input)
+        {
+            const cursorPosition = input.selectionStart;
+            const numeric = parseRupiah(input.value);
+            input.value = toRupiah(numeric);
+
+            setTimeout(() => {
+                input.setSelectionRange(input.value.length, input.value.length);
+            }, 0);
+
+            updateTotalEdit(input.closest('tr'));
+        }
+
+        function editOnQuantityKeydown(e)
+        {
+            const allowedKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'];
+            if (!(e.key >= '0' && e.key <= '9') && !allowedKeys.includes(e.key)) {
+                e.preventDefault();
+            }
+        }
+
+        function editOnQuantityInput(input)
+        {
+            let val = parseInt(input.value) || 0;
+            input.value = val > 99 ? '99' : (val < 0 ? '0' : val.toString());
+            updateTotalEdit(input.closest('tr'));
+        }
+
+        function updateTotalEdit(row)
+        {
+            const priceInput = row.querySelector('.price-input');
+            const quantityInput = row.querySelector('.quantity-input');
+            const totalInput = row.querySelector('.total-input');
+
+            const price = parseRupiah(priceInput.value);
+            const quantity = parseFloat(quantityInput.value) || 0;
+            const total = price * quantity;
+
+            totalInput.value = toRupiah(total);
+        }
 
         function toRupiah(number) {
                                 return new Intl.NumberFormat('id-ID', {

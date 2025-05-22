@@ -138,24 +138,25 @@ class BudgetListController extends Controller
                 'no' => 'required|exists:budget_allocations,budget_allocation_no',
                 'name' => 'required|string|max:255',
                 'category' => 'required|exists:category_masters,id',
-                'quantity' => 'required|numeric',
+                'quantity' => 'required|integer|min:1',
                 'um' => 'required|string|max:255',
-                'amount' => 'required|numeric',
-                'total' => 'required|numeric'
+                'amount' => 'required|string|min:0',
+                'total' => 'required|string|min:0'
             ]);
 
             $user = Auth::user();
             $budget = BudgetList::findOrFail($id);
             $budgetOld = clone $budget; //simpan no budget yang lama
 
+            $amount =  max(0,Purchase::parseRupiah($validatedData['amount']));
             $budget->update([
                 'budget_allocation_no' => $validatedData['no'],
                 'name' => $validatedData['name'],
                 'category_id' => $validatedData['category'],
                 'quantity' => $validatedData['quantity'],
                 'um' => $validatedData['um'],
-                'default_amount' => $validatedData['amount'],
-                'total_amount' => $validatedData['total']
+                'default_amount' => $amount,
+                'total_amount' => $amount * $validatedData['quantity']
             ]);
 
             // kalau no budget berubah

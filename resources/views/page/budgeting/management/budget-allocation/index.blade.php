@@ -67,7 +67,7 @@
                 <!-- Header -->
                 <div class="flex justify-start">
                     <div class="flex items-center">
-                        <h1 class="text-6xl font-bold text-yellow-700 font-mono">Create Category</h1>
+                        <h1 class="text-6xl font-bold text-yellow-700 font-mono">Create Budget-Allocation</h1>
                     </div>
                     
                     <div class="w-72 h-32 ml-auto">
@@ -252,73 +252,65 @@
             newEditModal = `
                 <div id="editContactModal${id}" tabindex="-1" aria-modal="true" role="dialog"
                     class="flex overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-                    <div class="relative p-4 w-full max-w-md max-h-full">
-                        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700" style="margin-top: 10%;">
-                            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-                                <h3 class="text-3xl font-semibold text-white">Update Budget</h3>
-                                <button type="button"
-                                    class="end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                                    data-modal-hide="editContactModal${id}" onClick="openEditModal(${id})">
-                                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                        viewbox="0 0 14 14">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"></path>
-                                    </svg>
-                                    <span class="sr-only">Close modal</span>
-                                </button>
+                    <div class="absolute bg-white text-black p-6 rounded-lg shadow-lg w-2/3 max-h-[800px] card">
+                        <!-- Header -->
+                        <div class="flex justify-start">
+                            <div class="flex items-center">
+                                <h1 class="text-6xl font-bold text-yellow-700 font-mono">Update Budget-Allocation</h1>
                             </div>
-                            <div class="p-4 md:p-5">
-                                <form class="space-y-4" action="${updateUrl}" method="POST" id="updateBudgetForm">
-                                @csrf
-                                @method('PUT')
-                                    <div class="form-group">
-                                        <label class="form-label text-white text-xl">Budget No<span
-                                                class="text-danger">(readonly)</span></label>
-                                        <div class="controls">
-                                            <input type="text" name="no"
-                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-xl rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                                                required readonly placeholder="Budget No" value="${budget.budget_allocation_no}">
-                                            <div class="help-block"></div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label class="form-label text-white text-xl">Department<span
-                                                class="text-danger">(readonly)</span></label>
-                                        <div class="controls">
-                                            <select name="department" required readonly disabled
-                                                class="form-select w-full text-xl" aria-invalid="false"
-                                                placeholder="Department">
-                                                `;
-                                                departments.forEach(function(department){
-                                                    newEditModal +=`
-                                                    <option value="${department.id}" ${budget.department_id == department.id ? 'selected' : ''}>
-                                                        ${department.department_name}
-                                                    </option>
-                                                    `;
-                                                });
-                                                newEditModal += `
-                                            </select>
-                                            <div class="help-block"></div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label class="form-label text-white text-xl">Description</label>
-                                        <div class="controls">
-                                            <input type="text" name="description" value="${budget.description ?? ''}"
-                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-xl rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                                                placeholder="Budget Name">
-                                            <div class="help-block"></div>
-                                        </div>
-                                    </div>
-                                    <button type="submit"
-                                        class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                                        Update
-                                    </button>
-                                </form>
+                            
+                            <div class="w-72 h-32 ml-auto">
+                                <img src="{{ asset('assets/images/logo/logowhite.png')  }}" class="dark-logo" alt="Logo-Dark">
+                                <img src="{{ asset('assets/images/logo/logo.png') }}" class="light-logo" alt="Logo-light">
                             </div>
                         </div>
+                        <hr class="my-10 border-t-2 rounded-md border-slate-900 opacity-90">
+
+                        <!-- Keterangan -->
+                        <div>
+                            <div class="flex items-center mt-2">
+                                <div class="form-group">
+                                    <h1 class="form-label font-bold text-lg">Department</h1>
+                                    <h2 class="font-semibold text-base">${budget.department.department_name}</h2>
+                                </div>
+                                <div class="ml-auto form-group">
+                                    <h1 class="form-label font-bold text-lg">Budget No</h1>
+                                    <h2 class="font-semibold text-base">${budget.budget_allocation_no}</h2>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form method="POST" action="${updateUrl}">
+                            <!-- Table -->
+                            <div class="container mt-10">
+                                @csrf
+                                @method('PUT')
+                                <div x-data="{ scrolled: false }" @scroll="scrolled = $el.scrollTop > 0 || false"
+                                    class="overflow-y-auto max-h-[250px] mt-6">
+                                    <table class="table-auto w-full border-collapse" id="testTable">
+                                        <thead :class="scrolled ? 'bg-white shadow-md border-none' : ''" class="sticky top-0 z-10">
+                                            <tr>
+                                                <th class="text-center w-fit">
+                                                    <h2>Description</h2>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="max-h-[50vh] overflow-y-auto">
+                                            <tr>
+                                                <td>
+                                                    <input type="text" name="description" placeholder="Budget Name" value="${budget.description ?? ''}"
+                                                    class="w-full p-2 border focus:ring-0 text-center text-body bg-secondary-light">
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="flex items-center justify-end mx-4 mt-4 gap-2">
+                                    <button type="submit" class="btn btn-success">Simpan</button>
+                                    <button type="button" class="btn btn-danger" data-modal-hide="editContactModal${id}" onClick="openEditModal(${id})">Exit</button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             `;
