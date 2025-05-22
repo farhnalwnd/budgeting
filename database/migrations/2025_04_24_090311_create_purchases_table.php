@@ -21,10 +21,10 @@ return new class extends Migration
             $table->integer('PO')->nullable();
             $table->decimal('actual_amount',18,2)->nullable(); //biaya aktual pembelian
             $table->decimal('grand_total',18,2)->nullable(); //biaya aktual pembelian
-            // $table->foreignId('category_id')->constrained(
-            //     table:'category_masters',
-            //     indexName:'fk_purchases_categoryMasters'
-            // )->nullable();
+            $table->foreignId('category_id')->nullable()->constrained(
+                table:'category_masters',
+                indexName:'fk_purchases_categoryMasters'
+            );
             $table->enum('status', ['pending','approved','rejected'])->default('approved');
             $table->timestamps();
         });

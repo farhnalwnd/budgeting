@@ -52,9 +52,9 @@ class approvedEmail extends Mailable
      */
     public function envelope(): Envelope
     {
+        $subject = $this->isAdmin ? 'notifikasi data baru yang memiliki status approved':'budget request disetujui dan sudah berstatus approved';
         return new Envelope(
-            subject: 'Defaul Email',
-        );
+            subject: $subject);
     }
 
     /**

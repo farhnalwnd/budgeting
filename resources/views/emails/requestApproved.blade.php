@@ -88,6 +88,7 @@
                 <td>saldo department:</td>
                 <td>{{$purchases->department->balance}}</td>
             </tr>
+            @if($isAdmin)
             <tr>
                 <th colspan="3">
                     <a href=""
@@ -96,7 +97,7 @@
                     </a>
                 </th>
             </tr>
-
+            @endif
             <tr>
                 <td colspan="3">
                     <p style="text-align: center;">Kindly approve it at your earliest convenience so we can proceed.</p>

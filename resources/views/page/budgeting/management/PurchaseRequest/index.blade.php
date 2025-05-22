@@ -73,7 +73,7 @@
                                     </button>
                                 
                                     <!-- Modal -->
-                                    <div x-show="openModal" x-on:keydown.escape.window="open = false" x-transition.duration.400ms"
+                                    <div x-show="openModal" x-on:keydown.escape.window="open = false" x-transition.duration.400ms
                                         class="text-black fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
                                         <div class="bg-white p-6 rounded-lg w-2/3" @click.away="openModal = false">
                                             <!-- Header -->
@@ -155,13 +155,22 @@
                                             <div class="grid grid-cols-4 gap-3 mt-20 text-left">
                                                 <div class="col-span-3">
                                                     <p>note:</p>
-                                                    <p>{{$purchase->budgetRequest->feedback ?? 'tidak ada feedback'}}</p>
+                                                    @if($purchase->status === 'approved')
+                                                    <p>-</p>
+                                                    @elseif($purchase->status === 'pending')
+                                                    <p>peminjaman dana belum mendapatkan respon</p>
+                                                    @elseif($purchase->status === 'rejected')
+                                                    <p>{{$purchase->budgetRequest->feedback ?? 'peminjaman ditolak'}}</p>
+                                                    @endif
                                                 </div>
                                                 <div class="flex justify-between">
                                                     <p class="uppercase font-semibold text-lg px-5 text-right">grand total :</p>
                                                     <p class="text-right"> Rp.
                                                         {{number_format($purchase->grand_total)}}</p>
                                                 </div>
+                                            </div>
+                                            <div>
+                                                <a href="{{ route('purchase-request.edit', $purchase->id) }}">Edit</a>
                                             </div>
                                             <div class="flex justify-between items-center mb-4">
                                                 <button @click="openModal = false" class="text-red-500 font-bold text-2xl ml-auto">&times;</button>
@@ -181,8 +190,9 @@
         </div>
 <!-- Modal -->
 <div x-show="open" x-on:keydown.escape.window="open = false" x-transition.duration.400ms
-    class="fixed inset-0 z-[900] flex items-center justify-center bg-black bg-opacity-50">
-    <div class="absolute bg-white text-black p-6 rounded-lg shadow-lg w-2/3 max-h-[950px]overflow-y-scroll" @click.away="open = false">
+    class="fixed inset-0 z-[999] flex items-center justify-center bg-black bg-opacity-50">
+    <div class="absolute bg-white text-black p-6 rounded-lg shadow-lg w-2/3 max-h-[800px] overflow-y-scroll"
+        @click.away="open = false">
         <!-- Header -->
         <div class="flex justify-start">
             <div class="flex items-center">
@@ -211,7 +221,7 @@
         <!-- Table -->
         <div class="container mt-10">
             <form x-on:keydown.enter.window="$el.submit()" method="POST"
-                action="{{ route('PurchaseRequest.store') }}">
+                action="{{ route('purchase-request.store') }}">
         <div x-data="{ scrolled: false }" @scroll="scrolled = $el.scrollTop > 0 || false"
             class="overflow-y-auto max-h-[250px] mt-6">
             @csrf

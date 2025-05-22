@@ -21,7 +21,7 @@
                 <li><a href="{{ route('budget-list.index') }}"
                     class="{{ request()->is('management/budget-list') ? 'current' : '' }}"><i class="icon-Commit"><span
                             class="path1"></span><span class="path2"></span></i>Budget List </a></li>
-                <li><a href="{{ route('PurchaseRequest.index') }}"
+                <li><a href="{{ route('purchase-request.index') }}"
                     class="{{ request()->is('management/PurchaseRequest') ? 'current' : '' }}"><i class="icon-Commit"><span
                             class="path1"></span><span class="path2"></span></i>Purchase Request</a></li>
                 <li><a href="{{ route('budget-allocation.index') }}"

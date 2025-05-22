@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Budgeting;
 
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdatePurchaseRequest;
 use App\Jobs\sendApprovalRequest;
 use App\Jobs\SendApprovedPurchase;
 use App\Jobs\SendApprovedPurchaseNotification;
@@ -13,6 +14,7 @@ use App\Models\Budgeting\BudgetAllocation;
 use App\Models\Budgeting\BudgetApproval;
 use App\Models\Budgeting\BudgetApprover;
 use App\Models\Budgeting\BudgetRequest;
+use App\Models\Budgeting\CategoryMaster;
 use App\Models\Budgeting\Purchase;
 use App\Models\Department;
 use App\Models\PurchaseDetail;
@@ -36,7 +38,6 @@ class PurchaseController extends Controller
         $user = Auth::user();
         $departments = Department::all();
         $department= $user->department;
-        $feedback=BudgetApproval::where('feedback', '');
         $budget = BudgetAllocation::where('department_id', $user->department_id)->latest()->first();
 
         return view(".page.budgeting.management.PurchaseRequest.index", [
@@ -190,6 +191,7 @@ class PurchaseController extends Controller
         }
 
         $department->withdraw($grandTotal);
+        // dd($department);
 
         //* email ke user
         $data = purchase::with('detail')->where('purchase_no', $purchaseNumber)->firstOrFail();
@@ -202,7 +204,7 @@ class PurchaseController extends Controller
 
         DB::commit();
         Alert::success('Berhasil', 'Data pembelian berhasil disimpan.');
-        return redirect()->route('PurchaseRequest.index');
+        return redirect()->route('purchase-request.index');
 
         }catch(\Exception $e){
             DB::rollBack();
@@ -225,23 +227,83 @@ class PurchaseController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $purchase = Purchase::findOrfail($id);
+        $categories = CategoryMaster::all();
+        $departments = Department::all();
+        $dept = Department::where('id', $purchase->department_id)->first();
+        $deptId = $dept->id;
+        return view('page.budgeting.management.PurchaseRequest.edit', compact('purchase','categories','dept','deptId', 'departments'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdatePurchaseRequest $request, string $id)
     {
-        //
+        DB::beginTransaction();
+    
+        try {
+            $validated = $request->validated();
+    
+            $purchase = Purchase::findOrFail($id);
+            $fromDept = Department::findOrFail($validated['fromDept']);
+    
+            $oldAmount = $purchase->actual_amount;
+            $grandTotal = $validated['grand_total'];
+            $newActualAmount = $validated['actual_amount'];
+    
+            if ($oldAmount !== null) {
+                if ($oldAmount > $grandTotal) {
+                    $fromDept->deposit($oldAmount - $grandTotal);
+                } elseif ($oldAmount < $grandTotal) {
+                    $fromDept->withdraw($grandTotal - $oldAmount);
+                }
+            }
+    
+            $purchase->update([
+                'PO' => $validated['PO'],
+                'category_id' => $validated['category_id'],
+                'actual_amount' => $newActualAmount
+            ]);
+    
+            if ($newActualAmount > $grandTotal) {
+                $diff = $newActualAmount - $grandTotal;
+    
+                if ($fromDept->balance < $diff) {
+                    $toDept = Department::findOrFail($validated['department_id']);
+    
+                    if ($toDept->balance < $diff) {
+                        DB::rollBack();
+                        Alert::toast("The selected department's budget is insufficient.", 'error');
+                        return redirect()->route('purchase-request.index');
+                    }
+    
+                    $toDept->transfer($fromDept, $diff);
+                }
+    
+                $fromDept->withdraw($diff);
+    
+            } elseif ($newActualAmount < $grandTotal) {
+                $fromDept->deposit($grandTotal - $newActualAmount);
+            }
+    
+            DB::commit();
+            Alert::toast('Berhasil melakukan update', 'success');
+            return redirect()->route('purchase-request.index');
+    
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Alert::toast('Terjadi kesalahan: ' . $e->getMessage(), 'error');
+            return back();
+        }
     }
+    
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $purchase_no)
     {
-        //
     }
 
     //* email diapprove
