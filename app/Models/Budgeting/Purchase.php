@@ -17,6 +17,7 @@ class Purchase extends Model
         'department_id',
         'status',
         'grand_total',
+        'category_id',
         'PO',
         'actual_amount',
     ];
@@ -48,7 +49,11 @@ class Purchase extends Model
 
     public function budgetRequest()
 {
-    return $this->hasMany(BudgetRequest::class, 'budget_purchase_no', 'purchase_no');
+    return $this->hasOne(BudgetRequest::class, 'budget_purchase_no', 'purchase_no');
+}
+public function category()
+{
+    return $this->hasOne(CategoryMaster::class, 'category_id');
 }
 
 

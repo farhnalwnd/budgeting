@@ -48,7 +48,7 @@ class rejectStatus extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Reject Status',
+            subject: 'peminjaman dana direject oleh '. $this->deptName[0],
         );
     }
 

@@ -48,7 +48,7 @@ class requestApproval extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Request Approval',
+            subject: 'Permohonan peminjaman dana untuk keperluan divisi ' .$this->requestData['from_department_name'],
         );
     }
 

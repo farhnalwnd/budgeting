@@ -16,4 +16,8 @@ class CategoryMaster extends Model
     {
         return $this->hasMany(BudgetList::class, 'category_id');
     }
+
+    public function category(){
+        return $this->hasMany(Purchase::class, 'category_id');
+    }
 }
