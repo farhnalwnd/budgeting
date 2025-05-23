@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Casts\AsDecimal;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\department;
 use App\Models\PurchaseDetail;
+use App\Models\Budgeting\CategoryMaster;
 
 class Purchase extends Model
 {
@@ -53,7 +54,7 @@ class Purchase extends Model
 }
 public function category()
 {
-    return $this->hasOne(CategoryMaster::class, 'category_id');
+    return $this->belongsTo(CategoryMaster::class);
 }
 
 

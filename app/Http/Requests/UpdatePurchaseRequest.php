@@ -43,10 +43,10 @@ public function withValidator($validator)
             $validator->errors()->add('purchase_request', 'Purchase not found.');
             return;
         }
-        if ($actualAmount > $purchase->grand_total && $actualAmount > $purchase->department->balance && !$this->filled('department_id')) {
-            $validator->errors()->add('department_id', 'Department is required when actual amount exceeds grand total.');
-            return;
-        }
+        // if ($actualAmount && !$this->filled('department_id')) {
+        //     $validator->errors()->add('department_id', 'Department is required when actual amount exceeds grand total.');
+        //     return;
+        // }
         if ($validator->errors()->any()) {
             dd($validator->errors()->all());}
     });

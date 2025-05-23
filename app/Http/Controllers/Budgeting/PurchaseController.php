@@ -249,9 +249,10 @@ class PurchaseController extends Controller
             $fromDept = Department::findOrFail($validated['fromDept']);
     
             $oldAmount = $purchase->actual_amount;
-            $grandTotal = $validated['grand_total'];
+            $grandTotal = $purchase->grand_total;
             $newActualAmount = $validated['actual_amount'];
     
+            //* actual amount pernah diinput
             if ($oldAmount !== null) {
                 if ($oldAmount > $grandTotal) {
                     $fromDept->deposit($oldAmount - $grandTotal);
@@ -266,24 +267,26 @@ class PurchaseController extends Controller
                 'actual_amount' => $newActualAmount
             ]);
     
+            // * ketika actual amount baru  besar dari grand total
             if ($newActualAmount > $grandTotal) {
                 $diff = $newActualAmount - $grandTotal;
     
+                // * ketika balance lebih kecil dari diff
                 if ($fromDept->balance < $diff) {
                     $toDept = Department::findOrFail($validated['department_id']);
     
-                    if ($toDept->balance < $diff) {
+                    if ($toDept->balance < $diff-$fromDept->balance) {
                         DB::rollBack();
                         Alert::toast("The selected department's budget is insufficient.", 'error');
                         return redirect()->route('purchase-request.index');
                     }
-    
-                    $toDept->transfer($fromDept, $diff);
+                    $toDept->transfer($fromDept, $diff-$fromDept->balance);
                 }
     
                 $fromDept->withdraw($diff);
     
-            } elseif ($newActualAmount < $grandTotal) {
+            }//* ketika new actual amount kecil dari grand total
+            elseif ($newActualAmount < $grandTotal) {
                 $fromDept->deposit($grandTotal - $newActualAmount);
             }
     

@@ -14,7 +14,31 @@
             </div>
             <div class="card-body">
                 <form action="{{ route('purchase-request.update', $purchase) }}" method="POST"
-                    x-data="{grandTotal: {{ $purchase->grand_total ?? 0 }},actualAmount: {{ old('actual_amount', $purchase->actual_amount) ?? 0 }},deptBalance: {{ $dept->balance ?? 0 }},get showDepartment() {return this.actualAmount > this.grandTotal && this.actualAmount > this.deptBalance;},get showBalance() {return this.actualAmount < this.deptBalance;},get leftColSpan() {return this.showDepartment ? 'col-span-2' : 'col-span-3';},get shortage() {return this.actualAmount > this.grandTotal && this.actualAmount > this.deptBalance? (this.actualAmount - this.deptBalance).toFixed(2): 0;}}">
+                x-data="{
+                    grandTotal: {{ $purchase->grand_total ?? 0 }},
+                    actualAmount: {{ old('actual_amount', $purchase->actual_amount) ?? 0 }},
+                    oldactualAmount: {{ $purchase->actual_amount ?? 0 }},
+                    deptBalance: {{ $dept->balance ?? 0 }},
+                    get diff() {
+                        return this.actualAmount - this.grandTotal;
+                    },
+                    get showDepartment() {
+                        var baseAmount = this.oldactualAmount > 0 ? this.oldactualAmount : this.grandTotal;
+                        return (this.actualAmount - baseAmount - this.deptBalance) > 0;
+                    },
+                    get showBalance() {
+                        return this.actualAmount < this.deptBalance;
+                    },
+                    get leftColSpan() {
+                        return this.showDepartment ? 'col-span-2' : 'col-span-3';
+                    },
+                    get shortage() {
+                        var baseAmount = this.oldactualAmount > 0 ? this.oldactualAmount : this.grandTotal;
+                        const short = this.actualAmount - baseAmount - this.deptBalance;
+                        return short > 0 ? short.toFixed(2) : 0;
+                    }
+                }"
+                
                     @csrf
                     @method('PUT')
                 
