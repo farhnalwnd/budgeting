@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('item_name');
             $table->string('purchase_no');
             $table->foreign('purchase_no')->references('purchase_no')->on('purchases')->onDelete('cascade');
-            $table->integer('quanitity');
+            $table->integer('quantity');
             $table->string('um')->nullable(); // unit measure
             $table->decimal('amount',18,2); //budget awal / estimasi
             $table->decimal('total_amount',18,2); //total budget awal / total estimasi

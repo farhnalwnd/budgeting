@@ -19,9 +19,6 @@
                     actualAmount: {{ old('actual_amount', $purchase->actual_amount) ?? 0 }},
                     oldactualAmount: {{ $purchase->actual_amount ?? 0 }},
                     deptBalance: {{ $dept->balance ?? 0 }},
-                    get diff() {
-                        return this.actualAmount - this.grandTotal;
-                    },
                     get showDepartment() {
                         var baseAmount = this.oldactualAmount > 0 ? this.oldactualAmount : this.grandTotal;
                         return (this.actualAmount - baseAmount - this.deptBalance) > 0;
@@ -37,7 +34,7 @@
                         const short = this.actualAmount - baseAmount - this.deptBalance;
                         return short > 0 ? short.toFixed(2) : 0;
                     }
-                }"
+                }">
                 
                     @csrf
                     @method('PUT')

@@ -34,19 +34,44 @@ class PurchaseController extends Controller
      */
     public function index()
     {
-        $purchases = Purchase::with('department', 'detail', 'budgetRequest')->paginate(5);
         $user = Auth::user();
         $departments = Department::all();
-        $department= $user->department;
+    
+        $years = Purchase::selectRaw('YEAR(created_at) as year')
+            ->distinct()
+            ->orderByDesc('year')
+            ->pluck('year');
+    
+        $query = Purchase::with('department', 'detail', 'budgetRequest')
+            ->orderBy('created_at', 'desc');
+    
+        // *Jika bukan super admin, hanya data sesuai departemen
+        if ($user->username !== 'super') {
+            $query->where('department_id', $user->department_id);
+        } else {
+            if (request()->filled('department_id')) {
+                $query->where('department_id', request('department_id'));
+            }
+        }
+    
+        if (request()->filled('year')) {
+            $query->whereYear('created_at', request('year'));
+        }
+    
+        $purchases = $query->paginate(5);
+    
+        $department = $user->department;
         $budget = BudgetAllocation::where('department_id', $user->department_id)->latest()->first();
-
+    
         return view(".page.budgeting.management.PurchaseRequest.index", [
+            'user' => $user,
             'purchases' => $purchases,
-            'department'=>$department,
-            'userDepartment'=>$user->department->department_name ?? 'unknown',
-            'currentDate'=>now()->format('j M y'),  
+            'department' => $department,
+            'departments' => $departments,
+            'years' => $years,
+            'userDepartment' => $user->department->department_name ?? 'unknown',
+            'currentDate' => now()->format('j M y'),
             'budgetNo' => $budget->budget_allocation_no ?? 'N/A',
-            'departments'=>$departments,
         ]);
     }
 
@@ -106,7 +131,7 @@ class PurchaseController extends Controller
                 'purchase_no'=> $master->purchase_no,
                 'item_name' => $desc,
                 'amount' => $price,
-                'quanitity' => $quantity,
+                'quantity' => $quantity,
                 'total_amount' => $total,
                 'remarks' => $validatedData['remark'][$index] ?? null,
                 // 'status' => $isBalanceEnough ? 'approved' : 'pending',
