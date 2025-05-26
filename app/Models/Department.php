@@ -12,11 +12,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use App\Models\Budgeting\Purchase;
 use App\Traits\HasYearlyWallets;
+use Bavix\Wallet\Traits\HasWallets;
 
 class Department extends Model implements Wallet
 {
 
-    use HasFactory, HasWallet, HasYearlyWallets;
+    use HasFactory, HasWallet, HasYearlyWallets, HasWallets;
     protected $connection = 'mysql';
     protected $guarded = ['id'];
 

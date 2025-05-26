@@ -5,16 +5,15 @@ namespace App\Http\Controllers\Budgeting;
 use App\Http\Controllers\Controller;
 use App\Models\Budgeting\BudgetAllocation;
 use App\Models\Department;
-use App\Traits\HasYearlyWallets;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use RealRashid\SweetAlert\Facades\Alert;
+use Illuminate\Support\Str;
 
 
 class BudgetAllocationController extends Controller
 {
-    use HasYearlyWallets;
     /**
      * Display a listing of the resource.
      */
@@ -58,7 +57,13 @@ class BudgetAllocationController extends Controller
             // bikin wallet
             $year = now()->addYear()->format('Y');
             $dept = Department::findOrFail($validatedData['department']);
-            $dept->getYearlyWallet($year);
+            if(!$dept->hasWallet($year))
+            {
+                $dept->createWallet([
+                    'name' => $year,
+                    'slug' => Str::slug($year),
+                ]);
+            }
             
             activity()
                 ->performedOn($budget)
