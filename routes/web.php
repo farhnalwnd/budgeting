@@ -136,11 +136,8 @@ Route::group(['middleware' => ['role:super-admin|admin']], function () {
     Route::delete('levels/{level:level_slug}/delete', [LevelController::class, 'destroy'])->name('level.destroy');
 
     Route::resource('purchase-request', PurchaseController::class);
-//     Route::get('/test-helper', function() {
-//     $department = Department::first();
-//     $department->deposit(10000);
-//     dd($department->balanceInt, $department->department_name); 
-// });
+    Route::get('purchaserequest', [PurchaseController::class, 'getData'])->name('purchase.data');
+    Route::get('/purchases/{purchase_no}/details', [PurchaseController::class, 'getDetails'])->name('purchase.details');
 });
 
 

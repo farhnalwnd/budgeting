@@ -478,6 +478,21 @@ class PurchaseController extends Controller
                 }
             }
 
+    public function getData()
+    {
+        $data = Purchase::with(['department', 'detail'])->get();
+        return response()->json($data);
+    }
+
+    public function getDetails($purchase_no)
+    {
+        $details = PurchaseDetail::where('purchase_no', $purchase_no)->get();
+        if(!$details){
+            return response()->json(['message'=>'purchase not found'], 404);
+        }
+        return response()->json($details);
+    }
+            
     protected function getBudgetRequestNo($departmentId)
     {
         $department = Department::findOrFail($departmentId);
