@@ -37,6 +37,9 @@
         <div class="card">
             <div class="card-header">
                 <h1 class="card-title text-2xl font-medium">List Budget Allocation</h1>
+                <select id="yearFilter" class="form-control">
+                    <!-- tambah department lainnya sesuai kebutuhan -->
+                </select>
             </div>
             <div class="card-body">
                 <div class="relative overflow-x-auto sm:rounded-lg">
@@ -70,7 +73,7 @@
                         <h1 class="text-6xl font-bold text-yellow-700 font-mono">Create Budget-Allocation</h1>
                     </div>
                     
-                    <div class="w-72 h-32 ml-auto">
+                    <div class="w-72 h-32 ml-auto mb-5">
                         <img src="{{ asset('assets/images/logo/logowhite.png')  }}" class="dark-logo" alt="Logo-Dark">
                         <img src="{{ asset('assets/images/logo/logo.png') }}" class="light-logo" alt="Logo-light">
                     </div>
@@ -113,15 +116,14 @@
                                         </td>
                                         <td>
                                             <input type="text" name="description" id="description" placeholder="Budget Name"
-                                            class="w-full p-2 border focus:ring-0 text-center text-body bg-secondary-light" 
-                                            required>
+                                            class="w-full p-2 border focus:ring-0 text-center text-body bg-secondary-light">
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                         <div class="flex items-center justify-end mx-4 mt-4 gap-2">
-                            <button type="submit" class="btn btn-success">Simpan</button>
+                            <button type="submit" class="btn btn-success" onClick="event.preventDefault(); confirmBudgetCreate(this)">Simpan</button>
                             <button @click="open = !open" type="button" class="btn btn-danger">Exit</button>
                         </div>
                     </div>
@@ -139,8 +141,27 @@
     <script>
         var budgets = null;
         var departments = null;
+        var table = null;
         document.addEventListener('DOMContentLoaded', function() {
-            
+            // get budget-allocation year list
+            $.ajax({
+                url: '{{ route('get.budget-allocation.year') }}',
+                method: 'GET',
+                success: function(response) {
+                    years = response;
+                    var yearSelect = document.getElementById('yearFilter');
+                    years.forEach(year => {
+                        var option = document.createElement('option');
+                        option.value = year;
+                        option.textContent = year;
+                        yearSelect.appendChild(option);
+                    });
+                },
+                error: function() {
+                    // Jika gagal, tampilkan pesan error
+                    console.log('Error ketika mengambil data department.');
+                }
+            });
             // get department list
             $.ajax({
                 url: '{{ route('get.department.data') }}',
@@ -163,7 +184,7 @@
             });
 
             // Init datatable
-            var table = $('#budgetTable').DataTable({
+            table = $('#budgetTable').DataTable({
                 dom: 'Bfrtip',
                 buttons: [
                     'copy', 'csv', 'excel', 'pdf', 'print'
@@ -171,6 +192,9 @@
                 ajax: {
                     url: '{{ route('get.budget.data') }}',
                     type: 'GET',
+                    data: function (d) {
+                        d.year = $('#yearFilter').val();
+                    },
                     dataSrc: function(response) {
                         console.log(response);
                         budgets = response;
@@ -204,7 +228,7 @@
                                     @csrf
                                     @method('DELETE')
                                     <a href="javascript:void(0)" class="text-dark delete ms-2"
-                                        data-budget-id="${id}" onClick="confirmBudgetDelete(this)">
+                                        data-budget-id="${id}" onClick="event.preventDefault(); confirmBudgetDelete(this)">
                                         <i class="ti ti-trash fs-5"></i>
                                     </a>
                                 </form>
@@ -216,10 +240,145 @@
             });
         });
 
+        // Function untuk menghapus edit div
+        function clearEditDiv()
+        {
+            const container = document.getElementById('editModalDiv');
+            const background = document.getElementById('modalBackground');
+            // Simpan elemen background
+            const preserved = background.cloneNode(true);
+            // Kosongkan container
+            container.innerHTML = '';
+            // Masukkan kembali elemen yang disimpan
+            container.appendChild(preserved);
+        }
+
+        // Function untuk konfirmasi create budget
+        function confirmBudgetCreate(button){
+            var form = button.closest('form');
+            var actionUrl = form.getAttribute('action');
+            
+            // Cek validasi form 
+            if (!form.checkValidity()) {
+                form.reportValidity(); // Menampilkan pesan default browser
+                return;
+            }
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, create it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Tutup edit modal div
+                    const alpineData = Alpine.closestDataStack(button)?.[0];
+                    if (alpineData) {
+                        alpineData.open = false;
+                    }
+
+                    // Kirim form
+                    $.ajax({
+                        url: actionUrl,
+                        method: 'POST',
+                        data: $(form).serialize(), // Ambil semua input form
+                        success: function(response) {
+                            // Alert data berhasil
+                            Swal.fire({
+                                toast: true,
+                                icon: 'success',
+                                title: response.message,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                            // Bersihkan edit div
+                            clearEditDiv();
+
+                            // Refresh data table
+                            table.ajax.reload(null, false); // Reload data dari server
+
+                            // reset form
+                            form.reset();
+                        },
+                        error: function(xhr) {
+                            // Alert data gagal
+                            Swal.fire({
+                                toast: true,
+                                icon: 'error',
+                                title: xhr.responseJSON.message,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        // Function untuk konfirmasi edit budget
+        function confirmBudgetEdit(button, divId){
+            var form = button.closest('form');
+            var actionUrl = form.getAttribute('action');
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, edit it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Tutup edit modal div
+                    openEditModal(divId);
+
+                    // Kirim form
+                    $.ajax({
+                        url: actionUrl,
+                        method: 'PUT',
+                        data: $(form).serialize(), // Ambil semua input form
+                        success: function(response) {
+                            // Alert data berhasil
+                            Swal.fire({
+                                toast: true,
+                                icon: 'success',
+                                title: response.message,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                            // Bersihkan edit div
+                            clearEditDiv();
+
+                            // Refresh data table
+                            table.ajax.reload(null, false); // Reload data dari server
+                        },
+                        error: function(xhr) {
+                            // Alert data gagal
+                            Swal.fire({
+                                toast: true,
+                                icon: 'error',
+                                title: xhr.responseJSON.message,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        }
+                    });
+                }
+            });
+        }
 
         // Function untuk konfirmasi delete budget
         function confirmBudgetDelete(button){
             var budgetId = button.getAttribute('data-budget-id');
+            var form = document.getElementById('delete-form-' + budgetId);
+            var actionUrl = form.getAttribute('action');
             Swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
@@ -230,7 +389,39 @@
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    document.getElementById('delete-form-' + budgetId).submit();
+                    // Kirim form
+                    $.ajax({
+                        url: actionUrl,
+                        method: 'DELETE',
+                        data: $(form).serialize(), // Ambil semua input form
+                        success: function(response) {
+                            // Alert data berhasil
+                            Swal.fire({
+                                toast: true,
+                                icon: 'success',
+                                title: response.message,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                            // Bersihkan edit div
+                            clearEditDiv();
+
+                            // Refresh data table
+                            table.ajax.reload(null, false); // Reload data dari server
+                        },
+                        error: function(xhr) {
+                            // Alert data gagal
+                            Swal.fire({
+                                toast: true,
+                                icon: 'error',
+                                title: xhr.responseJSON.message,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        }
+                    });
                 }
             });
         }
@@ -259,7 +450,7 @@
                                 <h1 class="text-6xl font-bold text-yellow-700 font-mono">Update Budget-Allocation</h1>
                             </div>
                             
-                            <div class="w-72 h-32 ml-auto">
+                            <div class="w-72 h-32 ml-auto mb-5">
                                 <img src="{{ asset('assets/images/logo/logowhite.png')  }}" class="dark-logo" alt="Logo-Dark">
                                 <img src="{{ asset('assets/images/logo/logo.png') }}" class="light-logo" alt="Logo-light">
                             </div>
@@ -306,7 +497,7 @@
                                     </table>
                                 </div>
                                 <div class="flex items-center justify-end mx-4 mt-4 gap-2">
-                                    <button type="submit" class="btn btn-success">Simpan</button>
+                                    <button type="submit" class="btn btn-success" onClick="event.preventDefault(); confirmBudgetEdit(this, ${id})">Simpan</button>
                                     <button type="button" class="btn btn-danger" data-modal-hide="editContactModal${id}" onClick="openEditModal(${id})">Exit</button>
                                 </div>
                             </div>
@@ -322,7 +513,6 @@
         function getBudgetNumber(){
             // Get no budget new
             var departmentSelectValue = document.getElementById('department').value;
-            console.log(departmentSelectValue);
             $.ajax({
                 url: '{{ route('get.budget.no') }}',
                 method: 'GET',
@@ -330,7 +520,6 @@
                     departmentId: departmentSelectValue
                 },
                 success: function(response) {
-                    console.log(response);
                     var no = document.getElementById('no');
                     no.value = response;
                 },
@@ -341,7 +530,11 @@
             });
 
         }
-
+        
+        
+        $('#yearFilter').on('change', function() {
+            table.ajax.reload();  // Reload data table dengan filter department
+        });
     </script>
     @endpush
 

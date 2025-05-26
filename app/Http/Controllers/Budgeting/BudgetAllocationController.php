@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Budgeting;
 use App\Http\Controllers\Controller;
 use App\Models\Budgeting\BudgetAllocation;
 use App\Models\Department;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -81,15 +82,14 @@ class BudgetAllocationController extends Controller
 
             // Commit transaksi
             DB::commit();
-            Alert::toast('Budget-allocation successfully created!', 'success');
-            return redirect()->route('budget-allocation.index');
-            return response()->json('');
+            return response()->json(['message' => 'Budget-allocation successfully created!'], 200);
 
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
             DB::rollback();
-            Alert::toast('There was an error creating the budget-allocation.'.$e->getMessage(), 'error');
-            return back();
+            return response()->json([
+                'message' => 'There was an error creating the budget-allocation: ' . $e->getMessage()
+            ], 500); // status 500 = server error
         }
     }
 
@@ -150,14 +150,14 @@ class BudgetAllocationController extends Controller
 
             // Commit transaksi
             DB::commit();
-            Alert::toast('Budget-allocation successfully updated!', 'success');
-            return redirect()->route('budget-allocation.index');
+            return response()->json(['message' => 'Budget-allocation successfully updated!'], 200);
 
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
             DB::rollback();
-            Alert::toast('There was an error updating the budget-allocation.'.$e->getMessage(), 'error');
-            return back();
+            return response()->json([
+                'message' => 'There was an error updating the budget-allocation: ' . $e->getMessage()
+            ], 500); // status 500 = server error
         }
     }
 
@@ -191,19 +191,22 @@ class BudgetAllocationController extends Controller
 
             // Commit transaksi
             DB::commit();
-            Alert::toast('Budget-allocation successfully deleted!', 'success');
-            return redirect()->route('budget-allocation.index');
+            return response()->json(['message' => 'Budget-allocation successfully deleted!'], 200);
 
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
             DB::rollback();
-            Alert::toast('There was an error deleting the budget-allocation.'.$e->getMessage(), 'error');
-            return back();
+            return response()->json([
+                'message' => 'There was an error deleting the budget-allocation: ' . $e->getMessage()
+            ], 500); // status 500 = server error
         }
     }
 
-    public function getBudgetData(){
-        $budgets = BudgetAllocation::with('department.wallet')->get();
+    public function getBudgetData(Request $request){
+        $year = $request->has('year') && $request->year != '' 
+            ? $request->year 
+            : Carbon::now()->year;
+        $budgets = BudgetAllocation::with('department.wallet')->whereYear('created_at', $year)->get();
         return response()->json($budgets);
     }
     
@@ -227,5 +230,15 @@ class BudgetAllocationController extends Controller
 
         // Menghasilkan nomor alokasi baru
         return "CAPEX/{$departmentCode}/{$year}/{$newNumber}";
+    }
+
+    public function getBudgetAllocationYear()
+    {
+        $years = BudgetAllocation::select(DB::raw('YEAR(created_at) as year'))
+                ->distinct()
+                ->orderBy('year', 'desc')
+                ->pluck('year');
+
+        return response()->json($years);
     }
 }

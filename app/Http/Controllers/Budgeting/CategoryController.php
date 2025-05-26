@@ -56,14 +56,14 @@ class CategoryController extends Controller
                 ->withProperties(['no' => $category->id, 'action' => 'create', 'category' => $category->name])
                 ->log('Create category ' . $category->name . ' by ' . $user->name . ' at ' . now());
 
-            Alert::toast('Category successfully saved!', 'success');
-            return redirect()->route('category.index');
+            return response()->json(['message' => 'Category successfully created!'], 200);
 
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
             DB::rollback();
-            Alert::toast('There was an error saving the category.'.$e->getMessage(), 'error');
-            return back();
+            return response()->json([
+                'message' => 'There was an error creating the category: ' . $e->getMessage()
+            ], 500); // status 500 = server error
         }
     }
 
@@ -113,14 +113,14 @@ class CategoryController extends Controller
                 ->withProperties(['no' => $category->id, 'action' => 'create', 'category' => $category->name])
                 ->log('Update category ' . $categoryOldName . ' to ' . $category->name . ' by ' . $user->name . ' at ' . now());
 
-            Alert::toast('Category successfully saved!', 'success');
-            return redirect()->route('category.index');
+            return response()->json(['message' => 'Category successfully updated!'], 200);
 
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
             DB::rollback();
-            Alert::toast('There was an error saving the category.'.$e->getMessage(), 'error');
-            return back();
+            return response()->json([
+                'message' => 'There was an error updating the category: ' . $e->getMessage()
+            ], 500); // status 500 = server error
         }
     }
 
@@ -158,14 +158,14 @@ class CategoryController extends Controller
                 
             // Commit transaksi
             DB::commit();
-            Alert::toast('Category successfully deleted!', 'success');
-            return redirect()->route('category.index');
+            return response()->json(['message' => 'Category successfully deleted!'], 200);
 
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
             DB::rollback();
-            Alert::toast('There was an error deleting the Category. '.$e->getMessage(), 'error');
-            return back();
+            return response()->json([
+                'message' => 'There was an error deleting the Category: ' . $e->getMessage()
+            ], 500); // status 500 = server error
         }
     }
 

@@ -50,11 +50,15 @@ class BudgetRequestController extends Controller
             ]);
 
             $toDept = Department::findorfail($validatedData['to_department']);
-
-            if($toDept->balance < $validatedData['amount']){
+            $year = now()->format('Y');
+            if(!$toDept->hasWallet($year))
+            {
                 DB::rollback();
-                Alert::toast("The selected department's budget is insufficient.", 'error');
-                return back();
+                throw new \Exception("The selected department has insufficient budget.");
+            }
+            if($toDept->balanceForYear($year) < $validatedData['amount']){
+                DB::rollback();
+                throw new \Exception("The selected department has insufficient budget.");
             }
 
 
@@ -94,14 +98,14 @@ class BudgetRequestController extends Controller
 
             // Commit transaksi
             DB::commit();
-            Alert::toast('Budget-request successfully created!', 'success');
-            return redirect()->route('budget-request.index');
+            return response()->json(['message' => 'Budget-request successfully created!'], 200);
 
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
             DB::rollback();
-            Alert::toast('There was an error creating the budget-request.'.$e->getMessage(), 'error');
-            return back();
+            return response()->json([
+                'message' => 'There was an error creating the budget-request: ' . $e->getMessage()
+            ], 500); // status 500 = server error
         }
     }
 
@@ -145,11 +149,15 @@ class BudgetRequestController extends Controller
 
             $fromDept = Department::findOrFail($budget->from_department_id);
             $toDept = Department::findOrFail($budget->to_department_id);
-
-            if($toDept->balance < $validatedData['amount']){
+            $year = now()->format('Y');
+            if(!$toDept->hasWallet($year))
+            {
                 DB::rollback();
-                Alert::toast("The selected department's budget is insufficient.", 'error');
-                return back();
+                throw new \Exception("Your department has insufficient budget this year.");
+            }
+            if($toDept->balanceForYear($year) < $validatedData['amount']){
+                DB::rollback();
+                throw new \Exception("Your department has insufficient budget this year.");
             }
 
 
@@ -163,7 +171,7 @@ class BudgetRequestController extends Controller
                 {
                     $review = $validatedData['reviewTextArea'];
                 }
-                $toDept->transfer($fromDept, $budget->amount);
+                $toDept->getWallet($year)->transfer($fromDept->getWallet($year), $budget->amount);
             }
             else
             {   
@@ -202,14 +210,14 @@ class BudgetRequestController extends Controller
 
             // Commit transaksi
             DB::commit();
-            Alert::toast('Budget-request successfully ' . $validatedData['action'] .'!' , 'success');
-            return redirect()->route('budget-request.approval');
+            return response()->json(['message' => 'Budget-request successfully ' . $validatedData['action'] .'!'], 200);
 
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
             DB::rollback();
-            Alert::toast('There was an error approving the budget-request.'.$e->getMessage(), 'error');
-            return back();
+            return response()->json([
+                'message' => 'There was an error updating the budget-request: ' . $e->getMessage()
+            ], 500); // status 500 = server error
         }
     }
 
@@ -218,6 +226,7 @@ class BudgetRequestController extends Controller
      */
     public function destroy(string $id)
     {
+        return response()->json(['message' => 'Budget-request cannot be deleted!']);
         // Mulai transaction untuk memastikan integritas data
         DB::beginTransaction();
 
@@ -254,19 +263,25 @@ class BudgetRequestController extends Controller
                 
             // Commit transaksi
             DB::commit();
-            Alert::toast('Budget-request successfully deleted!', 'success');
-            return redirect()->route('budget-request.index');
+            return response()->json(['message' => 'Budget-request successfully deleted!'], 200);
 
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
             DB::rollback();
-            Alert::toast('There was an error deleting the budget-request. '.$e->getMessage(), 'error');
-            return back();
+            return response()->json([
+                'message' => 'There was an error deleting the budget-request: ' . $e->getMessage()
+            ], 500); // status 500 = server error
         }
     }
 
     public function getBudgetRequestList(){
-        $budgets = BudgetRequest::with('fromDepartment', 'toDepartment')->get();
+        $user = Auth::user();
+        $query = BudgetRequest::with('fromDepartment', 'toDepartment');
+        if(!$user->hasRole(['super-admin', 'admin']))
+        {
+            $query->where('from_department_id', $user->department->id);
+        }
+        $budgets = $query->get();
         return response()->json($budgets);
     }
 
@@ -277,7 +292,7 @@ class BudgetRequestController extends Controller
         // Ambil departemen berdasarkan ID
         $department = Department::findOrFail($departmentId);
         $departmentCode = str_replace(" ","", strtoupper(substr($department->department_name, 0, 3))); // Ambil 3 huruf pertama nama departemen
-        $year = now()->addYear()->format('y');
+        $year = now()->format('y');
         // Cari alokasi terakhir yang dimulai dengan CAPEX/{kodeDepartemen}/{tahun}
         $lastAllocation = BudgetRequest::where('budget_req_no', 'like', 'CAPEX/REQ/'.$departmentCode.'/'.$year.'/%')
                                         ->latest()
@@ -317,5 +332,16 @@ class BudgetRequestController extends Controller
             return response()->json(null);
         }
 
+    }
+
+
+    public function getBudgetRequestYear()
+    {
+        $years = BudgetRequest::select(DB::raw('YEAR(created_at) as year'))
+                ->distinct()
+                ->orderBy('year', 'desc')
+                ->pluck('year');
+
+        return response()->json($years);
     }
 }

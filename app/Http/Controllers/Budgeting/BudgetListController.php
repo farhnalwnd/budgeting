@@ -100,14 +100,14 @@ class BudgetListController extends Controller
 
             // Commit transaksi
             DB::commit();
-            Alert::toast('Budget-list successfully created!', 'success');
-            return redirect()->route('budget-list.index');
+            return response()->json(['message' => 'Budget-list successfully created!'], 200);
 
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
             DB::rollback();
-            Alert::toast('There was an error creating the budget-list. '.$e->getMessage(), 'error');
-            return back();
+            return response()->json([
+                'message' => 'There was an error creating the budget-list: ' . $e->getMessage()
+            ], 500); // status 500 = server error
         }
     }
 
@@ -199,14 +199,14 @@ class BudgetListController extends Controller
 
             // Commit transaksi
             DB::commit();
-            Alert::toast('Budget-list successfully updated!', 'success');
-            return redirect()->route('budget-list.index');
+            return response()->json(['message' => 'Budget-list successfully updated!'], 200);
 
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
             DB::rollback();
-            Alert::toast('There was an error updating the budget-list. '.$e->getMessage(), 'error');
-            return back();
+            return response()->json([
+                'message' => 'There was an error updating the budget-list: ' . $e->getMessage()
+            ], 500); // status 500 = server error
         }
     }
 
@@ -248,14 +248,14 @@ class BudgetListController extends Controller
 
             // Commit transaksi
             DB::commit();
-            Alert::toast('Budget-list successfully deleted!', 'success');
-            return redirect()->route('budget-list.index');
+            return response()->json(['message' => 'Budget-list successfully deleted!'], 200);
 
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
             DB::rollback();
-            Alert::toast('There was an error deleting the budget-list. '.$e->getMessage(), 'error');
-            return back();
+            return response()->json([
+                'message' => 'There was an error deleting the budget-list: ' . $e->getMessage()
+            ], 500); // status 500 = server error
         }
     }
 
@@ -296,5 +296,15 @@ class BudgetListController extends Controller
             DB::rollback();
             return $e;
         }
+    }
+
+    public function getBudgetListYear()
+    {
+        $years = BudgetList::select(DB::raw('YEAR(created_at) as year'))
+                ->distinct()
+                ->orderBy('year', 'desc')
+                ->pluck('year');
+
+        return response()->json($years);
     }
 }

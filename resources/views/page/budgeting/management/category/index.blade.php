@@ -100,7 +100,7 @@
                             </table>
                         </div>
                         <div class="flex items-center justify-end mx-4 mt-4 gap-2">
-                            <button type="submit" class="btn btn-success">Simpan</button>
+                            <button type="button" class="btn btn-success" onClick="event.preventDefault(); confirmCategoryCreate(this)">Simpan</button>
                             <button @click="open = !open" type="button" class="btn btn-danger">Exit</button>
                         </div>
                     </div>
@@ -108,56 +108,6 @@
             </div>
         </div>
     </section>
-
-    {{-- {-- Create Category Modal --} --}}
-    <div id="createCategoryModal" tabindex="-1" aria-hidden="true"
-        class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-        <div class="relative p-4 w-full max-w-md max-h-full">
-            <div class="relative bg-white rounded-lg shadow dark:bg-gray-700" style="margin-top: 10%;">
-                <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-                    <h3 class="text-3xl font-semibold text-white">Create Category</h3>
-                    <button type="button"
-                        class="end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                        data-modal-hide="createCategoryModal">
-                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                            viewbox="0 0 14 14">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"></path>
-                        </svg>
-                        <span class="sr-only">Close modal</span>
-                    </button>
-                </div>
-                <div class="p-4 md:p-5">
-                    @if ($errors->any())
-                        <div class="alert alert-danger">
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-                    <form class="space-y-4" action="{{ route('category.store') }}" method="POST" id="createCategoryForm">
-                        @csrf
-                        <div class="form-group">
-                            <label class="form-label text-white text-xl">Category Name<span
-                                    class="text-danger">*</span></label>
-                            <div class="controls">
-                                <input type="text" name="name" id="name"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-xl rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                                    required placeholder="Category Name">
-                                <div class="help-block"></div>
-                            </div>
-                        </div>
-                        <button type="submit"
-                            class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                            Create
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
 
 
     <!-- Modal Edit User -->
@@ -169,9 +119,10 @@
     @push('scripts')
     <script>
         var categories = null;
+        var table = null;
         document.addEventListener('DOMContentLoaded', function() {
             // Init datatable
-            var table = $('#categoryTable').DataTable({
+            table = $('#categoryTable').DataTable({
                 dom: 'Bfrtip',
                 buttons: [
                     'copy', 'csv', 'excel', 'pdf', 'print'
@@ -206,7 +157,7 @@
                                     @csrf
                                     @method('DELETE')
                                     <a href="javascript:void(0)" class="text-dark delete ms-2"
-                                        data-category-id="${id}" onClick="confirmCategoryDelete(this)">
+                                        data-category-id="${id}" onClick="event.preventDefault(); confirmCategoryDelete(this)">
                                         <i class="ti ti-trash fs-5"></i>
                                     </a>
                                 </form>
@@ -218,9 +169,152 @@
             });
         });
 
+        // Function untuk menghapus edit div
+        function clearEditDiv()
+        {
+            const container = document.getElementById('editModalDiv');
+            const background = document.getElementById('modalBackground');
+            // Simpan elemen background
+            const preserved = background.cloneNode(true);
+            // Kosongkan container
+            container.innerHTML = '';
+            // Masukkan kembali elemen yang disimpan
+            container.appendChild(preserved);
+        }
+
+        // Function untuk konfirmasi create category
+        function confirmCategoryCreate(button){
+            var form = button.closest('form');
+            var actionUrl = form.getAttribute('action');
+
+            // Cek validasi form 
+            if (!form.checkValidity()) {
+                form.reportValidity(); // Menampilkan pesan default browser
+                return;
+            }
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, create it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Tutup edit modal div
+                    const alpineData = Alpine.closestDataStack(button)?.[0];
+                    if (alpineData) {
+                        alpineData.open = false;
+                    }
+
+                    // Kirim form
+                    $.ajax({
+                        url: actionUrl,
+                        method: 'POST',
+                        data: $(form).serialize(), // Ambil semua input form
+                        success: function(response) {
+                            // Alert data berhasil
+                            Swal.fire({
+                                toast: true,
+                                icon: 'success',
+                                title: response.message,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                            // Bersihkan edit div
+                            clearEditDiv();
+
+                            // Refresh data table
+                            table.ajax.reload(null, false); // Reload data dari server
+
+                            // reset form
+                            form.reset();
+                        },
+                        error: function(xhr) {
+                            // Alert data gagal
+                            Swal.fire({
+                                toast: true,
+                                icon: 'error',
+                                title: xhr.responseJSON.message,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        // Function untuk konfirmasi edit category
+        function confirmCategoryEdit(button, divId){
+            var form = button.closest('form');
+            var actionUrl = form.getAttribute('action');
+            
+            // Cek validasi form 
+            if (!form.checkValidity()) {
+                form.reportValidity(); // Menampilkan pesan default browser
+                return;
+            }
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, edit it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Tutup edit modal div
+                    openEditModal(divId);
+
+                    // Kirim form
+                    $.ajax({
+                        url: actionUrl,
+                        method: 'PUT',
+                        data: $(form).serialize(), // Ambil semua input form
+                        success: function(response) {
+                            // Alert data berhasil
+                            Swal.fire({
+                                toast: true,
+                                icon: 'success',
+                                title: response.message,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                            // Bersihkan edit div
+                            clearEditDiv();
+
+                            // Refresh data table
+                            table.ajax.reload(null, false); // Reload data dari server
+                        },
+                        error: function(xhr) {
+                            // Alert data gagal
+                            Swal.fire({
+                                toast: true,
+                                icon: 'error',
+                                title: xhr.responseJSON.message,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
         // Function untuk konfirmasi delete category
         function confirmCategoryDelete(button){
             var categoryId = button.getAttribute('data-category-id');
+            var form = document.getElementById('delete-form-' + categoryId);
+            var actionUrl = form.getAttribute('action');
             Swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
@@ -231,7 +325,39 @@
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    document.getElementById('delete-form-' + categoryId).submit();
+                    // Kirim form
+                    $.ajax({
+                        url: actionUrl,
+                        method: 'DELETE',
+                        data: $(form).serialize(), // Ambil semua input form
+                        success: function(response) {
+                            // Alert data berhasil
+                            Swal.fire({
+                                toast: true,
+                                icon: 'success',
+                                title: response.message,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                            // Bersihkan edit div
+                            clearEditDiv();
+
+                            // Refresh data table
+                            table.ajax.reload(null, false); // Reload data dari server
+                        },
+                        error: function(xhr) {
+                            // Alert data gagal
+                            Swal.fire({
+                                toast: true,
+                                icon: 'error',
+                                title: xhr.responseJSON.message,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        }
+                    });
                 }
             });
         }
@@ -260,7 +386,7 @@
                                 <h1 class="text-6xl font-bold text-yellow-700 font-mono">Update Category</h1>
                             </div>
                             
-                            <div class="w-72 h-32 ml-auto">
+                            <div class="w-72 h-32 ml-auto mb-5">
                                 <img src="{{ asset('assets/images/logo/logowhite.png')  }}" class="dark-logo" alt="Logo-Dark">
                                 <img src="{{ asset('assets/images/logo/logo.png') }}" class="light-logo" alt="Logo-light">
                             </div>
@@ -294,7 +420,7 @@
                                     </table>
                                 </div>
                                 <div class="flex items-center justify-end mx-4 mt-4 gap-2">
-                                    <button type="submit" class="btn btn-success">Simpan</button>
+                                    <button type="submit" class="btn btn-success" onClick="event.preventDefault(); confirmCategoryEdit(this, ${id})">Simpan</button>
                                     <button type="button" class="btn btn-danger" data-modal-hide="editContactModal${id}" onClick="openEditModal(${id})">Exit</button>
                                 </div>
                             </div>
