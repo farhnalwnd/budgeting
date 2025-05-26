@@ -76,7 +76,9 @@ class BudgetListController extends Controller
             
             $result = $this->calculateBudget($budget->budget_allocation_no);
             if($result instanceof \Exception){
-                throw new \Exception("Failed to calculate budget.");
+                DB::rollback();
+                dd($result);
+                throw new \Exception("Failed to calculate budget. " . $result);
             }
 
             activity()
@@ -273,12 +275,13 @@ class BudgetListController extends Controller
             $departmentBudget = $budget->total_amount ?? 0;
 
             $finalAmount = $totalAmount - $departmentBudget;
+            $year = now()->addYear()->format('Y');
             if($finalAmount > 0){
-                $department->deposit(abs($finalAmount));
+                $department->depositToYear($year, abs($finalAmount));
             }
             else if($finalAmount < 0)
             {
-                $department->withdraw(abs($finalAmount));
+                $department->withdrawFromYear($year, abs($finalAmount));
             }
             $departmentBudget += $finalAmount;
             $budget->update([

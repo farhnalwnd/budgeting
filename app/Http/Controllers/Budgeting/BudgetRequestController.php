@@ -277,9 +277,9 @@ class BudgetRequestController extends Controller
         // Ambil departemen berdasarkan ID
         $department = Department::findOrFail($departmentId);
         $departmentCode = str_replace(" ","", strtoupper(substr($department->department_name, 0, 3))); // Ambil 3 huruf pertama nama departemen
-
-        // Cari alokasi terakhir yang dimulai dengan CAPEX/{kodeDepartemen}
-        $lastAllocation = BudgetRequest::where('budget_req_no', 'like', 'CAPEX/REQ/'.$departmentCode.'/%')
+        $year = now()->addYear()->format('y');
+        // Cari alokasi terakhir yang dimulai dengan CAPEX/{kodeDepartemen}/{tahun}
+        $lastAllocation = BudgetRequest::where('budget_req_no', 'like', 'CAPEX/REQ/'.$departmentCode.'/'.$year.'/%')
                                         ->latest()
                                         ->first();
                                         
@@ -290,7 +290,7 @@ class BudgetRequestController extends Controller
         $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
 
         // Menghasilkan nomor alokasi baru
-        return "CAPEX/REQ/{$departmentCode}/{$newNumber}";
+        return "CAPEX/REQ/{$departmentCode}/{$year}/{$newNumber}";
     }
     
     

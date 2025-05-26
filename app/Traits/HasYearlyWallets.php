@@ -2,8 +2,21 @@
 
 namespace App\Traits;
 
+use Bavix\Wallet\Internal\Exceptions\ModelNotFoundException;
+use Bavix\Wallet\Models\Wallet as WalletModel;
+
+
 trait HasYearlyWallets
 {
+
+    public function getWallet(string $slug): ?WalletModel
+    {
+        try {
+            return $this->getWalletOrFail($slug);
+        } catch (ModelNotFoundException) {
+            return null;
+        }
+    }
     /**
      * Dapatkan wallet berdasarkan tahun tertentu (otomatis dibuat jika belum ada).
      */

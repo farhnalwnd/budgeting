@@ -5,13 +5,16 @@ namespace App\Http\Controllers\Budgeting;
 use App\Http\Controllers\Controller;
 use App\Models\Budgeting\BudgetAllocation;
 use App\Models\Department;
+use App\Traits\HasYearlyWallets;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use RealRashid\SweetAlert\Facades\Alert;
 
+
 class BudgetAllocationController extends Controller
 {
+    use HasYearlyWallets;
     /**
      * Display a listing of the resource.
      */
@@ -51,6 +54,11 @@ class BudgetAllocationController extends Controller
                 'description' => $validatedData['description'] ?? null,
                 'allocated_by' => $user->nik
             ]);
+
+            // bikin wallet
+            $year = now()->addYear()->format('Y');
+            $dept = Department::findOrFail($validatedData['department']);
+            $dept->getYearlyWallet($year);
             
             activity()
                 ->performedOn($budget)
@@ -70,6 +78,7 @@ class BudgetAllocationController extends Controller
             DB::commit();
             Alert::toast('Budget-allocation successfully created!', 'success');
             return redirect()->route('budget-allocation.index');
+            return response()->json('');
 
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
@@ -199,9 +208,9 @@ class BudgetAllocationController extends Controller
         // Ambil departemen berdasarkan ID
         $department = Department::findOrFail($departmentId);
         $departmentCode = str_replace(" ","", strtoupper(substr($department->department_name, 0, 3))); // Ambil 3 huruf pertama nama departemen
-
-        // Cari alokasi terakhir yang dimulai dengan CAPEX/{kodeDepartemen}
-        $lastAllocation = BudgetAllocation::where('budget_allocation_no', 'like', 'CAPEX/'.$departmentCode.'/%')
+        $year = now()->addYear()->format('y');
+        // Cari alokasi terakhir yang dimulai dengan CAPEX/{kodeDepartemen}/{tahun}
+        $lastAllocation = BudgetAllocation::where('budget_allocation_no', 'like', 'CAPEX/'.$departmentCode.'/'.$year.'/%')
                                         ->latest()
                                         ->first();
 
@@ -212,6 +221,6 @@ class BudgetAllocationController extends Controller
         $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
 
         // Menghasilkan nomor alokasi baru
-        return "CAPEX/{$departmentCode}/{$newNumber}";
+        return "CAPEX/{$departmentCode}/{$year}/{$newNumber}";
     }
 }
