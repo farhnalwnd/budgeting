@@ -11,11 +11,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use App\Models\Budgeting\Purchase;
+use App\Traits\HasYearlyWallets;
 
 class Department extends Model implements Wallet
 {
 
-    use HasFactory, HasWallet;
+    use HasFactory, HasWallet, HasYearlyWallets;
     protected $connection = 'mysql';
     protected $guarded = ['id'];
 
