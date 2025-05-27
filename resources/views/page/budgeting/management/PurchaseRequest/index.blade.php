@@ -46,6 +46,9 @@
 
         <!-- Card Data Display -->
         <div class="card">
+            <div class="card-header">
+                <h1 class="card-title text-2xl font-medium">Purchase Request</h1>
+            </div>
             <div class="card-body">
                 <table id="usersTable" class="table table-bordered w-full">
                     <thead>
@@ -64,76 +67,40 @@
         </div>
         
         <!-- modal detail -->
-         <div class="hidden">
-        <div class="text-black fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-            <div class="bg-white p-6 rounded-lg w-2/3">
-                <!-- Header -->
-                <div class="flex justify-start">
-                    <div class="flex items-center">
-                        <h1 class="text-6xl font-bold text-yellow-700 font-mono">PURCHASE</h1>
+        <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="detailModalLabel">Detail Purchase</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                     </div>
-                    <img src="/sinarlogo.png" alt="logo" class="w-72 h-32 ml-auto">
-                </div>
-                <hr class="my-10 border-t-2 rounded-md border-slate-900 opacity-90">
-                <!-- Keterangan -->
-                <div class="grid grid-cols-5 gap-2 text-left py-3">
-                    <div class="col-span-4">
-                        <h1 class="font-bold text-lg">ON:</h1>
-                        <h2 class="font-semibold text-base">{{$purchases->department->department_name}}</h2>
-                    </div>
-                    <div class="pl-7">
-                        <h1 class="font-bold text-lg">Budget No:</h1>
-                        <span class="font-semibold text-base">{{$purchases->purchase_no}}</span>
-                    </div>
-                    <div class="col-span-4">
-                        <h1 class="font-bold text-lg mb-1">DATE:</h1>
-                        <span class="font-semibold text-base">{{
-                            \Carbon\Carbon::parse($purchases->updated_at)->format('d M y') }}</span>
-                    </div>
-                    <div class="pl-7">
-                        <h1 class="font-bold text-lg mb-1">Status:</h1>
-                        <span
-                            class="font-semibold text-lg rounded-md p-1 uppercase text-emerald-700 border-2 border-emerald-600 border-opacity-50">{{$purchases->status}}</span>
-                    </div>
-                </div>
-        
-                <!-- * table -->
-                <div class="container pt-10">
-                    <div x-data="{ scrolled: false }" @scroll="scrolled = $el.scrollTop > 0 || false">
-                        <table class="table-auto w-full border-collapse">
-                            <thead :class="scrolled ? 'bg-white shadow-md border-none' : ''" class="sticky top-0 z-10">
+                    <div class="modal-body">
+                        <p><strong>No Purchase:</strong> <span id="modal-purchase-no"></span></p>
+                        <p><strong>Status:</strong> <span id="modal-status"></span></p>
+                        <p><strong>Grand Total:</strong> <span id="modal-grand-total"></span></p>
+                    
+                        <hr>
+                        <h6>Item Detail:</h6>
+                        <table class="table table-bordered">
+                            <thead>
                                 <tr>
-                                    <th class="border-2 border-gray-800 text-center w-2/6">ITEM NAME</th>
-                                    <th class="border-2 border-gray-800 text-center w-1/6">HARGA (RP)</th>
-                                    <th class="border-2 border-gray-800 text-center w-1/6">JML</th>
-                                    <th class="border-2 border-gray-800 text-center w-1/6">TOTAL</th>
-                                    <th class="border-2 border-gray-800 text-center w-1/6">REMARK</th>
+                                    <th>Nama Item</th>
+                                    <th>Jumlah</th>
+                                    <th>Harga</th>
                                 </tr>
                             </thead>
-                            <!-- <tbody class="overflow-y-auto">
-                            </tbody> -->
+                            <tbody id="modal-detail-table">
+                                <!-- Diisi lewat JS -->
+                            </tbody>
                         </table>
                     </div>
-                </div>
-        
-                <div class="grid grid-cols-4 gap-3 mt-20 text-left">
-                    <div class="col-span-3">
-                        <p>note:</p>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                     </div>
-                    <div class="flex justify-between">
-                        <p class="uppercase font-semibold text-lg px-5 text-right">grand total :</p>
-                        <p class="text-right"> Rp.
-                            {{number_format($purchases->grand_total)}}</p>
-                    </div>
-                </div>
-                <div>
-                </div>
-                <div class="flex justify-between items-center mb-4">
-                    <button @click="openModal = false" class="text-red-500 font-bold text-2xl ml-auto">&times;</button>
                 </div>
             </div>
         </div>
-        </div>
+
         
 
 <!-- Modal -->
@@ -296,7 +263,6 @@
                     url: "{{route('purchase.data')}}",
                     type: 'GET',
                     dataSrc:function(data){
-                        console.log(data);
                         return data;
                     }
                 },
@@ -316,15 +282,48 @@
                 orderable: false,
                 searchable: false,
                     render: function (data, type, row, meta) {
-                        return `<button class="btn-detail bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded">Detail</button>`;
+                        return `<button class="btn-detail bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded" data-purchase_no="${row.purchase_no}">Detail</button>`;
                     }}
                 ],
             });
             // Event delegation karena tombol di-generate via AJAX
-            $(document).on('click', '.open-modal', function () {
-                var nama = $(this).data('nama');
-                $('#modalNama').text(nama);
-                $('#modalDetail').modal('show');
+                $('#usersTable').on('click', '.btn-detail', function () {
+                    var purchase_no = $(this).data('purchase_no');
+                    var purchase_no_encoded = encodeURIComponent(purchase_no);
+
+                    $.ajax({
+                        url: '/purchases/' + purchase_no_encoded + '/details',
+                        method: 'GET',
+                        success: function (data) {
+                            // Pastikan data memiliki property yang diharapkan
+                            $('#modal-purchase-no').text(data.purchase_no ?? '-');
+                            $('#modal-status').text(data.status ?? '-');
+                            $('#modal-grand-total').text(data.grand_total ?? '-');
+
+                            // Kosongkan tabel sebelum isi ulang
+                            $('#modal-detail-table').empty();
+
+                            if (Array.isArray(data.detail)) {
+                                data.detail.forEach(function (item) {
+                                    $('#modal-detail-table').append(`
+                                    <tr>
+                                        <td>${item.name_item}</td>
+                                        <td>${item.amount}</td>
+                                        <td>${item.price}</td>
+                                    </tr>
+                                `);
+                                });
+                            } else {
+                                $('#modal-detail-table').append(`<tr><td colspan="3">No details found.</td></tr>`);
+                            }
+
+                            $('#detailModal').modal('show');
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("AJAX Error:", xhr.responseText);
+                            alert("Failed to fetch purchase details.");
+                        }
+                    });            
             });
 
         function toRupiah(number) {

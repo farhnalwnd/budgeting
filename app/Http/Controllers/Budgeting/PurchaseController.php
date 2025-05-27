@@ -483,12 +483,16 @@ class PurchaseController extends Controller
         return response()->json($data);
     }
 
+
     public function getDetails($purchase_no)
     {
+        $purchase_no = urldecode($purchase_no);
         $details = PurchaseDetail::where('purchase_no', $purchase_no)->get();
-        if(!$details){
-            return response()->json(['message'=>'purchase not found'], 404);
+
+        if ($details->isEmpty()) {
+            return response()->json(['message' => 'purchase details not found'], 404);
         }
+
         return response()->json($details);
     }
             
