@@ -87,6 +87,7 @@ Route::middleware('auth')->group(function () {
         Route::get('getCategoryData', [CategoryController::class, 'getCategoryData'])->name('get.category.data');
         Route::get('getBudgetAllocationYear', [BudgetAllocationController::class, 'getBudgetAllocationYear'])->name('get.budget-allocation.year');
         Route::get('getBudgetData', [BudgetAllocationController::class, 'getBudgetData'])->name('get.budget.data');
+        Route::get('getBudgetAllocationAll', [BudgetAllocationController::class, 'getBudgetAllocationAll'])->name('get.budget-allocation.all');
         Route::get('getBudgetNo', [BudgetAllocationController::class, 'getBudgetNo'])->name('get.budget.no');
         Route::get('getBudgetListYear', [BudgetListController::class, 'getBudgetListYear'])->name('get.budget-list.year');
         Route::get('getBudgetList', [BudgetListController::class, 'getBudgetList'])->name('get.budget.list');

@@ -7,6 +7,7 @@ use App\Models\Budgeting\BudgetApproval;
 use App\Models\Budgeting\BudgetApprover;
 use App\Models\Budgeting\BudgetRequest;
 use App\Models\Department;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -274,14 +275,22 @@ class BudgetRequestController extends Controller
         }
     }
 
-    public function getBudgetRequestList(){
+    public function getBudgetRequestList(Request $request){
+        $year = $request->has('year') && $request->year != '' 
+            ? $request->year 
+            : Carbon::now()->year;
+            
+        $yearSuffix = substr($year, -2); // '2026' -> '26'
+
         $user = Auth::user();
         $query = BudgetRequest::with('fromDepartment', 'toDepartment');
         if(!$user->hasRole(['super-admin', 'admin']))
         {
             $query->where('from_department_id', $user->department->id);
         }
-        $budgets = $query->get();
+        $budgets = $query->where(DB::raw("SUBSTRING_INDEX(SUBSTRING_INDEX(budget_req_no, '/', 4), '/', -1)"), '=', $yearSuffix)
+                        ->get();
+
         return response()->json($budgets);
     }
 
@@ -337,10 +346,11 @@ class BudgetRequestController extends Controller
 
     public function getBudgetRequestYear()
     {
-        $years = BudgetRequest::select(DB::raw('YEAR(created_at) as year'))
-                ->distinct()
-                ->orderBy('year', 'desc')
-                ->pluck('year');
+        $years = BudgetRequest::select(DB::raw("CONCAT('20', SUBSTRING_INDEX(SUBSTRING_INDEX(budget_req_no, '/', 4), '/', -1)) as year"))
+                    ->groupBy('year')
+                    ->orderBy('year', 'desc')
+                    ->pluck('year')
+                    ->toArray();
 
         return response()->json($years);
     }

@@ -181,6 +181,7 @@
                         option.textContent = year;
                         yearSelect.appendChild(option);
                     });
+                    initTable();
                 },
                 error: function() {
                     // Jika gagal, tampilkan pesan error
@@ -230,73 +231,85 @@
                 }
             });
 
-
-            // Init datatable
-            table = $('#budgetTable').DataTable({
-                dom: 'Bfrtip',
-                buttons: [
-                    'copy', 'csv', 'excel', 'pdf', 'print'
-                ],
-                ajax: {
-                    url: '{{ route('get.budget.request.list') }}',
-                    type: 'GET',
-                    data: function (d) {
-                        d.year = $('#yearFilter').val();
-                    },
-                    dataSrc: function(response) {
-                        budgets = response;
-                        return response;
-                    }
-                },
-                columns: [
-                    { 
-                        data: null,
-                        render: function(data, type, row, meta) {
-                            // Menambahkan nomor urut
-                            return meta.row + 1; // meta.row berisi index baris
+            function initTable()
+            {
+                // Init datatable
+                table = $('#budgetTable').DataTable({
+                    dom: 'Bfrtip',
+                    buttons: [
+                        'copy', 'csv', 'excel', 'pdf', 'print'
+                    ],
+                    ajax: {
+                        url: '{{ route('get.budget.request.list') }}',
+                        type: 'GET',
+                        data: function (d) {
+                            d.year = $('#yearFilter').val();
+                        },
+                        dataSrc: function(response) {
+                            budgets = response;
+                            return response;
                         }
                     },
-                    { data: 'budget_req_no', name: 'no' },
-                    { data: 'from_department.department_name', name: 'from_department' },
-                    { data: 'to_department.department_name', name: 'to_department' },
-                    { data: 'amount', name: 'amount' },
-                    { data: 'budget_purchase_no', name: 'purchase_no' },
-                    { data: 'reason', name: 'reason' },
-                    { data: 'status', name: 'status' ,
-                        render: function(data, type, row) {
-                            if (data === 'approved') 
-                            {
-                                return '<span style="color: green; font-weight: bold;">' + (data.charAt(0).toUpperCase() + data.slice(1)) + '</span>';
-                            } 
-                            else if (data === 'approved with review')
-                            {
-                                return '<span style="color: green; font-weight: bold;">' + (data.charAt(0).toUpperCase() + data.slice(1)) + '</span>';
+                    columns: [
+                        { 
+                            data: null,
+                            render: function(data, type, row, meta) {
+                                // Menambahkan nomor urut
+                                return meta.row + 1; // meta.row berisi index baris
                             }
-                            else if (data === 'rejected')
-                            {
-                                return '<span style="color: red; font-weight: bold;">' + (data.charAt(0).toUpperCase() + data.slice(1)) + '</span>';
+                        },
+                        { data: 'budget_req_no', name: 'no' },
+                        { data: 'from_department.department_name', name: 'from_department' },
+                        { data: 'to_department.department_name', name: 'to_department' },
+                        { data: 'amount', name: 'amount',
+                            render: function(data, type, row) {
+                                if (data == null) return '-';
+                                
+                                return new Intl.NumberFormat('id-ID', {
+                                style: 'currency',
+                                currency: 'IDR',
+                                minimumFractionDigits: 0
+                                }).format(data);
                             }
-                            else
-                            {
-                                return data;
+                        },
+                        { data: 'budget_purchase_no', name: 'purchase_no' },
+                        { data: 'reason', name: 'reason' },
+                        { data: 'status', name: 'status' ,
+                            render: function(data, type, row) {
+                                if (data === 'approved') 
+                                {
+                                    return '<span style="color: green; font-weight: bold;">' + (data.charAt(0).toUpperCase() + data.slice(1)) + '</span>';
+                                } 
+                                else if (data === 'approved with review')
+                                {
+                                    return '<span style="color: green; font-weight: bold;">' + (data.charAt(0).toUpperCase() + data.slice(1)) + '</span>';
+                                }
+                                else if (data === 'rejected')
+                                {
+                                    return '<span style="color: red; font-weight: bold;">' + (data.charAt(0).toUpperCase() + data.slice(1)) + '</span>';
+                                }
+                                else
+                                {
+                                    return data;
+                                }
+                            }
+                        },
+                        { data: null, name: 'action', orderable: false, searchable: false,
+                            render: function(data, type, row, meta) {
+                                var id = row.budget_req_no;
+                                var deleteUrl = "{{ route('budget-request.destroy', ':id') }}".replace(':id', id.replaceAll("/", "-")); 
+                                return `
+                                <div class="d-flex action-btn">
+                                    <a href="javascript:void(0)" class="text-primary edit" onClick="openEditModal(${meta.row})">
+                                        <i class="ti ti-eye fs-5"></i>
+                                    </a>
+                                </div>
+                                `; 
                             }
                         }
-                    },
-                    { data: null, name: 'action', orderable: false, searchable: false,
-                        render: function(data, type, row, meta) {
-                            var id = row.budget_req_no;
-                            var deleteUrl = "{{ route('budget-request.destroy', ':id') }}".replace(':id', id.replaceAll("/", "-")); 
-                            return `
-                            <div class="d-flex action-btn">
-                                <a href="javascript:void(0)" class="text-primary edit" onClick="openEditModal(${meta.row})">
-                                    <i class="ti ti-eye fs-5"></i>
-                                </a>
-                            </div>
-                            `; 
-                        }
-                    }
-                ]
-            });
+                    ]
+                });
+            }
         });
 
         

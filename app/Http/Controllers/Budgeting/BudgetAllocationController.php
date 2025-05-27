@@ -206,7 +206,23 @@ class BudgetAllocationController extends Controller
         $year = $request->has('year') && $request->year != '' 
             ? $request->year 
             : Carbon::now()->year;
-        $budgets = BudgetAllocation::with('department.wallet')->whereYear('created_at', $year)->get();
+            
+        $yearSuffix = substr($year, -2); // '2026' -> '26'
+
+        $budgets = BudgetAllocation::with('department')
+            ->where(DB::raw("SUBSTRING_INDEX(SUBSTRING_INDEX(budget_allocation_no, '/', 3), '/', -1)"), '=', $yearSuffix)
+            ->get()
+            ->map(function ($budget) use ($year) {
+                // tambah variable baru "balance"
+                $budget->balance = $budget->department->balanceForYear($year);
+
+                return $budget;
+            });
+        return response()->json($budgets);
+    }
+
+    public function getBudgetAllocationAll(){
+        $budgets = BudgetAllocation::all();
         return response()->json($budgets);
     }
     
@@ -234,10 +250,11 @@ class BudgetAllocationController extends Controller
 
     public function getBudgetAllocationYear()
     {
-        $years = BudgetAllocation::select(DB::raw('YEAR(created_at) as year'))
-                ->distinct()
-                ->orderBy('year', 'desc')
-                ->pluck('year');
+        $years = BudgetAllocation::select(DB::raw("CONCAT('20', SUBSTRING_INDEX(SUBSTRING_INDEX(budget_allocation_no, '/', 3), '/', -1)) as year"))
+                    ->groupBy('year')
+                    ->orderBy('year', 'desc')
+                    ->pluck('year')
+                    ->toArray();
 
         return response()->json($years);
     }

@@ -7,6 +7,7 @@ use App\Models\Budgeting\BudgetAllocation;
 use App\Models\Budgeting\BudgetList;
 use App\Models\Budgeting\Purchase;
 use App\Models\Department;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -259,8 +260,18 @@ class BudgetListController extends Controller
         }
     }
 
-    public function getBudgetList(){
-        $budgets = BudgetList::with('category')->get();
+    public function getBudgetList(Request $request){
+        $year = $request->has('year') && $request->year != '' 
+            ? $request->year 
+            : Carbon::now()->year;
+            
+        $yearSuffix = substr($year, -2); // '2026' -> '26'
+
+        $budgets = BudgetList::with('category')
+            ->where(DB::raw("SUBSTRING_INDEX(SUBSTRING_INDEX(budget_allocation_no, '/', 3), '/', -1)"), '=', $yearSuffix)
+            ->get();
+
+        // $budgets = BudgetList::with('category')->get();
         return response()->json($budgets);
     }
 
@@ -300,10 +311,11 @@ class BudgetListController extends Controller
 
     public function getBudgetListYear()
     {
-        $years = BudgetList::select(DB::raw('YEAR(created_at) as year'))
-                ->distinct()
-                ->orderBy('year', 'desc')
-                ->pluck('year');
+        $years = BudgetList::select(DB::raw("CONCAT('20', SUBSTRING_INDEX(SUBSTRING_INDEX(budget_allocation_no, '/', 3), '/', -1)) as year"))
+                    ->groupBy('year')
+                    ->orderBy('year', 'desc')
+                    ->pluck('year')
+                    ->toArray();
 
         return response()->json($years);
     }

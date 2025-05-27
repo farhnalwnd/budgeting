@@ -232,6 +232,7 @@
                         option.textContent = year;
                         yearSelect.appendChild(option);
                     });
+                    initTable();
                 },
                 error: function() {
                     // Jika gagal, tampilkan pesan error
@@ -239,9 +240,9 @@
                 }
             });
 
-            // get budget-allocation list
+            // get all budget-allocation list
             $.ajax({
-                url: '{{ route('get.budget.data') }}',
+                url: '{{ route('get.budget-allocation.all') }}',
                 method: 'GET',
                 success: function(response) {
                     allocations = response;
@@ -279,62 +280,84 @@
                 }
             });
 
-            // Init datatable
-            table = $('#budgetTable').DataTable({
-                dom: 'Bfrtip',
-                buttons: [
-                    'copy', 'csv', 'excel', 'pdf', 'print'
-                ],
-                ajax: {
-                    url: '{{ route('get.budget.list') }}',
-                    type: 'GET',
-                    data: function (d) {
-                        d.year = $('#yearFilter').val();
-                    },
-                    dataSrc: function(response) {
-                        console.log('berhasil', response);
-                        budgets = response;
-                        return response;
-                    }
-                },
-                columns: [
-                    { 
-                        data: null,
-                        render: function(data, type, row, meta) {
-                            // Menambahkan nomor urut
-                            return meta.row + 1; // meta.row berisi index baris
+            function initTable()
+            {
+                // Init datatable
+                table = $('#budgetTable').DataTable({
+                    dom: 'Bfrtip',
+                    buttons: [
+                        'copy', 'csv', 'excel', 'pdf', 'print'
+                    ],
+                    ajax: {
+                        url: '{{ route('get.budget.list') }}',
+                        type: 'GET',
+                        data: function (d) {
+                            d.year = $('#yearFilter').val();
+                        },
+                        dataSrc: function(response) {
+                            budgets = response;
+                            return response;
                         }
                     },
-                    { data: 'budget_allocation_no', name: 'no' },
-                    { data: 'name', name: 'name' },
-                    { data: 'category.name', name: 'category' },
-                    { data: 'quantity', name: 'quantity' },
-                    { data: 'um', name: 'um' },
-                    { data: 'default_amount', name: 'amount' },
-                    { data: 'total_amount', name: 'total' },
-                    { data: null, name: 'action', orderable: false, searchable: false,
-                        render: function(data, type, row, meta) {
-                            var id = row.id;
-                            var deleteUrl = "{{ route('budget-list.destroy', ':id') }}".replace(':id', id); 
-                            return `
-                            <div class="d-flex action-btn">
-                                <a href="javascript:void(0)" class="text-primary edit" onClick="openEditModal(${meta.row})">
-                                    <i class="ti ti-eye fs-5"></i>
-                                </a>
-                                <form id="delete-form-${id}" action="${deleteUrl}" method="POST" style="display: inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <a href="javascript:void(0)" class="text-dark delete ms-2"
-                                        data-budget-id="${id}" onClick="event.preventDefault(); confirmBudgetDelete(this)">
-                                        <i class="ti ti-trash fs-5"></i>
+                    columns: [
+                        { 
+                            data: null,
+                            render: function(data, type, row, meta) {
+                                // Menambahkan nomor urut
+                                return meta.row + 1; // meta.row berisi index baris
+                            }
+                        },
+                        { data: 'budget_allocation_no', name: 'no' },
+                        { data: 'name', name: 'name' },
+                        { data: 'category.name', name: 'category' },
+                        { data: 'quantity', name: 'quantity' },
+                        { data: 'um', name: 'um' },
+                        { data: 'default_amount', name: 'amount',
+                            render: function(data, type, row) {
+                                if (data == null) return '-';
+
+                                return new Intl.NumberFormat('id-ID', {
+                                style: 'currency',
+                                currency: 'IDR',
+                                minimumFractionDigits: 0
+                                }).format(data);
+                            }
+                        },
+                        { data: 'total_amount', name: 'total',
+                            render: function(data, type, row) {
+                                if (data == null) return '-';
+                                
+                                return new Intl.NumberFormat('id-ID', {
+                                style: 'currency',
+                                currency: 'IDR',
+                                minimumFractionDigits: 0
+                                }).format(data);
+                            }
+                        },
+                        { data: null, name: 'action', orderable: false, searchable: false,
+                            render: function(data, type, row, meta) {
+                                var id = row.id;
+                                var deleteUrl = "{{ route('budget-list.destroy', ':id') }}".replace(':id', id); 
+                                return `
+                                <div class="d-flex action-btn">
+                                    <a href="javascript:void(0)" class="text-primary edit" onClick="openEditModal(${meta.row})">
+                                        <i class="ti ti-eye fs-5"></i>
                                     </a>
-                                </form>
-                            </div>
-                            `;  
+                                    <form id="delete-form-${id}" action="${deleteUrl}" method="POST" style="display: inline;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <a href="javascript:void(0)" class="text-dark delete ms-2"
+                                            data-budget-id="${id}" onClick="event.preventDefault(); confirmBudgetDelete(this)">
+                                            <i class="ti ti-trash fs-5"></i>
+                                        </a>
+                                    </form>
+                                </div>
+                                `;  
+                            }
                         }
-                    }
-                ]
-            });
+                    ]
+                });
+            }
         });
 
         // Function untuk menghapus edit div
