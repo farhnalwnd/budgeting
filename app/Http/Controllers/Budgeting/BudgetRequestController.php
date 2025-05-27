@@ -284,6 +284,7 @@ class BudgetRequestController extends Controller
 
         $user = Auth::user();
         $query = BudgetRequest::with('fromDepartment', 'toDepartment');
+        /** @var User $user */
         if(!$user->hasRole(['super-admin', 'admin']))
         {
             $query->where('from_department_id', $user->department->id);

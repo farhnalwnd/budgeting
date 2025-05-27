@@ -205,7 +205,7 @@ class BudgetAllocationController extends Controller
     public function getBudgetData(Request $request){
         $year = $request->has('year') && $request->year != '' 
             ? $request->year 
-            : Carbon::now()->year;
+            : Carbon::now()->addYear()->year;
             
         $yearSuffix = substr($year, -2); // '2026' -> '26'
 
@@ -214,6 +214,7 @@ class BudgetAllocationController extends Controller
             ->get()
             ->map(function ($budget) use ($year) {
                 // tambah variable baru "balance"
+                /** @var BudgetAllocation $budget */
                 $budget->balance = $budget->department->balanceForYear($year);
 
                 return $budget;

@@ -263,7 +263,7 @@ class BudgetListController extends Controller
     public function getBudgetList(Request $request){
         $year = $request->has('year') && $request->year != '' 
             ? $request->year 
-            : Carbon::now()->year;
+            : Carbon::now()->addYear()->year;
             
         $yearSuffix = substr($year, -2); // '2026' -> '26'
 
