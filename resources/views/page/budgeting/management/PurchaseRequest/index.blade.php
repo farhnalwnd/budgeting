@@ -5,6 +5,9 @@
     #testTable tr,
     #testTable td {
         border: 3px solid black;
+    };
+    .center {
+        text-align: center;
     }
 </style>
 @endpush
@@ -43,41 +46,17 @@
 
         <!-- Card Data Display -->
         <div class="card">
-            <div class="card-header flex justify-between">
-                <h1 class="card-title text-2xl font-medium">Purchase Request</h1>
-                <!--! ganti dengan username pak kunto -->
-                <form method="GET" action="{{ route('purchase-request.index') }}">
-                    @if ($user->username === 'super')
-                    <select name="department_id" onchange="this.form.submit()" class="w-auto rounded-lg focus:ring-0  ">
-                        <option value="">-- Semua Departemen --</option>
-                        @foreach ($departments as $dept)
-                        <option value="{{ $dept->id }}" {{ request('department_id')==$dept->id ? 'selected' : '' }}>
-                            {{ $dept->department_name }}
-                        </option>
-                        @endforeach
-                    </select>
-                    @endif
-                    <select name="year" onchange="this.form.submit()" class="w-auto rounded-lg focus:ring-0 ">
-                        <option value="">-- Semua Tahun --</option>
-                        @foreach ($years as $year)
-                        <option value="{{ $year }}" {{ request('year')==$year ? 'selected' : '' }}>
-                            {{ $year }}
-                        </option>
-                        @endforeach
-                    </select>
-                </form>
-            </div>
             <div class="card-body">
                 <table id="usersTable" class="table table-bordered w-full">
                     <thead>
                         <tr>
-                            <th>#</th>
-                            <th>PO Number</th>
-                            <th>Department</th>
-                            <th>Grand Total</th>
-                            <th>Actual Amount</th>
-                            <th>Status</th>
-                            <th>Details</th>
+                            <th class="w-fit">#</th>
+                            <th class="text-center w-2/12">PO Number</th>
+                            <th class="text-center w-3/12">Department</th>
+                            <th class="text-center w-2/12">Grand Total</th>
+                            <th class="text-center w-2/12">Actual Amount</th>
+                            <th class="text-center w-2/12">Status</th>
+                            <th class="text-center w-fit">Details</th>
                         </tr>
                     </thead>
                 </table>
@@ -85,14 +64,77 @@
         </div>
         
         <!-- modal detail -->
-        <div id="detailModal" class="hidden fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
-            <div class="bg-white p-6 rounded w-1/2 max-h-[80vh] overflow-auto shadow-lg">
-                <h2 class="text-xl font-bold mb-4">Detail Purchase</h2>
-                <div id="modalContent" class="text-gray-700"></div>
-                <button onclick="closeModal()"
-                    class="mt-6 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">Tutup</button>
+         <div class="hidden">
+        <div class="text-black fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+            <div class="bg-white p-6 rounded-lg w-2/3">
+                <!-- Header -->
+                <div class="flex justify-start">
+                    <div class="flex items-center">
+                        <h1 class="text-6xl font-bold text-yellow-700 font-mono">PURCHASE</h1>
+                    </div>
+                    <img src="/sinarlogo.png" alt="logo" class="w-72 h-32 ml-auto">
+                </div>
+                <hr class="my-10 border-t-2 rounded-md border-slate-900 opacity-90">
+                <!-- Keterangan -->
+                <div class="grid grid-cols-5 gap-2 text-left py-3">
+                    <div class="col-span-4">
+                        <h1 class="font-bold text-lg">ON:</h1>
+                        <h2 class="font-semibold text-base">{{$purchases->department->department_name}}</h2>
+                    </div>
+                    <div class="pl-7">
+                        <h1 class="font-bold text-lg">Budget No:</h1>
+                        <span class="font-semibold text-base">{{$purchases->purchase_no}}</span>
+                    </div>
+                    <div class="col-span-4">
+                        <h1 class="font-bold text-lg mb-1">DATE:</h1>
+                        <span class="font-semibold text-base">{{
+                            \Carbon\Carbon::parse($purchases->updated_at)->format('d M y') }}</span>
+                    </div>
+                    <div class="pl-7">
+                        <h1 class="font-bold text-lg mb-1">Status:</h1>
+                        <span
+                            class="font-semibold text-lg rounded-md p-1 uppercase text-emerald-700 border-2 border-emerald-600 border-opacity-50">{{$purchases->status}}</span>
+                    </div>
+                </div>
+        
+                <!-- * table -->
+                <div class="container pt-10">
+                    <div x-data="{ scrolled: false }" @scroll="scrolled = $el.scrollTop > 0 || false">
+                        <table class="table-auto w-full border-collapse">
+                            <thead :class="scrolled ? 'bg-white shadow-md border-none' : ''" class="sticky top-0 z-10">
+                                <tr>
+                                    <th class="border-2 border-gray-800 text-center w-2/6">ITEM NAME</th>
+                                    <th class="border-2 border-gray-800 text-center w-1/6">HARGA (RP)</th>
+                                    <th class="border-2 border-gray-800 text-center w-1/6">JML</th>
+                                    <th class="border-2 border-gray-800 text-center w-1/6">TOTAL</th>
+                                    <th class="border-2 border-gray-800 text-center w-1/6">REMARK</th>
+                                </tr>
+                            </thead>
+                            <!-- <tbody class="overflow-y-auto">
+                            </tbody> -->
+                        </table>
+                    </div>
+                </div>
+        
+                <div class="grid grid-cols-4 gap-3 mt-20 text-left">
+                    <div class="col-span-3">
+                        <p>note:</p>
+                    </div>
+                    <div class="flex justify-between">
+                        <p class="uppercase font-semibold text-lg px-5 text-right">grand total :</p>
+                        <p class="text-right"> Rp.
+                            {{number_format($purchases->grand_total)}}</p>
+                    </div>
+                </div>
+                <div>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                    <button @click="openModal = false" class="text-red-500 font-bold text-2xl ml-auto">&times;</button>
+                </div>
             </div>
         </div>
+        </div>
+        
 
 <!-- Modal -->
 <div x-show="open" x-on:keydown.escape.window="open = false" x-transition.duration.400ms
@@ -263,20 +305,26 @@
                 render: function(data, type, row, meta){
                 return meta.row + 1;
                 }},
-                {data: 'purchase_no', name: 'purchase_no'},
-                {data: 'department.department_name', name: 'department'},
-                {data: 'grand_total', name: 'grand_total'},
-                {data: 'actual_amount', name: 'actual_amount'},
-                {data: 'status', name: 'status'},
+                {data: 'purchase_no', name: 'purchase_no', className: 'center'},
+                {data: 'department.department_name', name: 'department', className: 'center' },
+                {data: 'grand_total', name: 'grand_total', className: 'center' },
+                {data: 'actual_amount', name: 'actual_amount', className: 'center' },
+                {data: 'status', name: 'status', className: 'center' },
                 {
                 data: null,
+                name: 'aksi',
                 orderable: false,
                 searchable: false,
                     render: function (data, type, row, meta) {
-                        // simpan seluruh row di data-row, nanti dipakai untuk isi modal
-                        return `<button class="btn-detail bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded" data-row='${JSON.stringify(row)}'>Detail</button>`;
+                        return `<button class="btn-detail bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded">Detail</button>`;
                     }}
                 ],
+            });
+            // Event delegation karena tombol di-generate via AJAX
+            $(document).on('click', '.open-modal', function () {
+                var nama = $(this).data('nama');
+                $('#modalNama').text(nama);
+                $('#modalDetail').modal('show');
             });
 
         function toRupiah(number) {

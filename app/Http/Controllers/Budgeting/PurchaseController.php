@@ -37,28 +37,27 @@ class PurchaseController extends Controller
         $user = Auth::user();
         $departments = Department::all();
     
-        $years = Purchase::selectRaw('YEAR(created_at) as year')
-            ->distinct()
-            ->orderByDesc('year')
-            ->pluck('year');
+        // $years = Purchase::selectRaw('YEAR(created_at) as year')
+        //     ->distinct()
+        //     ->orderByDesc('year')
+        //     ->pluck('year');
     
-        $query = Purchase::with('department', 'detail', 'budgetRequest')
-            ->orderBy('created_at', 'desc');
+        $purchases = Purchase::with('department', 'detail', 'budgetRequest')->first();
     
-        // *Jika bukan super admin, hanya data sesuai departemen
-        if ($user->username !== 'super') {
-            $query->where('department_id', $user->department_id);
-        } else {
-            if (request()->filled('department_id')) {
-                $query->where('department_id', request('department_id'));
-            }
-        }
+        // // *Jika bukan super admin, hanya data sesuai departemen
+        // if ($user->username !== 'super') {
+        //     $query->where('department_id', $user->department_id);
+        // } else {
+        //     if (request()->filled('department_id')) {
+        //         $query->where('department_id', request('department_id'));
+        //     }
+        // }
     
-        if (request()->filled('year')) {
-            $query->whereYear('created_at', request('year'));
-        }
+        // if (request()->filled('year')) {
+        //     $query->whereYear('created_at', request('year'));
+        // }
     
-        $purchases = $query->paginate(5);
+        // $purchases = $query->paginate(5);
     
         $department = $user->department;
         $budget = BudgetAllocation::where('department_id', $user->department_id)->latest()->first();
@@ -68,7 +67,7 @@ class PurchaseController extends Controller
             'purchases' => $purchases,
             'department' => $department,
             'departments' => $departments,
-            'years' => $years,
+            // 'years' => $years,
             'userDepartment' => $user->department->department_name ?? 'unknown',
             'currentDate' => now()->format('j M y'),
             'budgetNo' => $budget->budget_allocation_no ?? 'N/A',
