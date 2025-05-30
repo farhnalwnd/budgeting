@@ -479,7 +479,7 @@ class PurchaseController extends Controller
 
     public function getData()
     {
-        $data = Purchase::with(['department', 'detail'])->get();
+        $data = Purchase::with(['department', 'detail', 'category'])->get();
         return response()->json($data);
     }
 

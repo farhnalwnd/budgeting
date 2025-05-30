@@ -303,15 +303,22 @@
                     <!--* Catatan dan Grand Total -->
                     <div class="grid grid-cols-4 gap-3 mt-20 text-left">
                         <div class="col-span-3">
-                            <p>note:</p>
-                            ${purchase.status === 'approved'
-                        ? '<p>-</p>' : purchase.status === 'pending' ? '<p>peminjaman dana belum mendapatkan respon</p>' : `<p>
-                                ${purchase.budgetRequest?.feedback || 'peminjaman ditolak'}</p>`
-                    }
+                            <p class="text-lg font-semibold">PO number : <span class="text-base font-medium">${purchase.PO || '-'}</span></p>
+                            <p class="text-lg font-semibold">category : <span class="text-base font-medium">${purchase.category?.name || 'category belum dipilih'} </span></p>
                         </div>
-                        <div class="flex justify-between">
-                            <p class="uppercase font-semibold text-lg px-5 text-right">grand total :</p>
-                            <p class="text-right">Rp. ${toRupiah(purchase.grand_total)}</p>
+                        <div>
+                            <div class="flex justify-between">
+                                <p class="uppercase font-semibold text-lg px-5 text-right">grand total :</p>
+                                <span class="text-right">Rp. ${toRupiah(purchase.grand_total)}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <p class="uppercase font-semibold text-lg px-5 text-right">actual amount :</p>
+                                <span class="text-right">${toRupiah(purchase.actual_amount || '0')}</span>
+                            </div>
+                        </div>
+                        <div class="">
+                            <p>note:</p>
+                            ${purchase.status === 'approved' ? '<p>-</p>' : purchase.status === 'pending' ? '<p>peminjaman dana belum mendapatkan respon</p>' : `<p> ${purchase.budgetRequest?.feedback || 'peminjaman ditolak'}</p>`}
                         </div>
                     </div>
     
@@ -509,8 +516,14 @@
                 },
                 { data: 'purchase_no', name: 'purchase_no', className: 'center' },
                 { data: 'department.department_name', name: 'department', className: 'center' },
-                { data: 'grand_total', name: 'grand_total', className: 'center' },
-                { data: 'actual_amount', name: 'actual_amount', className: 'center' },
+                { data: 'grand_total', name: 'grand_total', className: 'center',
+                render: function (data, type, row) {
+                    return toRupiah(data);}
+                },
+                { data: 'actual_amount', name: 'actual_amount', className: 'center',
+                render: function (data, type, row) {
+                    return toRupiah(data);}
+                },
                 { data: 'status', name: 'status', className: 'center' },
                 {
                     data: null,
