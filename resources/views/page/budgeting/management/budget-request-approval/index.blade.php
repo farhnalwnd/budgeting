@@ -62,11 +62,12 @@
     @push('scripts')
     <script>
         var budgets = null;
+        var table = null;
         document.addEventListener('DOMContentLoaded', function() {
 
 
             // Init datatable
-            var table = $('#budgetTable').DataTable({
+            table = $('#budgetTable').DataTable({
                 dom: 'Bfrtip',
                 buttons: [
                     'copy', 'csv', 'excel', 'pdf', 'print'
@@ -75,7 +76,6 @@
                     url: '{{ route('get.budget-request.approval.list') }}',
                     type: 'GET',
                     dataSrc: function(response) {
-                        console.log('berhasil', response);
                         budgets = response;
                         return response;
                     }
@@ -189,15 +189,15 @@
                                     </div>
                                     <div class="flex gap-x-4">
                                         <input type="hidden" name="action" value=""></input>
-                                        <button type="button" value="approve" onClick="submitForm(this)"
+                                        <button type="button" value="approve" onClick="submitForm(this, ${id})"
                                             class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                                             Approve
                                         </button>
-                                        <button type="button" value="approve with review" onClick="submitForm(this)"
+                                        <button type="button" value="approve with review" onClick="submitForm(this, ${id})"
                                             class="w-full text-white bg-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center dark:bg-yellow-600 dark:hover:bg-yellow-700 dark:focus:ring-yellow-800">
                                             Approve with review
                                         </button>
-                                        <button type="button" value="reject" onClick="submitForm(this)"
+                                        <button type="button" value="reject" onClick="submitForm(this, ${id})"
                                             class="w-full text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">
                                             Reject
                                         </button>
@@ -224,7 +224,6 @@
             var amountInput = parent.querySelector('.amount');
             var totalInput = parent.querySelector('.total');
             // var totalInput = parent.lastElementChild.lastElementChild.firstElementChild;
-            console.log(quantityInput.value, amountInput.value, totalInput.value);
             if(quantityInput.value <= 0)
             {
                 quantityInput.value = 1;
@@ -237,8 +236,23 @@
 
         }
 
-        function submitForm(button){
+        // Function untuk menghapus edit div
+        function clearEditDiv()
+        {
+            const container = document.getElementById('editModalDiv');
+            const background = document.getElementById('modalBackground');
+            // Simpan elemen background
+            const preserved = background.cloneNode(true);
+            // Kosongkan container
+            container.innerHTML = '';
+            // Masukkan kembali elemen yang disimpan
+            container.appendChild(preserved);
+        }
+
+        // Function check and submit form
+        function submitForm(button, divId){
             var form = button.closest('form');
+            var actionUrl = form.getAttribute('action');
             var actionDiv = form.querySelector('[name="action"]');
             var review = form.querySelector('[name="reviewTextArea"]');
             var label = form.querySelector('label[for="reviewTextArea"]');
@@ -262,8 +276,43 @@
                         cancelButtonColor: '#d33',
                         confirmButtonText: 'Yes, submit form!'
                     }).then((result) => {
-                        if (result.isConfirmed) {
-                            form.submit();
+                        if (result.isConfirmed) {                            
+                            // Tutup edit modal div
+                            openEditModal(divId);
+
+                            // Kirim form
+                            $.ajax({
+                                url: actionUrl,
+                                method: 'PUT',
+                                data: $(form).serialize(), // Ambil semua input form
+                                success: function(response) {
+                                    // Alert data berhasil
+                                    Swal.fire({
+                                        toast: true,
+                                        icon: 'success',
+                                        title: response.message,
+                                        position: 'top-end',
+                                        showConfirmButton: false,
+                                        timer: 3000
+                                    });
+                                    // Bersihkan edit div
+                                    clearEditDiv();
+
+                                    // Refresh data table
+                                    table.ajax.reload(null, false); // Reload data dari server
+                                },
+                                error: function(xhr) {
+                                    // Alert data gagal
+                                    Swal.fire({
+                                        toast: true,
+                                        icon: 'error',
+                                        title: xhr.responseJSON.message,
+                                        position: 'top-end',
+                                        showConfirmButton: false,
+                                        timer: 3000
+                                    });
+                                }
+                            });
                         }
                     });
                 }
@@ -280,13 +329,46 @@
                     confirmButtonText: 'Yes, submit form!'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        form.submit();
+                        // Tutup edit modal div
+                        openEditModal(divId);
+
+                        // Kirim form
+                        $.ajax({
+                            url: actionUrl,
+                            method: 'PUT',
+                            data: $(form).serialize(), // Ambil semua input form
+                            success: function(response) {
+                                // Alert data berhasil
+                                Swal.fire({
+                                    toast: true,
+                                    icon: 'success',
+                                    title: response.message,
+                                    position: 'top-end',
+                                    showConfirmButton: false,
+                                    timer: 3000
+                                });
+                                // Bersihkan edit div
+                                clearEditDiv();
+
+                                // Refresh data table
+                                table.ajax.reload(null, false); // Reload data dari server
+                            },
+                            error: function(xhr) {
+                                // Alert data gagal
+                                Swal.fire({
+                                    toast: true,
+                                    icon: 'error',
+                                    title: xhr.responseJSON.message,
+                                    position: 'top-end',
+                                    showConfirmButton: false,
+                                    timer: 3000
+                                });
+                            }
+                        });
                     }
                 });
                 
             }
-
-            console.log(button, form, actionDiv, review, label);  
         }
 
     </script>

@@ -41,6 +41,9 @@
         <div class="card">
             <div class="card-header">
                 <h1 class="card-title text-2xl font-medium">List Budget-List</h1>
+                <select id="yearFilter" class="form-control">
+                    <!-- tambah department lainnya sesuai kebutuhan -->
+                </select>
             </div>
             <div class="card-body">
                 <div class="relative overflow-x-auto sm:rounded-lg">
@@ -75,7 +78,7 @@
                         <h1 class="text-6xl font-bold text-yellow-700 font-mono">Create Budget-List</h1>
                     </div>
                     
-                    <div class="w-72 h-32 ml-auto">
+                    <div class="w-72 h-32 ml-auto mb-5">
                         <img src="{{ asset('assets/images/logo/logowhite.png')  }}" class="dark-logo" alt="Logo-Dark">
                         <img src="{{ asset('assets/images/logo/logo.png') }}" class="light-logo" alt="Logo-light">
                     </div>
@@ -192,7 +195,7 @@
                                 </button>
                             </div>
                             <div class="flex gap-2">
-                                <button type="submit" class="btn btn-success">Simpan</button>
+                                <button type="submit" class="btn btn-success" onClick="event.preventDefault(); confirmBudgetCreate(this)">Simpan</button>
                                 <button @click="open = !open" type="button" class="btn btn-danger">Exit</button>
                             </div>
                         </div>
@@ -214,10 +217,32 @@
         var budgets = null;
         var allocations = null;
         var categories = null;
+        var table = null;
         document.addEventListener('DOMContentLoaded', function() {
-            // get budget-allocation list
+            // get budget-list year list
             $.ajax({
-                url: '{{ route('get.budget.data') }}',
+                url: '{{ route('get.budget-list.year') }}',
+                method: 'GET',
+                success: function(response) {
+                    years = response;
+                    var yearSelect = document.getElementById('yearFilter');
+                    years.forEach(year => {
+                        var option = document.createElement('option');
+                        option.value = year;
+                        option.textContent = year;
+                        yearSelect.appendChild(option);
+                    });
+                    initTable();
+                },
+                error: function() {
+                    // Jika gagal, tampilkan pesan error
+                    console.log('Error ketika mengambil data department.');
+                }
+            });
+
+            // get all budget-allocation list
+            $.ajax({
+                url: '{{ route('get.budget-allocation.all') }}',
                 method: 'GET',
                 success: function(response) {
                     allocations = response;
@@ -255,65 +280,225 @@
                 }
             });
 
-            // Init datatable
-            var table = $('#budgetTable').DataTable({
-                dom: 'Bfrtip',
-                buttons: [
-                    'copy', 'csv', 'excel', 'pdf', 'print'
-                ],
-                ajax: {
-                    url: '{{ route('get.budget.list') }}',
-                    type: 'GET',
-                    dataSrc: function(response) {
-                        console.log('berhasil', response);
-                        budgets = response;
-                        return response;
-                    }
-                },
-                columns: [
-                    { 
-                        data: null,
-                        render: function(data, type, row, meta) {
-                            // Menambahkan nomor urut
-                            return meta.row + 1; // meta.row berisi index baris
+            function initTable()
+            {
+                // Init datatable
+                table = $('#budgetTable').DataTable({
+                    dom: 'Bfrtip',
+                    buttons: [
+                        'copy', 'csv', 'excel', 'pdf', 'print'
+                    ],
+                    ajax: {
+                        url: '{{ route('get.budget.list') }}',
+                        type: 'GET',
+                        data: function (d) {
+                            d.year = $('#yearFilter').val();
+                        },
+                        dataSrc: function(response) {
+                            budgets = response;
+                            return response;
                         }
                     },
-                    { data: 'budget_allocation_no', name: 'no' },
-                    { data: 'name', name: 'name' },
-                    { data: 'category.name', name: 'category' },
-                    { data: 'quantity', name: 'quantity' },
-                    { data: 'um', name: 'um' },
-                    { data: 'default_amount', name: 'amount' },
-                    { data: 'total_amount', name: 'total' },
-                    { data: null, name: 'action', orderable: false, searchable: false,
-                        render: function(data, type, row, meta) {
-                            var id = row.id;
-                            var deleteUrl = "{{ route('budget-list.destroy', ':id') }}".replace(':id', id); 
-                            return `
-                            <div class="d-flex action-btn">
-                                <a href="javascript:void(0)" class="text-primary edit" onClick="openEditModal(${meta.row})">
-                                    <i class="ti ti-eye fs-5"></i>
-                                </a>
-                                <form id="delete-form-${id}" action="${deleteUrl}" method="POST" style="display: inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <a href="javascript:void(0)" class="text-dark delete ms-2"
-                                        data-budget-id="${id}" onClick="confirmBudgetDelete(this)">
-                                        <i class="ti ti-trash fs-5"></i>
+                    columns: [
+                        { 
+                            data: null,
+                            render: function(data, type, row, meta) {
+                                // Menambahkan nomor urut
+                                return meta.row + 1; // meta.row berisi index baris
+                            }
+                        },
+                        { data: 'budget_allocation_no', name: 'no' },
+                        { data: 'name', name: 'name' },
+                        { data: 'category.name', name: 'category' },
+                        { data: 'quantity', name: 'quantity' },
+                        { data: 'um', name: 'um' },
+                        { data: 'default_amount', name: 'amount',
+                            render: function(data, type, row) {
+                                if (data == null) return '-';
+
+                                return new Intl.NumberFormat('id-ID', {
+                                style: 'currency',
+                                currency: 'IDR',
+                                minimumFractionDigits: 0
+                                }).format(data);
+                            }
+                        },
+                        { data: 'total_amount', name: 'total',
+                            render: function(data, type, row) {
+                                if (data == null) return '-';
+                                
+                                return new Intl.NumberFormat('id-ID', {
+                                style: 'currency',
+                                currency: 'IDR',
+                                minimumFractionDigits: 0
+                                }).format(data);
+                            }
+                        },
+                        { data: null, name: 'action', orderable: false, searchable: false,
+                            render: function(data, type, row, meta) {
+                                var id = row.id;
+                                var deleteUrl = "{{ route('budget-list.destroy', ':id') }}".replace(':id', id); 
+                                return `
+                                <div class="d-flex action-btn">
+                                    <a href="javascript:void(0)" class="text-primary edit" onClick="openEditModal(${meta.row})">
+                                        <i class="ti ti-eye fs-5"></i>
                                     </a>
-                                </form>
-                            </div>
-                            `;  
+                                    <form id="delete-form-${id}" action="${deleteUrl}" method="POST" style="display: inline;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <a href="javascript:void(0)" class="text-dark delete ms-2"
+                                            data-budget-id="${id}" onClick="event.preventDefault(); confirmBudgetDelete(this)">
+                                            <i class="ti ti-trash fs-5"></i>
+                                        </a>
+                                    </form>
+                                </div>
+                                `;  
+                            }
                         }
-                    }
-                ]
-            });
+                    ]
+                });
+            }
         });
 
+        // Function untuk menghapus edit div
+        function clearEditDiv()
+        {
+            const container = document.getElementById('editModalDiv');
+            const background = document.getElementById('modalBackground');
+            // Simpan elemen background
+            const preserved = background.cloneNode(true);
+            // Kosongkan container
+            container.innerHTML = '';
+            // Masukkan kembali elemen yang disimpan
+            container.appendChild(preserved);
+        }
+
+        // Function untuk konfirmasi create budget
+        function confirmBudgetCreate(button){
+            var form = button.closest('form');
+            var actionUrl = form.getAttribute('action');
+            
+            // Cek validasi form 
+            if (!form.checkValidity()) {
+                form.reportValidity(); // Menampilkan pesan default browser
+                return;
+            }
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, create it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Tutup edit modal div
+                    const alpineData = Alpine.closestDataStack(button)?.[0];
+                    if (alpineData) {
+                        alpineData.open = false;
+                    }
+
+                    // Kirim form
+                    $.ajax({
+                        url: actionUrl,
+                        method: 'POST',
+                        data: $(form).serialize(), // Ambil semua input form
+                        success: function(response) {
+                            // Alert data berhasil
+                            Swal.fire({
+                                toast: true,
+                                icon: 'success',
+                                title: response.message,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                            // Bersihkan edit div
+                            clearEditDiv();
+
+                            // Refresh data table
+                            table.ajax.reload(null, false); // Reload data dari server
+
+                            // reset form
+                            form.reset();
+                        },
+                        error: function(xhr) {
+                            // Alert data gagal
+                            Swal.fire({
+                                toast: true,
+                                icon: 'error',
+                                title: xhr.responseJSON.message,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        // Function untuk konfirmasi edit budget
+        function confirmBudgetEdit(button, divId){
+            var form = button.closest('form');
+            var actionUrl = form.getAttribute('action');
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, edit it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Tutup edit modal div
+                    openEditModal(divId);
+
+                    // Kirim form
+                    $.ajax({
+                        url: actionUrl,
+                        method: 'PUT',
+                        data: $(form).serialize(), // Ambil semua input form
+                        success: function(response) {
+                            // Alert data berhasil
+                            Swal.fire({
+                                toast: true,
+                                icon: 'success',
+                                title: response.message,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                            // Bersihkan edit div
+                            clearEditDiv();
+
+                            // Refresh data table
+                            table.ajax.reload(null, false); // Reload data dari server
+                        },
+                        error: function(xhr) {
+                            // Alert data gagal
+                            Swal.fire({
+                                toast: true,
+                                icon: 'error',
+                                title: xhr.responseJSON.message,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        }
+                    });
+                }
+            });
+        }
 
         // Function untuk konfirmasi delete budget
         function confirmBudgetDelete(button){
             var budgetId = button.getAttribute('data-budget-id');
+            var form = document.getElementById('delete-form-' + budgetId);
+            var actionUrl = form.getAttribute('action');
             Swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
@@ -324,7 +509,39 @@
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    document.getElementById('delete-form-' + budgetId).submit();
+                    // Kirim form
+                    $.ajax({
+                        url: actionUrl,
+                        method: 'DELETE',
+                        data: $(form).serialize(), // Ambil semua input form
+                        success: function(response) {
+                            // Alert data berhasil
+                            Swal.fire({
+                                toast: true,
+                                icon: 'success',
+                                title: response.message,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                            // Bersihkan edit div
+                            clearEditDiv();
+
+                            // Refresh data table
+                            table.ajax.reload(null, false); // Reload data dari server
+                        },
+                        error: function(xhr) {
+                            // Alert data gagal
+                            Swal.fire({
+                                toast: true,
+                                icon: 'error',
+                                title: xhr.responseJSON.message,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        }
+                    });
                 }
             });
         }
@@ -346,135 +563,6 @@
             newEditModal = `
                 <div id="editContactModal${id}" tabindex="-1" aria-modal="true" role="dialog"
                     class="flex overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-                    <div class="relative p-4 w-full max-w-4xl max-h-full">
-                        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700" style="margin-top: 10%;">
-                            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-                                <h3 class="text-3xl font-semibold text-white">Update Budget</h3>
-                                <button type="button"
-                                    class="end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                                    data-modal-hide="editContactModal${id}" onClick="openEditModal(${id})">
-                                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                        viewbox="0 0 14 14">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"></path>
-                                    </svg>
-                                    <span class="sr-only">Close modal</span>
-                                </button>
-                            </div>
-                            <div class="p-4 md:p-5">
-                                <form class="space-y-4" action="${updateUrl}" method="POST" id="updateBudgetForm">
-                                @csrf
-                                @method('PUT')
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <div class="form-group">
-                                            <label class="form-label text-white text-xl">Budget No<span
-                                                    class="text-danger">*</span></label>
-                                            <div class="controls">
-                                                <select name="no" required
-                                                    class="form-select w-full text-xl" aria-invalid="false"
-                                                    placeholder="Budget No">`;
-                                                    allocations.forEach(function(allocation){
-                                                        newEditModal +=`
-                                                        <option value="${allocation.budget_allocation_no}" ${allocation.budget_allocation_no == budget.budget_allocation_no ? 'selected' : ''}>
-                                                            ${allocation.budget_allocation_no}
-                                                        </option>
-                                                        `;
-                                                    });
-                                                    newEditModal += `
-                                                </select>
-                                                <div class="help-block"></div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="form-group">
-                                            <label class="form-label text-white text-xl">Name<span
-                                                    class="text-danger">*</span></label>
-                                            <div class="controls">
-                                                <input type="text" name="name"required
-                                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-xl rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                                                    placeholder="Name" value="${budget.name}">
-                                                <div class="help-block"></div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="form-group">
-                                            <label class="form-label text-white text-xl">Category<span
-                                                class="text-danger">*</span></label>
-                                            <div class="controls">
-                                                <select name="category" required
-                                                    class="form-select w-full text-xl" aria-invalid="false"
-                                                    placeholder="Category">`;
-                                                    categories.forEach(function(category){
-                                                        newEditModal +=`
-                                                        <option value="${category.id}" ${category.name == budget.category.name ? 'selected' : ''}>
-                                                            ${category.name}
-                                                        </option>
-                                                        `;
-                                                    });
-                                                    newEditModal += `
-                                                    
-                                                </select>
-                                                <div class="help-block"></div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="form-group">
-                                            <label class="form-label text-white text-xl">Quantity<span
-                                                class="text-danger">*</span></label>
-                                            <div class="controls">
-                                                <input type="number" name="quantity" required min="1"
-                                                    class="quantity bg-gray-50 border border-gray-300 text-gray-900 text-xl rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                                                    placeholder="Quantity" value="${budget.quantity}" onChange="getTotalAmount(this)">
-                                                <div class="help-block"></div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="form-group">
-                                            <label class="form-label text-white text-xl">UM<span
-                                                class="text-danger">*</span></label>
-                                            <div class="controls">
-                                                <input type="text" name="um" required
-                                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-xl rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                                                    placeholder="Unit Measure" value="${budget.um}">
-                                                <div class="help-block"></div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="form-group">
-                                            <label class="form-label text-white text-xl">Amount<span
-                                                class="text-danger">*</span></label>
-                                            <div class="controls">
-                                                <input type="number" name="amount" required min="0"
-                                                    class="amount bg-gray-50 border border-gray-300 text-gray-900 text-xl rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                                                    placeholder="Amount" value="${budget.default_amount}" onChange="getTotalAmount(this)">
-                                                <div class="help-block"></div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="form-group">
-                                            <label class="form-label text-white text-xl">Total Amount<span
-                                                class="text-danger">*</span></label>
-                                            <div class="controls">
-                                                <input type="number" name="total" required min="0"
-                                                    class="total bg-gray-50 border border-gray-300 text-gray-900 text-xl rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                                                    placeholder="Total" value="${budget.total_amount}" readonly>
-                                                <div class="help-block"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <button type="submit"
-                                        class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                                        Update
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            newEditModal = `
-                <div id="editContactModal${id}" tabindex="-1" aria-modal="true" role="dialog"
-                    class="flex overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
                     <div class="absolute bg-white text-black p-6 rounded-lg shadow-lg w-2/3 max-h-[800px] card">
                         <!-- Header -->
                         <div class="flex justify-start">
@@ -482,7 +570,7 @@
                                 <h1 class="text-6xl font-bold text-yellow-700 font-mono">Update Budget-List</h1>
                             </div>
                             
-                            <div class="w-72 h-32 ml-auto">
+                            <div class="w-72 h-32 ml-auto mb-5">
                                 <img src="{{ asset('assets/images/logo/logowhite.png')  }}" class="dark-logo" alt="Logo-Dark">
                                 <img src="{{ asset('assets/images/logo/logo.png') }}" class="light-logo" alt="Logo-light">
                             </div>
@@ -591,7 +679,7 @@
                                     </table>
                                 </div>
                                 <div class="flex items-center justify-end mx-4 mt-4 gap-2">
-                                    <button type="submit" class="btn btn-success">Simpan</button>
+                                    <button type="submit" class="btn btn-success" onClick="event.preventDefault(); confirmBudgetEdit(this, ${id})">Simpan</button>
                                     <button type="button" class="btn btn-danger" data-modal-hide="editContactModal${id}" onClick="openEditModal(${id})">Exit</button>
                                 </div>
                             </div>
@@ -805,6 +893,12 @@
 
             // Inisialisasi nilai awal saldo
             updateGrandTotal();
+
+        
+        
+        $('#yearFilter').on('change', function() {
+            table.ajax.reload();  // Reload data table dengan filter department
+        });
     </script>
     @endpush
 

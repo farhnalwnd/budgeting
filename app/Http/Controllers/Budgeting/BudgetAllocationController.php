@@ -5,10 +5,13 @@ namespace App\Http\Controllers\Budgeting;
 use App\Http\Controllers\Controller;
 use App\Models\Budgeting\BudgetAllocation;
 use App\Models\Department;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use RealRashid\SweetAlert\Facades\Alert;
+use Illuminate\Support\Str;
+
 
 class BudgetAllocationController extends Controller
 {
@@ -51,6 +54,17 @@ class BudgetAllocationController extends Controller
                 'description' => $validatedData['description'] ?? null,
                 'allocated_by' => $user->nik
             ]);
+
+            // bikin wallet
+            $year = now()->addYear()->format('Y');
+            $dept = Department::findOrFail($validatedData['department']);
+            if(!$dept->hasWallet($year))
+            {
+                $dept->createWallet([
+                    'name' => $year,
+                    'slug' => Str::slug($year),
+                ]);
+            }
             
             activity()
                 ->performedOn($budget)
@@ -68,14 +82,14 @@ class BudgetAllocationController extends Controller
 
             // Commit transaksi
             DB::commit();
-            Alert::toast('Budget-allocation successfully created!', 'success');
-            return redirect()->route('budget-allocation.index');
+            return response()->json(['message' => 'Budget-allocation successfully created!'], 200);
 
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
             DB::rollback();
-            Alert::toast('There was an error creating the budget-allocation.'.$e->getMessage(), 'error');
-            return back();
+            return response()->json([
+                'message' => 'There was an error creating the budget-allocation: ' . $e->getMessage()
+            ], 500); // status 500 = server error
         }
     }
 
@@ -136,14 +150,14 @@ class BudgetAllocationController extends Controller
 
             // Commit transaksi
             DB::commit();
-            Alert::toast('Budget-allocation successfully updated!', 'success');
-            return redirect()->route('budget-allocation.index');
+            return response()->json(['message' => 'Budget-allocation successfully updated!'], 200);
 
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
             DB::rollback();
-            Alert::toast('There was an error updating the budget-allocation.'.$e->getMessage(), 'error');
-            return back();
+            return response()->json([
+                'message' => 'There was an error updating the budget-allocation: ' . $e->getMessage()
+            ], 500); // status 500 = server error
         }
     }
 
@@ -177,19 +191,39 @@ class BudgetAllocationController extends Controller
 
             // Commit transaksi
             DB::commit();
-            Alert::toast('Budget-allocation successfully deleted!', 'success');
-            return redirect()->route('budget-allocation.index');
+            return response()->json(['message' => 'Budget-allocation successfully deleted!'], 200);
 
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
             DB::rollback();
-            Alert::toast('There was an error deleting the budget-allocation.'.$e->getMessage(), 'error');
-            return back();
+            return response()->json([
+                'message' => 'There was an error deleting the budget-allocation: ' . $e->getMessage()
+            ], 500); // status 500 = server error
         }
     }
 
-    public function getBudgetData(){
-        $budgets = BudgetAllocation::with('department.wallet')->get();
+    public function getBudgetData(Request $request){
+        $year = $request->has('year') && $request->year != '' 
+            ? $request->year 
+            : Carbon::now()->addYear()->year;
+            
+        $yearSuffix = substr($year, -2); // '2026' -> '26'
+
+        $budgets = BudgetAllocation::with('department')
+            ->where(DB::raw("SUBSTRING_INDEX(SUBSTRING_INDEX(budget_allocation_no, '/', 3), '/', -1)"), '=', $yearSuffix)
+            ->get()
+            ->map(function ($budget) use ($year) {
+                // tambah variable baru "balance"
+                /** @var BudgetAllocation $budget */
+                $budget->balance = $budget->department->balanceForYear($year);
+
+                return $budget;
+            });
+        return response()->json($budgets);
+    }
+
+    public function getBudgetAllocationAll(){
+        $budgets = BudgetAllocation::all();
         return response()->json($budgets);
     }
     
@@ -199,9 +233,9 @@ class BudgetAllocationController extends Controller
         // Ambil departemen berdasarkan ID
         $department = Department::findOrFail($departmentId);
         $departmentCode = str_replace(" ","", strtoupper(substr($department->department_name, 0, 3))); // Ambil 3 huruf pertama nama departemen
-
-        // Cari alokasi terakhir yang dimulai dengan CAPEX/{kodeDepartemen}
-        $lastAllocation = BudgetAllocation::where('budget_allocation_no', 'like', 'CAPEX/'.$departmentCode.'/%')
+        $year = now()->addYear()->format('y');
+        // Cari alokasi terakhir yang dimulai dengan CAPEX/{kodeDepartemen}/{tahun}
+        $lastAllocation = BudgetAllocation::where('budget_allocation_no', 'like', 'CAPEX/'.$departmentCode.'/'.$year.'/%')
                                         ->latest()
                                         ->first();
 
@@ -212,6 +246,17 @@ class BudgetAllocationController extends Controller
         $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
 
         // Menghasilkan nomor alokasi baru
-        return "CAPEX/{$departmentCode}/{$newNumber}";
+        return "CAPEX/{$departmentCode}/{$year}/{$newNumber}";
+    }
+
+    public function getBudgetAllocationYear()
+    {
+        $years = BudgetAllocation::select(DB::raw("CONCAT('20', SUBSTRING_INDEX(SUBSTRING_INDEX(budget_allocation_no, '/', 3), '/', -1)) as year"))
+                    ->groupBy('year')
+                    ->orderBy('year', 'desc')
+                    ->pluck('year')
+                    ->toArray();
+
+        return response()->json($years);
     }
 }

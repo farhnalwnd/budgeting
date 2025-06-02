@@ -51,10 +51,10 @@
                             <tr>
                                 {{-- <th scope="col" class="px-6 py-3 text-lg">#</th> --}}
                                 <th scope="col" class="px-6 py-3 text-lg">Purchase No</th>
-                                <th scope="col" class="px-6 py-3 text-lg">Item Name</th>
-                                <th scope="col" class="px-6 py-3 text-lg">Harga</th>
-                                <th scope="col" class="px-6 py-3 text-lg">Jumlah</th>
+                                <th scope="col" class="px-6 py-3 text-lg">Description</th>
                                 <th scope="col" class="px-6 py-3 text-lg">Total</th>
+                                <th scope="col" class="px-6 py-3 text-lg">No. PO</th>
+                                <th scope="col" class="px-6 py-3 text-lg">Actual PO</th>
                                 <th scope="col" class="px-6 py-3 text-lg">Remark</th>
                             </tr>
                         </thead>
@@ -116,6 +116,7 @@
         });
         var table = $('#reportTable').DataTable({
             dom: 'Bfrtip',
+            info: false,
             paging: false,
             ordering:false,
             buttons: [
@@ -139,6 +140,8 @@
                 },
                 {
                     extend: 'pdf',
+                    orientation: 'landscape',
+                    pageSize: 'LEGAL',
                     title: function () {
                         return getExportTitle();
                     }
@@ -154,11 +157,18 @@
                                 tr.subtotal-row {
                                     font-weight: bold !important;
                                     background-color: #f0f0f0 !important;
+                                    -webkit-print-color-adjust: exact;
+                                    print-color-adjust: exact;
                                 }
                                 tr.sub-title {
                                     font-weight: bold !important;
                                     text-align: center;
                                     background-color: whitesmoke !important;
+                                    -webkit-print-color-adjust: exact;
+                                    print-color-adjust: exact;
+                                }
+                                @page { 
+                                    size: landscape; 
                                 }
                             </style>
                         `);
@@ -219,15 +229,6 @@
                 }
             },
             columns: [
-                // {
-                //     data: null,
-                //     render: function (data, type, row, meta) {
-                //         // Kosongkan nomor untuk baris subtotal
-                        
-                //         return null;
-                //         return row.is_subtotal ? '' : meta.row + 1;
-                //     }
-                // },
                 {
                     data: 'purchase_no',
                     render: function (data, type, row) {
@@ -241,19 +242,30 @@
                     }
                 },
                 {
-                    data: 'amount',
-                    render: function (data, type, row) {
-                        return row.is_subtotal ? '' : row.is_subcategory ? '' : Number(data).toLocaleString();
-                    }
-                },
-                {
-                    data: 'quantity',
-                    render: function (data, type, row) {
-                        return row.is_subtotal ? `<strong>${data}</strong>` : data;
-                    }
-                },
-                {
                     data: 'total_amount',
+                    render: function (data, type, row) {
+                        if (row.is_subtotal) {
+                            if(!row.purchase_no.startsWith('Subtotal') && row.purchase_no !== 'GRAND TOTAL')
+                            {
+                                return '';
+                            }
+                            return `<strong>${Number(data).toLocaleString()}</strong>`;
+                        }
+                        if (row.is_subcategory)
+                        {
+                            return '';
+                        }
+                        return Number(data).toLocaleString();
+                    }
+                },
+                {
+                    data: 'PO',
+                    render: function (data, type, row) {
+                        return row.is_subtotal ? '' : data;
+                    }
+                },
+                {
+                    data: 'actual_amount',
                     render: function (data, type, row) {
                         if (row.is_subtotal) {
                             if(!row.purchase_no.startsWith('Subtotal') && row.purchase_no !== 'GRAND TOTAL')

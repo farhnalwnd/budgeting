@@ -80,14 +80,18 @@ Route::middleware('auth')->group(function () {
         Route::resource('budget-request', BudgetRequestController::class);
         Route::resource('activity', ActivityLogController::class);
         Route::resource('approver', BudgetApproverController::class);
-
+        
         Route::get('budget-approval', [BudgetRequestController::class, 'BudgetRequestApprovalIndex'])->name('budget-request.approval');
         Route::get('getBudgetRequestApprovalList-approval', [BudgetRequestController::class, 'getBudgetRequestApprovalList'])->name('get.budget-request.approval.list');
 
         Route::get('getCategoryData', [CategoryController::class, 'getCategoryData'])->name('get.category.data');
+        Route::get('getBudgetAllocationYear', [BudgetAllocationController::class, 'getBudgetAllocationYear'])->name('get.budget-allocation.year');
         Route::get('getBudgetData', [BudgetAllocationController::class, 'getBudgetData'])->name('get.budget.data');
+        Route::get('getBudgetAllocationAll', [BudgetAllocationController::class, 'getBudgetAllocationAll'])->name('get.budget-allocation.all');
         Route::get('getBudgetNo', [BudgetAllocationController::class, 'getBudgetNo'])->name('get.budget.no');
+        Route::get('getBudgetListYear', [BudgetListController::class, 'getBudgetListYear'])->name('get.budget-list.year');
         Route::get('getBudgetList', [BudgetListController::class, 'getBudgetList'])->name('get.budget.list');
+        Route::get('getBudgetRequestYear', [BudgetRequestController::class, 'getBudgetRequestYear'])->name('get.budget-request.year');
         Route::get('getBudgetRequestList', [BudgetRequestController::class, 'getBudgetRequestList'])->name('get.budget.request.list');
         Route::get('getApproverData', [BudgetApproverController::class, 'getApproverData'])->name('get.approver.data');
         
@@ -96,6 +100,8 @@ Route::middleware('auth')->group(function () {
         Route::get('getLogsData', [ActivityLogController::class, 'getLogsData'])->name('get.logs.data');
     });
 
+    // get data department
+    Route::get('getDepartmentData', [DepartmentController::class, 'getDepartmentData'])->name('get.department.data');
 });
 
 route::prefix('page')->group(function () {
@@ -123,7 +129,6 @@ Route::group(['middleware' => ['role:super-admin|admin']], function () {
     Route::post('departments', [DepartmentController::class, 'store'])->name('department.store');
     Route::delete('departments/{department:department_slug}/delete', [DepartmentController::class, 'destroy'])->name('department.destroy');
     Route::put('departments/{department:department_slug}/update', [DepartmentController::class, 'update'])->name('department.update');
-    Route::get('getDepartmentData', [DepartmentController::class, 'getDepartmentData'])->name('get.department.data');
 
     Route::get('positions', [PositionController::class, 'index'])->name('position.index');
     Route::delete('positions/{position:position_slug}/delete', [PositionController::class, 'destroy'])->name('positions.destroy');

@@ -7,6 +7,7 @@ use App\Models\Budgeting\BudgetAllocation;
 use App\Models\Budgeting\BudgetList;
 use App\Models\Budgeting\Purchase;
 use App\Models\Department;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -76,7 +77,9 @@ class BudgetListController extends Controller
             
             $result = $this->calculateBudget($budget->budget_allocation_no);
             if($result instanceof \Exception){
-                throw new \Exception("Failed to calculate budget.");
+                DB::rollback();
+                dd($result);
+                throw new \Exception("Failed to calculate budget. " . $result);
             }
 
             activity()
@@ -98,14 +101,14 @@ class BudgetListController extends Controller
 
             // Commit transaksi
             DB::commit();
-            Alert::toast('Budget-list successfully created!', 'success');
-            return redirect()->route('budget-list.index');
+            return response()->json(['message' => 'Budget-list successfully created!'], 200);
 
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
             DB::rollback();
-            Alert::toast('There was an error creating the budget-list. '.$e->getMessage(), 'error');
-            return back();
+            return response()->json([
+                'message' => 'There was an error creating the budget-list: ' . $e->getMessage()
+            ], 500); // status 500 = server error
         }
     }
 
@@ -197,14 +200,14 @@ class BudgetListController extends Controller
 
             // Commit transaksi
             DB::commit();
-            Alert::toast('Budget-list successfully updated!', 'success');
-            return redirect()->route('budget-list.index');
+            return response()->json(['message' => 'Budget-list successfully updated!'], 200);
 
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
             DB::rollback();
-            Alert::toast('There was an error updating the budget-list. '.$e->getMessage(), 'error');
-            return back();
+            return response()->json([
+                'message' => 'There was an error updating the budget-list: ' . $e->getMessage()
+            ], 500); // status 500 = server error
         }
     }
 
@@ -246,19 +249,29 @@ class BudgetListController extends Controller
 
             // Commit transaksi
             DB::commit();
-            Alert::toast('Budget-list successfully deleted!', 'success');
-            return redirect()->route('budget-list.index');
+            return response()->json(['message' => 'Budget-list successfully deleted!'], 200);
 
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
             DB::rollback();
-            Alert::toast('There was an error deleting the budget-list. '.$e->getMessage(), 'error');
-            return back();
+            return response()->json([
+                'message' => 'There was an error deleting the budget-list: ' . $e->getMessage()
+            ], 500); // status 500 = server error
         }
     }
 
-    public function getBudgetList(){
-        $budgets = BudgetList::with('category')->get();
+    public function getBudgetList(Request $request){
+        $year = $request->has('year') && $request->year != '' 
+            ? $request->year 
+            : Carbon::now()->addYear()->year;
+            
+        $yearSuffix = substr($year, -2); // '2026' -> '26'
+
+        $budgets = BudgetList::with('category')
+            ->where(DB::raw("SUBSTRING_INDEX(SUBSTRING_INDEX(budget_allocation_no, '/', 3), '/', -1)"), '=', $yearSuffix)
+            ->get();
+
+        // $budgets = BudgetList::with('category')->get();
         return response()->json($budgets);
     }
 
@@ -273,12 +286,13 @@ class BudgetListController extends Controller
             $departmentBudget = $budget->total_amount ?? 0;
 
             $finalAmount = $totalAmount - $departmentBudget;
+            $year = now()->addYear()->format('Y');
             if($finalAmount > 0){
-                $department->deposit(abs($finalAmount));
+                $department->depositToYear($year, abs($finalAmount));
             }
             else if($finalAmount < 0)
             {
-                $department->withdraw(abs($finalAmount));
+                $department->withdrawFromYear($year, abs($finalAmount));
             }
             $departmentBudget += $finalAmount;
             $budget->update([
@@ -293,5 +307,16 @@ class BudgetListController extends Controller
             DB::rollback();
             return $e;
         }
+    }
+
+    public function getBudgetListYear()
+    {
+        $years = BudgetList::select(DB::raw("CONCAT('20', SUBSTRING_INDEX(SUBSTRING_INDEX(budget_allocation_no, '/', 3), '/', -1)) as year"))
+                    ->groupBy('year')
+                    ->orderBy('year', 'desc')
+                    ->pluck('year')
+                    ->toArray();
+
+        return response()->json($years);
     }
 }
