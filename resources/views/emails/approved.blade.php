@@ -65,7 +65,7 @@
             <tr>
                 <td style="width:auto"></td>
                 <td>Jumlah:</td>
-                <td>{{ $detail->quanitity}}</td>
+                <td>{{ $detail->quantity}}</td>
             </tr>
             <tr class="tr-odd">
                 <td style="width:auto"></td>

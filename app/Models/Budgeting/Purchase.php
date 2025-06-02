@@ -49,13 +49,13 @@ class Purchase extends Model
     }
 
     public function budgetRequest()
-    {
-        return $this->hasOne(BudgetRequest::class, 'budget_purchase_no', 'purchase_no');
-    }
-    public function category()
-    {
-        return $this->belongsTo(CategoryMaster::class);
-    }
+{
+    return $this->hasOne(BudgetRequest::class, 'budget_purchase_no', 'purchase_no');
+}
+public function category()
+{
+    return $this->belongsTo(CategoryMaster::class);
+}
 
 
 

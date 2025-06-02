@@ -34,20 +34,26 @@ class PurchaseController extends Controller
      */
     public function index()
     {
-        $purchases = Purchase::with('department', 'detail', 'budgetRequest')->paginate(5);
         $user = Auth::user();
         $departments = Department::all();
-        $department= $user->department;
+        $department = $user->department;
         $budget = BudgetAllocation::where('department_id', $user->department_id)->latest()->first();
+        $budgetNo = $budget->budget_allocation_no ?? 'N/A';
+        $currentDate = now()->format('j M y');
+        $years = Purchase::selectRaw('YEAR(created_at) as year')
+            ->distinct()
+            ->orderByDesc('year')
+            ->pluck('year');
 
-        return view(".page.budgeting.management.PurchaseRequest.index", [
-            'purchases' => $purchases,
-            'department'=>$department,
-            'userDepartment'=>$user->department->department_name ?? 'unknown',
-            'currentDate'=>now()->format('j M y'),  
-            'budgetNo' => $budget->budget_allocation_no ?? 'N/A',
-            'departments'=>$departments,
-        ]);
+        return view(".page.budgeting.management.PurchaseRequest.index", compact(
+            'user',
+            'years',
+            'department',
+            'departments',
+            'budget',
+            'budgetNo',
+            'currentDate'
+        ));
     }
 
     /**
@@ -87,7 +93,7 @@ class PurchaseController extends Controller
         //* looping data & kalkulasi harga
         $grandTotal = 0;
         $purchases = [];
-        $purchaseNumber = generateDocumentNumber();
+        $purchaseNumber = generateDocumentNumber($department->department_name);
 
         $master = Purchase::create([
             'department_id'=>$departmentId,
@@ -106,7 +112,7 @@ class PurchaseController extends Controller
                 'purchase_no'=> $master->purchase_no,
                 'item_name' => $desc,
                 'amount' => $price,
-                'quanitity' => $quantity,
+                'quantity' => $quantity,
                 'total_amount' => $total,
                 'remarks' => $validatedData['remark'][$index] ?? null,
                 // 'status' => $isBalanceEnough ? 'approved' : 'pending',
@@ -137,8 +143,10 @@ class PurchaseController extends Controller
                 // dd($toDept, $toDept->balance, $department->balance);
                 if ($toDept->balance < $amount) {
                     DB::rollback();
-                    Alert::toast("The selected department's budget is insufficient.", 'error');
-                    return back();
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Depertement yang dituju tidak memiliki dana yang mencukupi'
+                    ], 422);
                 }
 
                 $master->update([
@@ -179,14 +187,20 @@ class PurchaseController extends Controller
                     sendApprovalRequest::dispatch($approver, $requestData, $budgetApproval);
                 }
                 DB::commit();
-                Alert::toast('Saldo tidak mencukupi. Permintaan budget telah diajukan.', 'info');
-                return back();
-            }
+                return response()->json([
+                        'success' => true,
+                        'pending' => true,
+                        'new_balance' => $department->fresh()->balance,
+                        'message' => 'Saldo tidak mencukupi. Permintaan budget telah diajukan.',
+                    ], 200);
+                }
             //* rollback jika input table request ada yang kosong
             else{
-                DB::rollback();
-                Alert::toast('lengkapi semua data yang diminta. Permintaan budget gagal diajukan.', 'info');
-                return back();
+                    DB::rollback();
+                    return response()->json([
+                    'success' => false,
+                    'message' => "lengkapi semua data"
+                ], 422);
             }
         }
 
@@ -197,20 +211,24 @@ class PurchaseController extends Controller
         $data = purchase::with('detail')->where('purchase_no', $purchaseNumber)->firstOrFail();
         $purchaseDetails = $data->detail;
         $admin = user::where('username', 'admin')->first();
-        $user = user::where('department_id', $departmentId)->first();
+        $users = user::where('department_id', $departmentId)->first();
             // dd($user, $purchases , $deptName, $purchaseDetails);
-        SendApprovedPurchaseNotification::dispatch($user, $data, $purchaseDetails, false)->onQueue('emails');
+        SendApprovedPurchaseNotification::dispatch($users, $data, $purchaseDetails, false)->onQueue('emails');
         SendApprovedPurchaseNotification::dispatch($admin, $data, $purchaseDetails, true)->onQueue('emails');
 
         DB::commit();
-        Alert::success('Berhasil', 'Data pembelian berhasil disimpan.');
-        return redirect()->route('purchase-request.index');
-
+        return response()->json([
+                'new_balance' => $department->fresh()->balance,
+                'success' => true,
+                'pending' => false,
+                'message' => 'Data berhasil disimpan!'
+            ]);
         }catch(\Exception $e){
             DB::rollBack();
-            dd($e->getMessage());
-            Alert::toast('Terjadi kesalahan: ' . $e->getMessage(), 'error');
-            return back()->withInput();
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ]);
         }
     }
 
@@ -249,9 +267,10 @@ class PurchaseController extends Controller
             $fromDept = Department::findOrFail($validated['fromDept']);
     
             $oldAmount = $purchase->actual_amount;
-            $grandTotal = $validated['grand_total'];
+            $grandTotal = $purchase->grand_total;
             $newActualAmount = $validated['actual_amount'];
     
+            //* actual amount pernah diinput
             if ($oldAmount !== null) {
                 if ($oldAmount > $grandTotal) {
                     $fromDept->deposit($oldAmount - $grandTotal);
@@ -266,24 +285,26 @@ class PurchaseController extends Controller
                 'actual_amount' => $newActualAmount
             ]);
     
+            // * ketika actual amount baru  besar dari grand total
             if ($newActualAmount > $grandTotal) {
                 $diff = $newActualAmount - $grandTotal;
     
+                // * ketika balance lebih kecil dari diff
                 if ($fromDept->balance < $diff) {
                     $toDept = Department::findOrFail($validated['department_id']);
     
-                    if ($toDept->balance < $diff) {
+                    if ($toDept->balance < $diff-$fromDept->balance) {
                         DB::rollBack();
                         Alert::toast("The selected department's budget is insufficient.", 'error');
                         return redirect()->route('purchase-request.index');
                     }
-    
-                    $toDept->transfer($fromDept, $diff);
+                    $toDept->transfer($fromDept, $diff-$fromDept->balance);
                 }
     
                 $fromDept->withdraw($diff);
     
-            } elseif ($newActualAmount < $grandTotal) {
+            }//* ketika new actual amount kecil dari grand total
+            elseif ($newActualAmount < $grandTotal) {
                 $fromDept->deposit($grandTotal - $newActualAmount);
             }
     
@@ -450,6 +471,25 @@ class PurchaseController extends Controller
                 }
             }
 
+    public function getData(Request $request)
+    {
+        $user = Auth::user();
+        $query = Purchase::with(['department', 'detail', 'category']);
+
+        if ($user->username !== 'admin') {
+            $query->where('department_id', $user->department_id);
+        }
+
+        if ($request->has('year') && $request->year != '') {
+            $query->whereYear('created_at', $request->year);
+        }
+
+        $data = $query->get();
+
+        return response()->json($data);
+    }
+
+            
     protected function getBudgetRequestNo($departmentId)
     {
         $department = Department::findOrFail($departmentId);
