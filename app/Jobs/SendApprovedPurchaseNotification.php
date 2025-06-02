@@ -21,10 +21,10 @@ class SendApprovedPurchaseNotification implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct($user, $data, $purchaseDetails, bool $isAdmin)
+    public function __construct($users, $data, $purchaseDetails, bool $isAdmin)
     {
 
-        $this->user=$user;
+        $this->user=$users;
         $this->data=$data;
         $this->purchaseDetails=$purchaseDetails;
         $this->isAdmin=$isAdmin;
@@ -35,6 +35,7 @@ class SendApprovedPurchaseNotification implements ShouldQueue
      */
     public function handle(): void
     {
+        return;
         Mail::to($this->user->email)->send(new defaultEmail(
             $this->user,
             $this->data,

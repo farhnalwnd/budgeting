@@ -5,7 +5,7 @@
     #testTable tr,
     #testTable td {
         border: 3px solid black;
-    };
+    }
     .center {
         text-align: center;
     }
@@ -30,7 +30,7 @@
 
     <section x-data="{open : false}" class="content">
         <div class="mb-4 flex px-4">
-            <div
+            <div id="deptBalance"
                 class="w-fit h-max shadow-md rounded-md shadow-neutral-500 bg-gradient-to-t from-cyan-500 to-blue-500  text-lg p-3 hover:scale-105 group">
                 <h1 class="group-hover:cursor-pointer">Rp. {{number_format($department->balance , 0, ',',
                     '.')}}</h1>
@@ -48,6 +48,14 @@
         <div class="card">
             <div class="card-header">
                 <h1 class="card-title text-2xl font-medium">Purchase Request</h1>
+                <div>
+                    <select id="yearFilter" name="year">
+                        <option value="">-- Pilih Tahun --</option>
+                        @foreach ($years as $year)
+                        <option value="{{ $year }}">{{ $year }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
             <div class="card-body">
                 <table id="usersTable" class="table table-bordered w-full">
@@ -73,7 +81,7 @@
         </div>
 
         
-        <!-- Modal -->
+        <!-- Modal create-->
         <div x-show="open" x-on:keydown.escape.window="open = false" x-transition.duration.400ms
             class="fixed inset-0 z-[999] flex items-center justify-center bg-black bg-opacity-50">
             <div class="absolute bg-white text-black p-6 rounded-lg shadow-lg w-2/3 max-h-[800px] overflow-y-scroll"
@@ -92,7 +100,7 @@
                     <div class="flex items-center mt-2">
                         <div>
                             <h1 class="font-bold text-lg">ON: </h1>
-                            <h2 class="font-semibold text-base">{{$userDepartment}}</h2>
+                            <h2 class="font-semibold text-base">{{$user->department->department_name}}</h2>
                         </div>
                         <div class="ml-auto">
                             <h1 class="font-bold text-lg">Budget No:</h1>
@@ -105,7 +113,7 @@
             
                 <!-- Table -->
                 <div class="container mt-10">
-                    <form x-on:keydown.enter.window="$el.submit()" method="POST"
+                    <form id="purchase-form" x-on:keydown.enter.window="$el.submit()" method="POST"
                         action="{{ route('purchase-request.store') }}">
                 <div x-data="{ scrolled: false }" @scroll="scrolled = $el.scrollTop > 0 || false"
                     class="overflow-y-auto max-h-[250px] mt-6">
@@ -208,7 +216,7 @@
                             </button>
                             </div>
                 <div class="flex gap-2">
-                    <button type="submit" class="btn btn-success">Simpan</button>
+                    <button @click="open = false" type="submit" class="btn btn-success">Simpan</button>
                     <button @click="open = !open" type="button" class="btn btn-danger">Exit</button>
                 </div>
                 </div>
@@ -220,6 +228,7 @@
 </section>
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     var purchases = null;
     let walletBalance = {{ $department->balance }};
@@ -495,6 +504,81 @@
 
     // Inisialisasi yang harus dijalankan setelah DOM siap
     document.addEventListener('DOMContentLoaded', function () {
+
+        const form = document.getElementById('purchase-form');
+        const reqbud = document.getElementById('request-budget-form');
+        const tableBody = document.querySelector('#testTable tbody');
+        const balanceElement = document.getElementById('deptBalance')?.querySelector('h1');
+
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+            const csrfToken = document.querySelector('input[name="_token"]').value;
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json',
+                    },
+                    body: formData
+                });
+
+                const result = await response.json();
+                handleResponse(result);
+            } catch (error) {
+                showError('Gagal', error.message);
+                console.error('Error:', error);
+            }
+        });
+
+        function handleResponse(result) {
+            if (result.success) {
+                showSuccessOrPendingAlert(result);
+                updateUIAfterSuccess(result);
+            } else {
+                showError('Gagal', result.message);
+            }
+        }
+
+        function showSuccessOrPendingAlert(result) {
+            Swal.fire({
+                icon: result.pending ? 'info' : 'success',
+                title: result.pending ? 'Budget Pending' : 'Berhasil melakukan purchase',
+                text: result.message,
+                timer: result.pending ? 2500 : 2000,
+                showConfirmButton: !result.pending
+            });
+        }
+
+        function updateUIAfterSuccess(result) {
+            if (balanceElement) {
+                balanceElement.innerText = toRupiah(result.new_balance);
+            }
+
+            // Reload table and reset form
+            table.ajax.reload(null, false);
+            form.reset();
+            reqbud.classList.add('hidden');
+
+            // Hapus semua baris kecuali baris pertama
+            const rows = tableBody.querySelectorAll('tr');
+            rows.forEach((row, index) => {
+                if (index > 0) row.remove();
+            });
+        }
+
+        function showError(title, message) {
+            Swal.fire({
+                icon: 'error',
+                title: title,
+                text: message
+            });
+        }
+        
+        
         var table = $('#usersTable').DataTable({
             dom: 'Bfrtip',
             autoWidth: false,
@@ -502,8 +586,12 @@
             ajax: {
                 url: "{{ route('purchase.data') }}",
                 type: 'GET',
+                data: function (d) {
+                    d.year = $('#yearFilter').val();
+                },
                 dataSrc: function (response) {
                     purchases = response;
+                    //console.log('data masuk :', purchases);
                     return response;
                 }
             },
@@ -538,6 +626,10 @@
                 }
             ]
         });
+
+        $('#yearFilter').on('change', function () {
+            table.ajax.reload(); // reload datatable dengan parameter tahun baru
+            });
 
         // Setup event listeners on existing rows of your table if any
         document.querySelectorAll('#testTable tbody tr').forEach(row => {

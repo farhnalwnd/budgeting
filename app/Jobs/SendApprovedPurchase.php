@@ -39,6 +39,7 @@ class SendApprovedPurchase implements ShouldQueue
      */
     public function handle(): void
     {
+        return;
         Mail::to($this->user->email)->send(new approvedEmail(
             $this->user,
             $this->purchases,
