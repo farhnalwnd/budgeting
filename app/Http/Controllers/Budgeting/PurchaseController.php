@@ -578,7 +578,6 @@ class PurchaseController extends Controller
         if ($user->username !== 'admin') {
             $query->where('department_id', $user->department_id);
         }
-
         if ($request->has('year') && $request->year != '') {
             $query->whereYear('created_at', $request->year);
         }
@@ -588,7 +587,16 @@ class PurchaseController extends Controller
         return response()->json($data);
     }
 
-            
+    public function getYear()
+    {
+        $years = Purchase::selectRaw('YEAR(created_at) as year')
+            ->distinct()
+            ->orderByDesc('year')
+            ->pluck('year');
+        return response()->json($years);
+    }
+
+
     protected function getBudgetRequestNo($departmentId)
     {
         $department = Department::findOrFail($departmentId);

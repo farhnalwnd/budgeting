@@ -18,7 +18,7 @@ return new class extends Migration
                 table:'departments',
                 indexName:'fk_purchases_department'
             );
-            $table->foreignId('category_id')->constrained(
+            $table->foreignId('category_id')->nullable()->constrained(
                 table:'category_masters',
                 indexName:'fk_purchases_category'
             );

@@ -41,7 +41,7 @@ trait HasYearlyWallets
      */
     public function balanceForYear(int $year): int|float
     {
-        return $this->getYearlyWallet($year)->balance;
+        return $this->getYearlyWallet($year)->balance ?? 0;
     }
 }
 

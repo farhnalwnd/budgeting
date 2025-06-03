@@ -32,8 +32,7 @@
         <div class="mb-4 flex px-4">
             <div id="deptBalance"
                 class="w-fit h-max shadow-md rounded-md shadow-neutral-500 bg-gradient-to-t from-cyan-500 to-blue-500  text-lg p-3 hover:scale-105 group">
-                <h1 class="group-hover:cursor-pointer">Rp. {{number_format($department->balance , 0, ',',
-                    '.')}}</h1>
+                <h1 class="group-hover:cursor-pointer">Rp. {{number_format($department->balanceForYear(now()->year) , 0, ',' , '.')}}</h1>
             </div>
             <div @click="open = ! open" class="ml-auto">
                 <button type="button"
@@ -49,11 +48,8 @@
             <div class="card-header">
                 <h1 class="card-title text-2xl font-medium">Purchase Request</h1>
                 <div>
-                    <select id="yearFilter" name="year">
-                        <option value="">-- Pilih Tahun --</option>
-                        @foreach ($years as $year)
-                        <option value="{{ $year }}">{{ $year }}</option>
-                        @endforeach
+                    <select id="filterYear" class="border border-gray-400 rounded px-2 py-1">
+                        <!--! isi filter diatur ajax -->
                     </select>
                 </div>
             </div>
@@ -70,6 +66,7 @@
                             <th class="text-center w-fit">Details</th>
                         </tr>
                     </thead>
+                    <!-- ! td diatur oleh datatable -->
                 </table>
             </div>
         </div>
@@ -231,7 +228,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     var purchases = null;
-    let walletBalance = {{ $department->balance }};
+    let walletBalance = {{ $department->balanceForYear(now()->year) }};
 
     // Fungsi-fungsi dideklarasikan di luar DOMContentLoaded
     function openModal(purchaseNo) {
@@ -288,7 +285,7 @@
                     </div>
                     <div class="pl-7">
                         <h1 class="font-bold text-lg mb-1">Status:</h1>
-                        <span class="font-semibold text-lg rounded-md p-1 uppercase text-emerald-700 border-2 border-emerald-600 border-opacity-50">${purchase.status}</span>
+                        <span class="font-semibold text-lg rounded-md uppercase border-2 ${getStatusColor(purchase.status)} border-opacity-50">${purchase.status}</span>
                     </div>
                 </div>
 
@@ -348,6 +345,19 @@
         `;
         modalDiv.innerHTML += newEditModal;
     }
+
+    function getStatusColor(status) {
+            switch (status.toLowerCase()) {
+                case 'pending':
+                    return 'p-1 bg-yellow-100 text-yellow-800 border border-yellow-400';
+                case 'rejected':
+                    return 'p-1 bg-blue-100 text-red-800 border border-red-400';
+                    break;
+                default:
+                    return 'p-1 bg-green-100 text-green-800 border border-green-400';
+                    break;
+            }
+        }
 
     function formatTanggalShort(dateStr) {
         const options = { day: 'numeric', month: 'short', year: '2-digit' };
@@ -505,6 +515,7 @@
     // Inisialisasi yang harus dijalankan setelah DOM siap
     document.addEventListener('DOMContentLoaded', function () {
 
+        let table;
         const form = document.getElementById('purchase-form');
         const reqbud = document.getElementById('request-budget-form');
         const tableBody = document.querySelector('#testTable tbody');
@@ -578,58 +589,103 @@
             });
         }
         
-        
-        var table = $('#usersTable').DataTable({
-            dom: 'Bfrtip',
-            autoWidth: false,
-            buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-            ajax: {
-                url: "{{ route('purchase.data') }}",
-                type: 'GET',
-                data: function (d) {
-                    d.year = $('#yearFilter').val();
-                },
-                dataSrc: function (response) {
-                    purchases = response;
-                    //console.log('data masuk :', purchases);
-                    return response;
-                }
+        $.ajax({
+            url: "{{ route('get.year') }}",
+            method: 'GET',
+            success: function (response) {
+                years = response;
+                var yearSelect = document.getElementById('filterYear');
+                years.forEach(year => {
+                    var option = document.createElement('option');
+                    option.value = year;
+                    option.textContent = year;
+                    yearSelect.appendChild(option);
+                });
+                initTable();
             },
-            columns: [
-                {
-                    data: null,
-                    render: function (data, type, row, meta) {
-                        return meta.row + 1;
-                    }
-                },
-                { data: 'purchase_no', name: 'purchase_no', className: 'center' },
-                { data: 'department.department_name', name: 'department', className: 'center' },
-                { data: 'grand_total', name: 'grand_total', className: 'center',
-                render: function (data, type, row) {
-                    return toRupiah(data);}
-                },
-                { data: 'actual_amount', name: 'actual_amount', className: 'center',
-                render: function (data, type, row) {
-                    return toRupiah(data);}
-                },
-                { data: 'status', name: 'status', className: 'center' },
-                {
-                    data: null,
-                    name: 'aksi',
-                    orderable: false,
-                    searchable: false,
-                    render: function (data, type, row) {
-                        return `
-                        <button class="btn btn-info" onclick="openModal('${row.purchase_no}')">Detail</button>
-                        `;
-                    }
-                }
-            ]
+            error: function () {
+                Swal.fire({
+                    icon: 'error',
+                    title: title,
+                    text: 'Error ketika mengambil data department.'
+                });
+            }
         });
-
-        $('#yearFilter').on('change', function () {
-            table.ajax.reload(); // reload datatable dengan parameter tahun baru
+        
+        function initTable(){
+            table = $('#usersTable').DataTable({
+                dom: 'Bfrtip',
+                autoWidth: false,
+                buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+                ajax: {
+                    url: "{{ route('purchase.data') }}",
+                    type: 'GET',
+                    data: function (d) {
+                        d.year = $('#filterYear').val();
+                    },
+                    dataSrc: function (response) {
+                        purchases = response;
+                        //console.log('data masuk :', purchases);
+                        return response;
+                    }
+                },
+                columns: [
+                    {
+                        data: null,
+                        render: function (data, type, row, meta) {
+                            return meta.row + 1;
+                        }
+                    },
+                    { data: 'purchase_no', name: 'purchase_no', className: 'center' },
+                    { data: 'department.department_name', name: 'department', className: 'center' },
+                    { data: 'grand_total', name: 'grand_total', className: 'center',
+                    render: function (data, type, row) {
+                        return toRupiah(data);}
+                    },
+                    { data: 'actual_amount', name: 'actual_amount', className: 'center',
+                    render: function (data, type, row) {
+                        return toRupiah(data);}
+                    },
+                    { data: 'status', name: 'status', className: 'center',
+                    render: function(data, type, row){
+                        let statusClass = '';
+                        switch (data.toLowerCase()) {
+                            case 'pending':
+                                statusClass = 'bg-yellow-100 text-yellow-800 border border-yellow-400';
+                                break;
+                            case 'rejected':
+                                statusClass = 'bg-blue-100 text-red-800 border border-red-400';
+                                break;
+                            default:
+                                statusClass = 'bg-green-100 text-green-800 border border-green-400';
+                                break;
+                            }
+                            return `<span class="px-3 py-1 rounded-full font-semibold text-sm ${statusClass}">${data}</span>`;
+                        }
+                    },
+                    {
+                        data: null,
+                        name: 'aksi',
+                        orderable: false,
+                        searchable: false,
+                        render: function (data, type, row) {
+                            return `
+                            <button class="btn btn-info" onclick="openModal('${row.purchase_no}')">Detail</button>
+                            `;
+                        }
+                    }
+                ],
+                rowCallback: function (row, data) {
+                    $('td', row).addClass('text-gray-700');
+                }
             });
+        }
+
+        $('#filterYear').on('change', function () {
+            if(table){
+            table.ajax.reload();
+            }
+        });
 
         // Setup event listeners on existing rows of your table if any
         document.querySelectorAll('#testTable tbody tr').forEach(row => {
