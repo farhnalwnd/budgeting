@@ -106,8 +106,6 @@ class PurchaseController extends Controller
             $total = $price * $quantity;
             $grandTotal += $total;
 
-            // $isBalanceEnough = $department->balance >= $grandTotal;
-
             $purchases[] = [
                 'purchase_no'=> $master->purchase_no,
                 'item_name' => $desc,
@@ -115,7 +113,6 @@ class PurchaseController extends Controller
                 'quantity' => $quantity,
                 'total_amount' => $total,
                 'remarks' => $validatedData['remark'][$index] ?? null,
-                // 'status' => $isBalanceEnough ? 'approved' : 'pending',
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
@@ -126,13 +123,11 @@ class PurchaseController extends Controller
         $master-> update([
             'grand_total'=>$grandTotal,
         ]);
-        // dd($master);
 
         $amount = Purchase::parseRupiah($validatedData['amount']);
-        // dd($grandTotal,$department->balance);
 
         //* kondisi balance kurang
-        if ($grandTotal > $department->balance) {
+        if ($grandTotal > $department->balanceForYear(now()->year)) {
             if (
                 $validatedData['from_department'] &&
                 $validatedData['to_department'] &&
@@ -140,8 +135,7 @@ class PurchaseController extends Controller
                 $validatedData['reason']
             ) {
                 $toDept = Department::findorfail($validatedData['to_department']);
-                // dd($toDept, $toDept->balance, $department->balance);
-                if ($toDept->balance < $amount) {
+                if ($toDept->balanceForYear(now()->year) < $amount) {
                     DB::rollback();
                     return response()->json([
                         'success' => false,
@@ -165,8 +159,7 @@ class PurchaseController extends Controller
                 ]);
 
                 $approver= null;
-                $approver= BudgetApprover::where('department_id', $validatedData['to_department'])
-                                        ->first();
+                $approver= BudgetApprover::where('department_id', $validatedData['to_department'])->first();
                 $budgetApproval= BudgetApproval::create([
                 'budget_req_no' => $budgetRequest->budget_req_no,
                 'nik' => $approver->nik,
@@ -186,11 +179,29 @@ class PurchaseController extends Controller
                     ];
                     sendApprovalRequest::dispatch($approver, $requestData, $budgetApproval);
                 }
+
+                //*log activity on budgetRequest
+                activity()
+                    ->performedOn($budgetRequest)
+                    ->inLog('budget-request')
+                    ->event('create')
+                    ->causedBy($user)
+                    ->withProperties([
+                        'no' => $budgetRequest->budget_req_no,
+                        'action' => 'create',
+                        'data' => [
+                            'department_id' => $departmentId,
+                            'to_department' => $toDept->department_name,
+                            'purchase_no' => $purchaseNumber,
+                            'status' => $budgetRequest->status
+                        ]
+                    ])
+                    ->log('create budget-request ' . $budgetRequest->budget_req_no . ' by ' . $user->name . ' at ' . now());
                 DB::commit();
                 return response()->json([
                         'success' => true,
                         'pending' => true,
-                        'new_balance' => $department->fresh()->balance,
+                        'new_balance' => $department->fresh()->balanceForYear(now()->year),
                         'message' => 'Saldo tidak mencukupi. Permintaan budget telah diajukan.',
                     ], 200);
                 }
@@ -204,11 +215,12 @@ class PurchaseController extends Controller
             }
         }
 
-        $department->withdraw($grandTotal);
-        // dd($department);
+        // $department->withdraw($grandTotal);
+        $department->withdrawFromYear(now()->year, $grandTotal);
+            // dd($department);
 
-        //* email ke user
-        $data = purchase::with('detail')->where('purchase_no', $purchaseNumber)->firstOrFail();
+            //* email ke user
+            $data = purchase::with('detail')->where('purchase_no', $purchaseNumber)->firstOrFail();
         $purchaseDetails = $data->detail;
         $admin = user::where('username', 'admin')->first();
         $users = user::where('department_id', $departmentId)->first();
@@ -216,9 +228,24 @@ class PurchaseController extends Controller
         SendApprovedPurchaseNotification::dispatch($users, $data, $purchaseDetails, false)->onQueue('emails');
         SendApprovedPurchaseNotification::dispatch($admin, $data, $purchaseDetails, true)->onQueue('emails');
 
-        DB::commit();
+        //*log activity on purchaseRequest
+            activity()
+                ->performedOn($data)
+                ->inLog('purchase-request')
+                ->event('create')
+                ->causedBy($user)
+                ->withProperties(['no'=> $data->purchase_no, 'action'=>'create',
+                'data'=>[
+                    'department_id'=> $departmentId,
+                    'category_id'=> $data->category_id ?? null,
+                    'grand_total'=> $data->grand_total,
+                    'status'=> $data->status
+                ]
+                ])
+                ->log('create purchase-request '. $data->purchase_no . ' by'. $user->name . ' at: ' . now());
+            DB::commit();
         return response()->json([
-                'new_balance' => $department->fresh()->balance,
+                'new_balance' => $department->fresh()->balanceForYear(now()->year),
                 'success' => true,
                 'pending' => false,
                 'message' => 'Data berhasil disimpan!'
@@ -261,6 +288,8 @@ class PurchaseController extends Controller
         DB::beginTransaction();
     
         try {
+            $user = auth()->user();
+
             $validated = $request->validated();
     
             $purchase = Purchase::findOrFail($id);
@@ -273,9 +302,11 @@ class PurchaseController extends Controller
             //* actual amount pernah diinput
             if ($oldAmount !== null) {
                 if ($oldAmount > $grandTotal) {
-                    $fromDept->deposit($oldAmount - $grandTotal);
+                    // $fromDept->deposit($oldAmount - $grandTotal);
+                    $fromDept->depositToYear(now()->year, $oldAmount - $grandTotal);
                 } elseif ($oldAmount < $grandTotal) {
-                    $fromDept->withdraw($grandTotal - $oldAmount);
+                    // $fromDept->withdraw($grandTotal - $oldAmount);
+                    $fromDept->withdrawFromYear(now()->year, $grandTotal - $oldAmount);
                 }
             }
     
@@ -290,24 +321,48 @@ class PurchaseController extends Controller
                 $diff = $newActualAmount - $grandTotal;
     
                 // * ketika balance lebih kecil dari diff
-                if ($fromDept->balance < $diff) {
+                if ($fromDept->balanceForYear(now()->year) < $diff) {
                     $toDept = Department::findOrFail($validated['department_id']);
     
-                    if ($toDept->balance < $diff-$fromDept->balance) {
+                    if ($toDept->balanceForYear(now()->year) < $diff-$fromDept->balanceForYear(now()->year)) {
                         DB::rollBack();
                         Alert::toast("The selected department's budget is insufficient.", 'error');
                         return redirect()->route('purchase-request.index');
                     }
-                    $toDept->transfer($fromDept, $diff-$fromDept->balance);
+                    // $toDept->transfer($fromDept, $diff-$fromDept->balance);
+                    //*balance pertahun
+                    $toDeptWallet = $toDept->balanceForYear(now()->year);
+                    $fromDeptWallet = $fromDept->balanceForYear(now()->year);
+                    $toDeptWallet->transfer($fromDeptWallet, $diff - $fromDeptWallet);
                 }
     
-                $fromDept->withdraw($diff);
+                // $fromDept->withdraw($diff);
+                $fromDept->withdrawFromYear(now()->year, $diff);
     
             }//* ketika new actual amount kecil dari grand total
             elseif ($newActualAmount < $grandTotal) {
-                $fromDept->deposit($grandTotal - $newActualAmount);
+                // $fromDept->deposit($grandTotal - $newActualAmount);
+                $fromDept->depositToYear(now()->year, $grandTotal - $newActualAmount);
             }
-    
+
+
+            //* activity log uppdate
+            activity()
+                ->performedOn($purchase)
+                ->inLog('purchase-update')
+                ->event('update')
+                ->causedBy($user)
+                ->withProperties([
+                    'no' => $purchase->purchase_no,
+                    'action' => 'update',
+                    'data' => [
+                        'PO' => $purchase->PO,
+                        'actual_amount' => $purchase->actual_amount,
+                        'category' => $purchase->category->name,
+                    ]
+                ])
+                ->log('purchase-update ' .  $purchase->purchase_no . ' by ' . $user->name . ' at: ' . now());
+
             DB::commit();
             Alert::toast('Berhasil melakukan update', 'success');
             return redirect()->route('purchase-request.index');
@@ -383,8 +438,14 @@ class PurchaseController extends Controller
                 $amount = $budgetRequest->amount;
 
                 // Transfer saldo antar wallet
-                $fromDept->transfer($toDept, $amount);
-                $toDept->withdraw($toDept->balanceInt);
+                // $fromDept->transfer($toDept, $amount);
+
+                $toDeptWallet = $toDept->balanceForYear(now()->year);
+                $fromDeptWallet = $fromDept->balanceForYear(now()->year);
+                $fromDeptWallet->transfer($toDeptWallet, $amount);
+
+                // $toDept->withdraw($toDept->balanceInt);
+                $toDept->withdrawFromYear(now()->year, $toDeptWallet);
 
                 $budgetRequest->status = 'approved';
                 $budgetRequest->save();
@@ -404,6 +465,21 @@ class PurchaseController extends Controller
                     SendApprovedPurchase::dispatch($admin, $purchases , $budgetRequest, $deptName, $purchaseDetails, true)->onQueue('emails');
                 }
             }
+
+                //* activity log approve
+                activity()
+                    ->performedOn($budgetRequest)
+                    ->inLog('budget-request approval')
+                    ->event('approve')
+                    ->causedBy($requestApprove->nik->name)
+                    ->withProperties([
+                        'no' => $budgetRequest,
+                        'action' => 'approval',
+                        'data' => [
+                            'feedback' => '-'
+                        ]
+                    ])
+                    ->log('budget-request approval ' .  $budgetRequest . ' by ' . $requestApprove->nik->name . ' at: ' . now());
             DB::commit();
             return view('emails.finishProcces');
         }else{
@@ -429,6 +505,8 @@ class PurchaseController extends Controller
             'feedback' => 'required|string|max:1000',
         ]);
 
+        DB::beginTransaction();
+
         try {
             $data = BudgetApproval::where('budget_req_no', $request->budget_req_no)
                 ->where('nik', $request->nik)
@@ -445,31 +523,52 @@ class PurchaseController extends Controller
             $data->updated_at = now();
             $data->save();
 
-            //*update budgetrequest dan pruchase
-            $budgetRequest = BudgetRequest::with(['purchase', 'toDepartment', 'fromDepartment'])->where('budget_req_no', $request->budget_req_no)->first();
-                if ($budgetRequest) {
-                    $budgetRequest->status = 'rejected';
-                    $budgetRequest->feedback = $data->feedback;
-                    $budgetRequest->save();
+            //* update budgetrequest dan purchase
+            $budgetRequest = BudgetRequest::with(['purchase', 'toDepartment', 'fromDepartment'])
+                ->where('budget_req_no', $request->budget_req_no)
+                ->first();
 
-                    $purchases = $budgetRequest->purchase;
-                    if($purchases){
-                        $purchases->update(['status'=> 'rejected']);
-                        
-                        $purchaseDetails = $purchases->detail;
-                        $toDept = $budgetRequest->toDepartment->department_name;
-                        $fromDept = $budgetRequest->fromDepartment->department_name;
-                        $deptName = [$toDept,$fromDept];
-                        $user = user::where('department_id', $budgetRequest->from_department_id)->first();
-                        // dd($user, $purchases , $budgetRequest, $deptName, $purchaseDetails);
-                        SendRejectedPurchaseNotification::dispatch($user, $purchases , $budgetRequest, $deptName, $purchaseDetails);
-                    }
-                }
-                    return view('emails.finishProcces');
-                } catch (\Exception $e) {
-                    return back()->with('error', 'Gagal menyimpan alasan: ' . $e->getMessage());
+            if ($budgetRequest) {
+                $budgetRequest->status = 'rejected';
+                $budgetRequest->feedback = $data->feedback;
+                $budgetRequest->save();
+
+                $purchases = $budgetRequest->purchase;
+                if ($purchases) {
+                    $purchases->update(['status' => 'rejected']);
+
+                    $purchaseDetails = $purchases->detail;
+                    $toDept = $budgetRequest->toDepartment->department_name;
+                    $fromDept = $budgetRequest->fromDepartment->department_name;
+                    $deptName = [$toDept, $fromDept];
+                    $user = user::where('department_id', $budgetRequest->from_department_id)->first();
+
+                    //* Kirim notifikasi dalam transaction-safe context
+                    SendRejectedPurchaseNotification::dispatch($user, $purchases, $budgetRequest, $deptName, $purchaseDetails);
                 }
             }
+
+            //* log untuk reject budget request
+            activity()
+                ->performedOn($budgetRequest)
+                ->inLog('budget-request reject')
+                ->event('reject')
+                ->causedBy($data->nik->name)
+                ->withProperties([
+                    'no' => $budgetRequest->budget->req_no,
+                    'action' => 'reject',
+                    'data' => [
+                        'feedback' => $data->feedback,
+                    ]
+                ])
+                ->log('budget-request reject ' .  $budgetRequest->budget->req_no . ' by ' . $data->nik->name . ' with feedback '. $data->feedback . ' at: ' . now());
+            DB::commit(); 
+            return view('emails.finishProcces');
+        } catch (\Exception $e) {
+            DB::rollBack(); 
+            return back()->with('error', 'Gagal menyimpan alasan: ' . $e->getMessage());
+        }
+    }
 
     public function getData(Request $request)
     {
