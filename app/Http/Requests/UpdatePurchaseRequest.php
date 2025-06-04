@@ -47,8 +47,8 @@ public function withValidator($validator)
         //     $validator->errors()->add('department_id', 'Department is required when actual amount exceeds grand total.');
         //     return;
         // }
-        if ($validator->errors()->any()) {
-            dd($validator->errors()->all());}
+        // if ($validator->errors()->any()) {
+        //     dd($validator->errors()->all());}
     });
 }
 }

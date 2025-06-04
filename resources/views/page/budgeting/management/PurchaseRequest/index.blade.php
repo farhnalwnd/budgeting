@@ -28,7 +28,7 @@
         </div>
     </div>
 
-    <section x-data="{open : false}" class="content">
+    <section x-data="{open : false}" @modal-close.window="open = false" class="content">
         <div class="mb-4 flex px-4">
             <div id="deptBalance"
                 class="w-fit h-max shadow-md rounded-md shadow-neutral-500 bg-gradient-to-t from-cyan-500 to-blue-500  text-lg p-3 hover:scale-105 group">
@@ -82,7 +82,7 @@
         <div x-show="open" x-on:keydown.escape.window="open = false" x-transition.duration.400ms
             class="fixed inset-0 z-[999] flex items-center justify-center bg-black bg-opacity-50">
             <div class="absolute bg-white text-black p-6 rounded-lg shadow-lg w-2/3 max-h-[800px] overflow-y-scroll"
-                @click.away="open = false">
+                @click.away="if (!Swal.isVisible()) open = false">
                 <!-- Header -->
                 <div class="flex justify-start">
                     <div class="flex items-center">
@@ -110,7 +110,7 @@
             
                 <!-- Table -->
                 <div class="container mt-10">
-                    <form id="purchase-form" x-on:keydown.enter.window="$el.submit()" method="POST"
+                    <form id="purchase-form" method="POST"
                         action="{{ route('purchase-request.store') }}">
                 <div x-data="{ scrolled: false }" @scroll="scrolled = $el.scrollTop > 0 || false"
                     class="overflow-y-auto max-h-[250px] mt-6">
@@ -213,8 +213,8 @@
                             </button>
                             </div>
                 <div class="flex gap-2">
-                    <button @click="open = false" type="submit" class="btn btn-success">Simpan</button>
-                    <button @click="open = !open" type="button" class="btn btn-danger">Exit</button>
+                    <button id="submitButton" type="button" class="btn btn-success">Simpan</button>
+                    <button id="exitButton" @click="open = !open" type="button" class="btn btn-danger">Exit</button>
                 </div>
                 </div>
                 </form>
@@ -225,12 +225,12 @@
 </section>
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.5/dist/sweetalert2.all.min.js"></script>
 <script>
     var purchases = null;
     let walletBalance = {{ $department->balanceForYear(now()->year) }};
 
-    // Fungsi-fungsi dideklarasikan di luar DOMContentLoaded
+    // view detail dan edit button
     function openModal(purchaseNo) {
         var modal = document.getElementById(`detail-${purchaseNo}`);
         var modalBackground = document.getElementById('modalBackground');
@@ -346,6 +346,7 @@
         modalDiv.innerHTML += newEditModal;
     }
 
+    // css untuk status
     function getStatusColor(status) {
             switch (status.toLowerCase()) {
                 case 'pending':
@@ -521,9 +522,39 @@
         const tableBody = document.querySelector('#testTable tbody');
         const balanceElement = document.getElementById('deptBalance')?.querySelector('h1');
 
-        form.addEventListener('submit', async function (e) {
-            e.preventDefault();
+        document.getElementById('exitButton').addEventListener('click', function(){
+            form.reset();
+        })
 
+        document.getElementById('submitButton').addEventListener('click', function (e) {
+            e.preventDefault();
+            alertConfirm();
+        });
+
+        function alertConfirm() {
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Data yang disubmit tidak akan bisa dihapus dan diedit!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, update!',
+                cancelButtonText: 'Batal',
+                buttonsStyling: true,
+                customClass: {
+                    confirmButton: 'bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded mx-1',
+                    cancelButton: 'bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded mx-1'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    submitFormAsync();
+                }
+            });
+        }
+
+        // Fungsi untuk handle form submission
+        async function submitFormAsync() {
             const formData = new FormData(form);
             const csrfToken = document.querySelector('input[name="_token"]').value;
 
@@ -533,17 +564,26 @@
                     headers: {
                         'X-CSRF-TOKEN': csrfToken,
                         'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
                     },
                     body: formData
                 });
 
                 const result = await response.json();
-                handleResponse(result);
+                console.log(result);
+
+                if (response.ok) {
+                    Swal.fire('Sukses!', 'Data berhasil diupdate', 'success');
+                    window.dispatchEvent(new Event('modal-close'));
+                    handleResponse(result);
+                } else {
+                    throw new Error(result.message || 'Terjadi kesalahan');
+                }
             } catch (error) {
-                showError('Gagal', error.message);
+                Swal.fire('Gagal!', error.message, 'error');
                 console.error('Error:', error);
             }
-        });
+        }
 
         function handleResponse(result) {
             if (result.success) {
@@ -559,22 +599,22 @@
                 icon: result.pending ? 'info' : 'success',
                 title: result.pending ? 'Budget Pending' : 'Berhasil melakukan purchase',
                 text: result.message,
-                timer: result.pending ? 2500 : 2000,
-                showConfirmButton: !result.pending
+                timer: result.pending ? 3000 : 3000,
+                showConfirmButton: true,
+                confirmButtonColor: '#bc9421',
+                confirmButtonText: 'close',
             });
         }
 
         function updateUIAfterSuccess(result) {
             if (balanceElement) {
-                balanceElement.innerText = toRupiah(result.new_balance);
+            balanceElement.innerText = toRupiah(result.new_balance);
             }
 
-            // Reload table and reset form
-            table.ajax.reload(null, false);
             form.reset();
+            table.ajax.reload(null, false);
             reqbud.classList.add('hidden');
 
-            // Hapus semua baris kecuali baris pertama
             const rows = tableBody.querySelectorAll('tr');
             rows.forEach((row, index) => {
                 if (index > 0) row.remove();
@@ -585,34 +625,77 @@
             Swal.fire({
                 icon: 'error',
                 title: title,
-                text: message
+                text: message,
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#bc9421'
+            });
+        }
+
+        // Fungsi update balance berdasarkan tahun
+        function updateBalance(year) {
+            $.ajax({
+                url: "{{ route('get.balance.by.year') }}",
+                method: 'GET',
+                data: { year: year },
+                success: function (response) {
+                    if (balanceElement) {
+                        balanceElement.innerText = toRupiah(response.new_balance);
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: 'Gagal mengambil saldo untuk tahun ' + year,
+                        confirmButtonText: 'OK'
+                    });
+                }
             });
         }
         
+        // Inisialisasi filter tahun dan set default ke tahun sekarang
         $.ajax({
             url: "{{ route('get.year') }}",
             method: 'GET',
-            success: function (response) {
-                years = response;
-                var yearSelect = document.getElementById('filterYear');
+            success: function (years) {
+                const yearSelect = document.getElementById('filterYear');
+                yearSelect.innerHTML = '';
+
+                const currentYear = new Date().getFullYear();
+                let selectedYear = years.includes(currentYear) ? currentYear : years[0];
+
                 years.forEach(year => {
-                    var option = document.createElement('option');
+                    let option = document.createElement('option');
                     option.value = year;
                     option.textContent = year;
+                    if (year == selectedYear) option.selected = true;
                     yearSelect.appendChild(option);
                 });
-                initTable();
+
+                updateBalance(selectedYear);
+                initTable(selectedYear);
             },
             error: function () {
                 Swal.fire({
                     icon: 'error',
-                    title: title,
-                    text: 'Error ketika mengambil data department.'
+                    title: 'Gagal',
+                    text: 'Gagal mengambil data tahun.',
+                    confirmButtonText: 'OK'
                 });
             }
         });
+
+        document.getElementById('filterYear').addEventListener('change', function () {
+            const selectedYear = this.value;
+            updateBalance(selectedYear);
+            initTable(selectedYear);
+        });
         
-        function initTable(){
+        // data table
+        function initTable(year){
+            if ($.fn.DataTable.isDataTable('#usersTable')) {
+                $('#usersTable').DataTable().destroy();
+            }
             table = $('#usersTable').DataTable({
                 dom: 'Bfrtip',
                 autoWidth: false,
@@ -675,29 +758,24 @@
                         }
                     }
                 ],
-                rowCallback: function (row, data) {
-                    $('td', row).addClass('text-gray-700');
-                }
             });
         }
 
-        $('#filterYear').on('change', function () {
-            if(table){
-            table.ajax.reload();
-            }
-        });
+        //$('#filterYear').on('change', function () {
+            //if(table){
+            //table.ajax.reload();
+            //}
+        //});
 
-        // Setup event listeners on existing rows of your table if any
         document.querySelectorAll('#testTable tbody tr').forEach(row => {
             setupRow(row);
         });
 
-        // Tombol tambah baris
+        // add new row
         document.getElementById('add-row')?.addEventListener('click', function () {
             const tbody = document.querySelector('#testTable tbody');
             const newRow = document.createElement('tr');
             newRow.innerHTML = `
-            <tr>
                 <td><input type="text" name="description[]"
                     class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none" required>
                 </td>
@@ -726,7 +804,6 @@
                         <button type="button" class="clear-btn btn btn-warning text-base px-2 py-1">Clear</button>
                     </div>
                 </td>
-            </tr>
             `;
             tbody.appendChild(newRow);
             setupRow(newRow);

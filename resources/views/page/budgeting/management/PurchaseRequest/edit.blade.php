@@ -6,19 +6,19 @@
         }
     </style>
     @endpush
-    
+
     <div class="min-h-screen flex items-center justify-center bg-gray-100">
         <div class="card w-fit p-6 bg-white rounded-lg shadow-md transition-all duration-500 ease-in-out min-h-[600px]">
             <div class="card-header mb-4">
                 <h1 class="text-2xl font-medium">Purchase No: {{ $purchase->purchase_no }}</h1>
             </div>
             <div class="card-body">
-                <form action="{{ route('purchase-request.update', $purchase) }}" method="POST"
+                <form id="formEdit" action="{{ route('purchase-request.update', $purchase) }}" method="POST"
                 x-data="{
                     grandTotal: {{ $purchase->grand_total ?? 0 }},
                     actualAmount: {{ old('actual_amount', $purchase->actual_amount) ?? 0 }},
                     oldactualAmount: {{ $purchase->actual_amount ?? 0 }},
-                    deptBalance: {{ $dept->balance ?? 0 }},
+                    deptBalance: {{ $dept->balanceForYear(now()->year) ?? 0 }},
                     get showDepartment() {
                         var baseAmount = this.oldactualAmount > 0 ? this.oldactualAmount : this.grandTotal;
                         return (this.actualAmount - baseAmount - this.deptBalance) > 0;
@@ -108,7 +108,7 @@
                                 </div>
                                 <div>
                                     <p class="text-center text-gray-600">Saldo Department:
-                                        <span class="text-center font-medium">{{ number_format($dept->balance, 2) }}</span>
+                                        <span class="text-center font-medium">{{ number_format($dept->balanceForYear(now()->year), 2) }}</span>
                                     </p>
                                     <p class="text-center text-gray-600">Grand Total:
                                         <span class="text-center font-medium">{{ number_format($purchase->grand_total, 2) }}</span>
@@ -132,15 +132,40 @@
                             </button>
                         </div>
                     </div>
-                    @if ($errors->any())
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                        @endforeach
-                                        </ul>
-                                        @endif
-                                        </form>
-                                        </div>
+                </form>
+            </div>
         </div>
     </div>
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.5/dist/sweetalert2.all.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('formEdit');
+        if (form) {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: "Data akan diperbarui!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya, update!',
+                    cancelButtonText: 'Batal',
+                    buttonsStyling: true,
+                    customClass: {
+                        confirmButton: 'bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded mx-1',
+                        cancelButton: 'bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded mx-1'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        }
+    });
+</script>
+@endpush
 </x-app-layout>

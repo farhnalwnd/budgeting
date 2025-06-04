@@ -364,8 +364,7 @@ class PurchaseController extends Controller
                 ->log('purchase-update ' .  $purchase->purchase_no . ' by ' . $user->name . ' at: ' . now());
 
             DB::commit();
-            Alert::toast('Berhasil melakukan update', 'success');
-            return redirect()->route('purchase-request.index');
+            return redirect()->route('purchase-request.index')->with('success', 'Purchase request berhasil diperbarui!');
     
         } catch (\Exception $e) {
             DB::rollBack();
@@ -594,6 +593,16 @@ class PurchaseController extends Controller
             ->orderByDesc('year')
             ->pluck('year');
         return response()->json($years);
+    }
+    public function getBalanceByYear(Request $request)
+    {
+        $year = $request->query('year');
+        $user = auth()->user();
+        $department = $user->department;
+
+        $balance = $department->balanceForYear($year);
+
+        return response()->json(['new_balance' => $balance]);
     }
 
 

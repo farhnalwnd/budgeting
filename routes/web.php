@@ -143,6 +143,7 @@ Route::group(['middleware' => ['role:super-admin|admin']], function () {
     Route::resource('purchase-request', PurchaseController::class);
     Route::get('purchaserequest', [PurchaseController::class, 'getData'])->name('purchase.data');
     Route::get('getYear', [PurchaseController::class, 'getYear'])->name('get.year');
+    Route::get('getBalanceByYear', [PurchaseController::class, 'getBalanceByYear'])->name('get.balance.by.year');
     Route::get('/purchases/{purchase_no}/details', [PurchaseController::class, 'getDetails'])->name('purchase.details');
 });
 
