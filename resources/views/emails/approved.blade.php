@@ -2,27 +2,53 @@
 <html lang="en">
 
 <head>
-    <title>Form detail</title>
+    <title>Budget Approval Notification</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
         .header-style {
             background-color: yellow;
-            padding: 5px;
-            padding-left: 15px;
+            padding: 5px 15px;
         }
 
         .tr-odd {
             background-color: rgb(238, 238, 238);
         }
 
-        td,
-        th {
-            padding: 0.3rem 0.5rem;
+        td, th {
+            padding: 0.5rem;
+            vertical-align: top;
+        }
+
+        table {
+            border: 1px solid black;
+            width: 100%;
+            max-width: 1000px;
+            margin: auto;
+            border-collapse: collapse;
+        }
+
+        h2, h5, p {
+            margin: 0.2em 0;
+        }
+
+        a.btn {
+            text-decoration: none;
+            color: green;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .text-center {
+            text-align: center;
         }
     </style>
 </head>
 
 <body>
-    <table style="border: 1px solid black; width:100%; max-width:1000px; margin:auto;">
+    <table>
         <thead>
             <tr class="header-style">
                 <td colspan="3">
@@ -32,67 +58,68 @@
             </tr>
             <tr>
                 <td colspan="3">
-                    @if($isAdmin)
-                    <p>Dear <strong>{{$user->name}}</strong>,</p>
-                    @else
-                    <p>Dear <strong>{{$user->name}}</strong>,</p>
-                    @endif
-                    <p>Data purchases baru sudah approved</p>
-                    <p>berikut rincianya:</p>
+                    <p>Dear <strong>{{ $user->name }}</strong>,</p>
+                    <p>Data purchase baru telah <strong>disetujui</strong>. Berikut adalah rinciannya:</p>
                 </td>
             </tr>
         </thead>
+
         <tbody>
             <tr>
-                <th colspan="3">
-                    <h5 class="text-center">data purchases baru dengan status {{$data->status}}</h5>
+                <th colspan="3" class="text-center">
+                    <h5>Data purchase dengan status: <strong>{{ ucfirst($data->status) }}</strong></h5>
                 </th>
             </tr>
             <tr class="tr-odd">
-                <td colspan="2">penganggar:</td>
-                <td>{{ $data->department->department_name }}</td>
+                <td colspan="2">Departemen Penganggar:</td>
+                <td>{{ $data->department->department_name ?? '-' }}</td>
             </tr>
             <tr>
-                <td colspan="2">no purchase:</td>
+                <td colspan="2">No Purchase:</td>
                 <td>{{ $data->department_id }}</td>
             </tr>
+
             @foreach ($purchaseDetails as $detail)
-            <tr class="tr-odd">
-                <td style="width:auto">{{$loop->iteration}}</td>
-                <td>Item:</td>
-                <td>{{ $detail->item_name}}</td>
-            </tr>
-            <tr>
-                <td style="width:auto"></td>
-                <td>Jumlah:</td>
-                <td>{{ $detail->quantity}}</td>
-            </tr>
-            <tr class="tr-odd">
-                <td style="width:auto"></td>
-                <td>Total:</td>
-                <td>{{ $detail->total_amount}}</td>
-            </tr>
+                <tr class="tr-odd">
+                    <td>{{ $loop->iteration }}</td>
+                    <td>Item:</td>
+                    <td>{{ $detail->item_name }}</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Jumlah:</td>
+                    <td>{{ $detail->quantity }}</td>
+                </tr>
+                <tr class="tr-odd">
+                    <td></td>
+                    <td>Total:</td>
+                    <td>Rp {{ number_format($detail->total_amount, 0, ',', '.') }}</td>
+                </tr>
             @endforeach
+
             <tr>
-                <td style="width:auto"></td>
-                <td>total purchase:</td>
-                <td>{{$data->grand_total}}</td>
+                <td></td>
+                <td>Total Purchase:</td>
+                <td><strong>Rp {{ number_format($data->grand_total, 0, ',', '.') }}</strong></td>
             </tr>
             <tr class="tr-odd">
-                <td style="width:auto"></td>
-                <td>saldo department:</td>
-                <td>{{$data->department->balance}}</td>
+                <td></td>
+                <td>Saldo Departemen:</td>
+                <td>
+                    @php
+                        $balance = optional($data->department)->balanceForYear(now()->year);
+                    @endphp
+                    {{ $balance !== null ? 'Rp ' . number_format($balance, 0, ',', '.') : '-' }}
+                </td>
             </tr>
-            <tr>
-                @if($isAdmin)
-                <th colspan="3">
-                    <a href=""
-                        style="text-decoration: none; color: green; font-size: 24px; font-weight: bold; margin-right: 20px;">
-                        Edit
-                    </a>
-                </th>
-                @endif
-            </tr>
+
+            @if ($isAdmin)
+                <tr>
+                    <td colspan="3" class="text-center">
+                        <a href="#" class="btn">Edit</a>
+                    </td>
+                </tr>
+            @endif
 
             <tr>
                 <td colspan="3">

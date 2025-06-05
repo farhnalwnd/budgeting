@@ -40,14 +40,9 @@ class PurchaseController extends Controller
         $budget = BudgetAllocation::where('department_id', $user->department_id)->latest()->first();
         $budgetNo = $budget->budget_allocation_no ?? 'N/A';
         $currentDate = now()->format('j M y');
-        $years = Purchase::selectRaw('YEAR(created_at) as year')
-            ->distinct()
-            ->orderByDesc('year')
-            ->pluck('year');
 
         return view(".page.budgeting.management.PurchaseRequest.index", compact(
             'user',
-            'years',
             'department',
             'departments',
             'budget',
@@ -124,7 +119,7 @@ class PurchaseController extends Controller
             'grand_total'=>$grandTotal,
         ]);
 
-        $amount = Purchase::parseRupiah($validatedData['amount']);
+        $amount = Purchase::parseRupiah($validatedData['amount'] ?? 0);
 
         //* kondisi balance kurang
         if ($grandTotal > $department->balanceForYear(now()->year)) {
@@ -220,13 +215,13 @@ class PurchaseController extends Controller
             // dd($department);
 
             //* email ke user
-            $data = purchase::with('detail')->where('purchase_no', $purchaseNumber)->firstOrFail();
+        $data = purchase::with(['detail', 'department'])->where('purchase_no', $purchaseNumber)->firstOrFail();
         $purchaseDetails = $data->detail;
         $admin = user::where('username', 'admin')->first();
         $users = user::where('department_id', $departmentId)->first();
-            // dd($user, $purchases , $deptName, $purchaseDetails);
-        SendApprovedPurchaseNotification::dispatch($users, $data, $purchaseDetails, false)->onQueue('emails');
-        SendApprovedPurchaseNotification::dispatch($admin, $data, $purchaseDetails, true)->onQueue('emails');
+        SendApprovedPurchaseNotification::dispatch($users, $data, $purchaseDetails, false)->onConnection('sync');
+        SendApprovedPurchaseNotification::dispatch($admin, $data->fresh(), $purchaseDetails->fresh(), true)->onConnection('sync');
+
 
         //*log activity on purchaseRequest
             activity()
@@ -289,6 +284,7 @@ class PurchaseController extends Controller
     
         try {
             $user = auth()->user();
+            $now = now()->year;
 
             $validated = $request->validated();
     
@@ -329,11 +325,8 @@ class PurchaseController extends Controller
                         Alert::toast("The selected department's budget is insufficient.", 'error');
                         return redirect()->route('purchase-request.index');
                     }
-                    // $toDept->transfer($fromDept, $diff-$fromDept->balance);
                     //*balance pertahun
-                    $toDeptWallet = $toDept->balanceForYear(now()->year);
-                    $fromDeptWallet = $fromDept->balanceForYear(now()->year);
-                    $toDeptWallet->transfer($fromDeptWallet, $diff - $fromDeptWallet);
+                    $toDept->transferForYear($fromDept, $now, $diff-$fromDept->balance);
                 }
     
                 // $fromDept->withdraw($diff);
@@ -430,47 +423,57 @@ class PurchaseController extends Controller
             $requestApprove->save();
 
             //* edit status purchase dan budgetrequest
-            $budgetRequest = BudgetRequest::where('budget_req_no', $budget_no)->first();
+            $budgetRequest = BudgetRequest::with(['toDepartment', 'fromDepartment'])->where('budget_req_no', $budget_no)->first();
             if ($budgetRequest) {
                 $toDept =$budgetRequest->fromDepartment;
                 $fromDept = $budgetRequest->toDepartment;
                 $amount = $budgetRequest->amount;
+                $purchases = $budgetRequest->purchase;
+                $now = now()->year;
 
                 // Transfer saldo antar wallet
                 // $fromDept->transfer($toDept, $amount);
+                $fromDept->transferForYear($toDept, $now,  $amount);
+                $actualBalance = $toDept->balanceForYear($now);
 
-                $toDeptWallet = $toDept->balanceForYear(now()->year);
-                $fromDeptWallet = $fromDept->balanceForYear(now()->year);
-                $fromDeptWallet->transfer($toDeptWallet, $amount);
+                if($actualBalance < $purchases->grand_total){
+                    $purchases->update(['status' => 'rejected']);
+                        $budgetRequest->status = 'approved';
+                        $budgetRequest->feedback = 'saldo anda tetap kurang karna telah digunakan untuk yang lain, buat purchase baru!!';
+                        $budgetRequest->save();
 
+                        $toDept->transferForYear($fromDept, $now, $amount);
+                }else{
                 // $toDept->withdraw($toDept->balanceInt);
-                $toDept->withdrawFromYear(now()->year, $toDeptWallet);
+                $toDept->withdrawFromYear($now, $actualBalance);
 
                 $budgetRequest->status = 'approved';
                 $budgetRequest->save();
 
-                $purchases = $budgetRequest->purchase;
-                if($purchases){
-                    $purchases->update(['status'=> 'approved']);
-                    
-                    $purchaseDetails = $purchases->detail;
-                    $toDept = $budgetRequest->toDepartment->department_name;
-                    $fromDept = $budgetRequest->fromDepartment->department_name;
-                    $deptName = [$toDept,$fromDept];
-                    $admin = user::where('username', 'admin')->first();
-                    $user = user::where('department_id', $budgetRequest->from_department_id)->first();
-                    // dd($user, $purchases , $budgetRequest, $deptName, $purchaseDetails);
-                    SendApprovedPurchase::dispatch($user, $purchases , $budgetRequest, $deptName, $purchaseDetails, false)->onQueue('emails');
-                    SendApprovedPurchase::dispatch($admin, $purchases , $budgetRequest, $deptName, $purchaseDetails, true)->onQueue('emails');
+                    if($purchases){
+                        $purchases->update(['status'=> 'approved']);
+
+                        $purchaseDetails = $purchases->detail;
+                        $toDeptName = $toDept->department_name;
+                        $fromDeptName = $fromDept->department_name;
+                        $deptName = [$toDeptName,$fromDeptName];
+                        $admin = user::where('username', 'admin')->first();
+                        $user = user::where('department_id', $budgetRequest->from_department_id)->first();
+                        // dd($user, $purchases , $budgetRequest, $deptName, $purchaseDetails);
+                        SendApprovedPurchase::dispatch($user, $purchases , $budgetRequest, $deptName, $purchaseDetails, false)->onConnection('sync');
+                        SendApprovedPurchase::dispatch($admin, $purchases , $budgetRequest, $deptName, $purchaseDetails, true)->onConnection('sync');
+                    }
                 }
             }
+            $user = User::where('nik', $requestApprove->nik)->first();
+
 
                 //* activity log approve
                 activity()
                     ->performedOn($budgetRequest)
                     ->inLog('budget-request approval')
                     ->event('approve')
-                    ->causedBy($requestApprove->nik->name)
+                    ->causedBy($user)
                     ->withProperties([
                         'no' => $budgetRequest,
                         'action' => 'approval',
@@ -478,7 +481,7 @@ class PurchaseController extends Controller
                             'feedback' => '-'
                         ]
                     ])
-                    ->log('budget-request approval ' .  $budgetRequest . ' by ' . $requestApprove->nik->name . ' at: ' . now());
+                    ->log('budget-request approval ' .  $budgetRequest . ' by ' . $user . ' at: ' . now());
             DB::commit();
             return view('emails.finishProcces');
         }else{
@@ -572,7 +575,7 @@ class PurchaseController extends Controller
     public function getData(Request $request)
     {
         $user = Auth::user();
-        $query = Purchase::with(['department', 'detail', 'category']);
+        $query = Purchase::with(['department', 'detail', 'category', 'budgetRequest']);
 
         if ($user->username !== 'admin') {
             $query->where('department_id', $user->department_id);

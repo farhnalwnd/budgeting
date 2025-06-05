@@ -324,7 +324,7 @@
                         </div>
                         <div class="">
                             <p>note:</p>
-                            ${purchase.status === 'approved' ? '<p>-</p>' : purchase.status === 'pending' ? '<p>peminjaman dana belum mendapatkan respon</p>' : `<p> ${purchase.budgetRequest?.feedback || 'peminjaman ditolak'}</p>`}
+                            ${purchase.status === 'approved' ? '<p>-</p>' : purchase.status === 'pending' ? '<p>peminjaman dana belum mendapatkan respon</p>' : `<p> ${purchase.budget_request?.feedback || 'peminjaman ditolak'}</p>`}
                         </div>
                     </div>
     
@@ -610,15 +610,9 @@
             if (balanceElement) {
             balanceElement.innerText = toRupiah(result.new_balance);
             }
-
-            form.reset();
+            walletBalance = result.new_balance;
+            resetFormState();
             table.ajax.reload(null, false);
-            reqbud.classList.add('hidden');
-
-            const rows = tableBody.querySelectorAll('tr');
-            rows.forEach((row, index) => {
-                if (index > 0) row.remove();
-            });
         }
 
         function showError(title, message) {
@@ -638,8 +632,13 @@
                 method: 'GET',
                 data: { year: year },
                 success: function (response) {
+                    walletBalance = response.new_balance;
+
+                    document.getElementById('wallet-balance').innerText = toRupiah(walletBalance);
+                    document.getElementById('wallet-after').innerText = toRupiah(walletBalance);
+
                     if (balanceElement) {
-                        balanceElement.innerText = toRupiah(response.new_balance);
+                        balanceElement.innerText = toRupiah(walletBalance);
                     }
                 },
                 error: function () {
@@ -694,7 +693,7 @@
         // data table
         function initTable(year){
             if ($.fn.DataTable.isDataTable('#usersTable')) {
-                $('#usersTable').DataTable().destroy();
+                table.destroy();
             }
             table = $('#usersTable').DataTable({
                 dom: 'Bfrtip',
@@ -708,10 +707,11 @@
                     },
                     dataSrc: function (response) {
                         purchases = response;
-                        //console.log('data masuk :', purchases);
+                        console.log('data masuk :', purchases);
                         return response;
                     }
                 },
+                order: [[1, 'desc']],
                 columns: [
                     {
                         data: null,
@@ -761,12 +761,6 @@
             });
         }
 
-        //$('#filterYear').on('change', function () {
-            //if(table){
-            //table.ajax.reload();
-            //}
-        //});
-
         document.querySelectorAll('#testTable tbody tr').forEach(row => {
             setupRow(row);
         });
@@ -810,10 +804,23 @@
             updateGrandTotal();
         });
 
-        // Set saldo awal
-        document.getElementById('wallet-balance').innerText = toRupiah(walletBalance);
-        document.getElementById('wallet-after').innerText = toRupiah(walletBalance);
-        updateGrandTotal();
+        function resetFormState() {
+            form.reset();
+
+            document.getElementById('grand-total').innerText = toRupiah(0);
+            document.getElementById('wallet-after').innerText = toRupiah(walletBalance);
+            document.getElementById('wallet-balance').innerText = toRupiah(walletBalance);
+
+            const rows = tableBody.querySelectorAll('tr');
+            rows.forEach((row, index) => {
+                if (index > 0) row.remove();
+                else clearRow(row);
+            });
+
+            reqbud.classList.add('hidden');
+
+            updateGrandTotal();
+        }
     });
 </script>
 @endpush

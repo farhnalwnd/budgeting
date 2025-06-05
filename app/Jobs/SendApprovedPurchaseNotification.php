@@ -8,6 +8,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use App\Mail\defaultEmail;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class SendApprovedPurchaseNotification implements ShouldQueue
@@ -35,12 +36,27 @@ class SendApprovedPurchaseNotification implements ShouldQueue
      */
     public function handle(): void
     {
-        return;
-        Mail::to($this->user->email)->send(new defaultEmail(
-            $this->user,
-            $this->data,
-            $this->purchaseDetails,
-            $this->isAdmin,
-        ));
+
+        try {
+            Log::info('Attempting to send email', [
+                'to' => $this->user->email,
+                'purchase_id' => $this->data->id ?? null
+            ]);
+
+            Mail::to($this->user->email)->send(new DefaultEmail(
+                $this->user,
+                $this->data,
+                $this->purchaseDetails,
+                $this->isAdmin
+            ));
+
+            Log::info('Email dispatched successfully');
+        } catch (\Throwable $e) {
+            Log::error('Email sending failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw $e;
+        }
     }
 }

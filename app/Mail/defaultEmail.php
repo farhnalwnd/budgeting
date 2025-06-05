@@ -5,6 +5,7 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -27,37 +28,47 @@ class defaultEmail extends Mailable
         $this->purchaseDetails=$purchaseDetails;
         $this->isAdmin=$isAdmin;
     }
-
-    public function build(){
-        $subject = $this->isAdmin ? 'notifikasi data baru yang memiliki status approved':'purchases anda sudah berstatus approved';
-        return $this->subject($subject)
-        ->markdown('emails.approved')
-        ->with([
-            'user'=>$this->user,
-            'data'=> $this->data,
-            'purchaseDetails' => $this->purchaseDetails,
-            'isAdmin' => $this->isAdmin,
-        ]);
-    }
-
+    
     /**
      * Get the message envelope.
      */
     public function envelope(): Envelope
     {
-        $subject = $this->isAdmin ? 'notifikasi data baru yang memiliki status approved':'purchases anda sudah berstatus approved';
-        return new Envelope(
-            subject: $subject
-        );
+        $data = is_array($this->data) && isset($this->data['App\\Models\\Budgeting\\Purchase'])
+            ? $this->data['App\\Models\\Budgeting\\Purchase']
+            : $this->data;
+
+        if (is_array($data)) {
+            $data = (object)$data;
+        }
+
+        Log::info('Processed data for view:', ['data' => $data]);
+
+        $subject = $this->isAdmin
+            ? 'Notifikasi data baru yang memiliki status approved'
+            : 'Purchases anda sudah berstatus approved';
+
+        return new Envelope(subject: $subject);
     }
 
-    /**
-     * Get the message content definition.
-     */
     public function content(): Content
     {
+        $data = is_array($this->data) && isset($this->data['App\\Models\\Budgeting\\Purchase'])
+            ? $this->data['App\\Models\\Budgeting\\Purchase']
+            : $this->data;
+
+        if (is_array($data)) {
+            $data = (object)$data;
+        }
+
         return new Content(
-            view: 'view.name',
+            markdown: 'emails.approved',
+            with: [
+                'user' => $this->user,
+                'data' => $data,
+                'purchaseDetails' => $this->purchaseDetails,
+                'isAdmin' => $this->isAdmin,
+            ],
         );
     }
 

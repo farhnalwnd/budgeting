@@ -43,5 +43,13 @@ trait HasYearlyWallets
     {
         return $this->getYearlyWallet($year)->balance ?? 0;
     }
+
+    public function transferForYear($receiver, int $year, int|float $amount, array $meta = [])
+    {
+        $senderWallet = $this->getYearlyWallet($year);
+        $receiverWallet = $receiver->getYearlyWallet($year);
+
+        return $senderWallet->transfer($receiverWallet, $amount, $meta);
+    }
 }
 

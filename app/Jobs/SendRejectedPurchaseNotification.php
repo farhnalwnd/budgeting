@@ -38,7 +38,6 @@ class SendRejectedPurchaseNotification implements ShouldQueue
     public function handle(): void
     {
         
-        return;
         Mail::to($this->user->email)->send(new rejectStatus(
             $this->user, 
             $this->purchases, 
