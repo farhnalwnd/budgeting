@@ -9,30 +9,9 @@ if (!function_exists('generateDocumentNumber')) {
     function generateDocumentNumber($departmentName)
     {
         $now = Carbon::now();
-        $year = $now->format('Y'); // Tahun 4 digit
+        $year = $now->format('Y');
+        $prefix = 'FAN';
 
-        // Normalisasi nama department
-        $cleaned = preg_replace('/[^a-zA-Z\s]/', '', $departmentName); // hilangkan karakter seperti &
-        $words = array_values(array_filter(explode(' ', strtolower($cleaned)))); // pecah jadi array dan filter kosong
-
-        // Ambil prefix: 2 huruf dari kata pertama + 1 huruf dari kata valid selanjutnya
-        $prefix = '';
-        if (count($words) >= 1) {
-            $prefix .= substr($words[0], 0, 2); // 2 huruf dari kata pertama
-        }
-        if (count($words) >= 2) {
-            // Cari kata kedua yang valid (bukan & atau kosong)
-            for ($i = 1; $i < count($words); $i++) {
-                if (strlen($words[$i]) > 0) {
-                    $prefix .= substr($words[$i], 0, 1); // 1 huruf dari kata valid
-                    break;
-                }
-            }
-        }
-
-        $prefix = strtoupper($prefix);
-
-        // Ambil dokumen terakhir dengan pola prefix/year/nomor
         $lastDocument = Purchase::where('purchase_no', 'like', "$prefix/$year/%")
             ->orderBy('id', 'desc')
             ->first();
@@ -46,7 +25,6 @@ if (!function_exists('generateDocumentNumber')) {
         $nextNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
 
         return "$prefix/$year/$nextNumber";
-    }
 }
 
 if (!function_exists('generateMultipleDocumentNumbers')) {
