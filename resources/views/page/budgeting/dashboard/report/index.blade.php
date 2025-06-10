@@ -99,7 +99,6 @@
                 method: 'GET',
                 success: function(response) {
                     years = response;
-                    console.log(response);
                     var yearSelect = document.getElementById('yearFilter');
                     years.forEach(year => {
                         var option = document.createElement('option');

@@ -6,7 +6,7 @@ use Carbon\Carbon;
 
 if (!function_exists('generateDocumentNumber')) {
 
-    function generateDocumentNumber($departmentName)
+    function generateDocumentNumber()
     {
         $now = Carbon::now();
         $year = $now->format('Y');
@@ -25,6 +25,7 @@ if (!function_exists('generateDocumentNumber')) {
         $nextNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
 
         return "$prefix/$year/$nextNumber";
+    }
 }
 
 if (!function_exists('generateMultipleDocumentNumbers')) {

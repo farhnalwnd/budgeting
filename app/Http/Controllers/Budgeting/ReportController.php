@@ -278,7 +278,7 @@ class ReportController extends Controller
                         'remarks' => ''
                     ];
 
-                    $categoryGrouped = $rows->groupBy(fn($item) => $item->category->name);
+                    $categoryGrouped = $rows->groupBy(fn($item) => $item->category->name ?? '-');
 
                     foreach ($categoryGrouped as $cat => $catRows) {
                         // Tambahkan baris sub-subtotal kategori

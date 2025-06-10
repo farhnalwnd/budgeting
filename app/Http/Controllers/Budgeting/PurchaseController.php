@@ -90,7 +90,7 @@ class PurchaseController extends Controller
         //* looping data & kalkulasi harga
         $grandTotal = 0;
         $purchases = [];
-        $purchaseNumber = generateDocumentNumber($department->department_name);
+        $purchaseNumber = generateDocumentNumber();
 
         $master = Purchase::create([
             'department_id'=>$departmentId,
@@ -478,7 +478,7 @@ class PurchaseController extends Controller
                     ->event('approve')
                     ->causedBy($user)
                     ->withProperties([
-                        'no' => $budgetRequest,
+                        'no' => $budgetRequest->budget_req_no,
                         'action' => 'approval',
                         'data' => [
                             'feedback' => '-'
