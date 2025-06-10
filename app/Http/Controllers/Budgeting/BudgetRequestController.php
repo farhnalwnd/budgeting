@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Budgeting\BudgetApproval;
 use App\Models\Budgeting\BudgetApprover;
 use App\Models\Budgeting\BudgetRequest;
+use App\Models\Budgeting\Purchase;
 use App\Models\Department;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -130,7 +131,8 @@ class BudgetRequestController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
-    {
+    {   
+        
         // Mulai transaction untuk memastikan integritas data
         DB::beginTransaction();
 
@@ -144,75 +146,128 @@ class BudgetRequestController extends Controller
                 'action' => 'required|string|in:approve,approve with review,reject',
                 'reviewTextArea' => 'nullable|string'
             ]);
-
+            
             $budget = BudgetRequest::findOrFail($id);
             $approval = BudgetApproval::where('budget_req_no', $budget->budget_req_no)->first();
 
-            $fromDept = Department::findOrFail($budget->from_department_id);
-            $toDept = Department::findOrFail($budget->to_department_id);
-            $year = now()->format('Y');
-            if(!$toDept->hasWallet($year))
+            // check purchase
+            $purchase = Purchase::where('purchase_no', $budget->budget_purchase_no)->first();
+            if($purchase)
             {
-                DB::rollback();
-                throw new \Exception("Your department has insufficient budget this year.");
-            }
-            if($toDept->balanceForYear($year) < $validatedData['amount']){
-                DB::rollback();
-                throw new \Exception("Your department has insufficient budget this year.");
-            }
-
-
-            $user = Auth::user();
-            $status = null;
-            $review = null;
-            if($validatedData['action'] === 'approve' || $validatedData['action'] === 'approve with review')
-            {
-                $status = 'Approved';
-                if($validatedData['action'] === 'approve with review')
+                // Simulasi request jika budget approved
+                $purchaseController = new PurchaseController();
+                $result = null;
+                if($validatedData['action'] === 'approve'|| $validatedData['action'] === 'approve with review')
                 {
+                    $request = new Request([
+                        'budget_req_no' => $approval->budget_req_no,
+                        'status' => 'approve',
+                        'token' => $approval->token,
+                        'nik' => $approval->nik
+                    ]);
+                    $result = $purchaseController->approved($request);
+                }
+                else
+                {
+                    $request = new Request([
+                        'budget_req_no' => $approval->budget_req_no,
+                        'nik' => $approval->nik,
+                        'feedback' => $validatedData['reviewTextArea']
+                    ]);
+                    $result = $purchaseController->submitRejectFeedback($request);
+                }
+
+                if ($result instanceof \Illuminate\Http\RedirectResponse) {
+                    if (session()->has('error')) {
+                        throw new \Exception(session('error'));
+                    }
+                }
+
+                // Commit transaksi
+                DB::commit();
+                return response()->json(['message' => 'Budget-request successfully ' . $validatedData['action'] .'!'], 200);  
+            } 
+            else
+            {
+
+                if($approval->status != 'pending')
+                {
+                    DB::rollback();
+                    throw new \Exception("Approval status is not pending.");
+                }
+
+                $fromDept = Department::findOrFail($budget->from_department_id);
+                $toDept = Department::findOrFail($budget->to_department_id);
+
+                // Get year from budget no
+                $parts = explode('/', $budget->budget_req_no);
+                $yearSuffix = $parts[3];
+                $year = '20' . $yearSuffix;
+
+                if(!$toDept->hasWallet($year))
+                {
+                    DB::rollback();
+                    throw new \Exception("Your department has insufficient budget this year.");
+                }
+                if($toDept->balanceForYear($year) < $validatedData['amount']){
+                    DB::rollback();
+                    throw new \Exception("Your department has insufficient budget this year.");
+                }
+
+
+                $user = Auth::user();
+                $status = null;
+                $review = null;
+                if($validatedData['action'] === 'approve' || $validatedData['action'] === 'approve with review')
+                {
+                    $status = 'Approved';
+                    if($validatedData['action'] === 'approve with review')
+                    {
+                        $review = $validatedData['reviewTextArea'];
+                    }
+                    $toDept->getWallet($year)->transfer($fromDept->getWallet($year), $budget->amount);
+                }
+                else
+                {   
+                    $status = 'Rejected';
                     $review = $validatedData['reviewTextArea'];
                 }
-                $toDept->getWallet($year)->transfer($fromDept->getWallet($year), $budget->amount);
+
+                $budget->update([
+                    'status' => $status,
+                    'feedback' => $review
+                ]);
+
+                $approval->update([
+                    'status' => $status,
+                    'feedback' => $review,
+                    'token' => null
+                ]);
+
+                
+
+                activity()
+                    ->performedOn($budget)
+                    ->inLog('budget-request')
+                    ->event(ucfirst($validatedData['action']))
+                    ->causedBy($user)
+                    ->withProperties(['no' => $budget->budget_req_no, 'action' => $validatedData['action'],
+                    'data' => [
+                        'budget_req_no' => $budget->budget_req_no,
+                        'from_department' => $user->department->department_name,
+                        'budget_purchase_no' => $budget->budget_purchase_no,
+                        'to_department' => $toDept->department_name,
+                        'amount' => $budget->amount,
+                        'reason' => $budget->reason,
+                        'status' => $budget->status,
+                        'feedback' => $budget->feedback
+                    ]])
+                    ->log(ucfirst($validatedData['action']) . ' budget-request ' . $budget->budget_req_no . ' by ' . $user->name . ' at ' . now());
+
+                // Commit transaksi
+                DB::commit();
+                return response()->json(['message' => 'Budget-request successfully ' . $validatedData['action'] .'!'], 200);
             }
-            else
-            {   
-                $status = 'Rejected';
-                $review = $validatedData['reviewTextArea'];
-            }
-
-            $budget->update([
-                'status' => $status,
-                'feedback' => $review
-            ]);
-
-            $approval->update([
-                'status' => $status,
-                'feedback' => $review,
-                'token' => null
-            ]);
-
-            activity()
-                ->performedOn($budget)
-                ->inLog('budget-request')
-                ->event('Approve')
-                ->causedBy($user)
-                ->withProperties(['no' => $budget->budget_req_no, 'action' => 'approve',
-                'data' => [
-                    'budget_req_no' => $budget->budget_req_no,
-                    'from_department' => $user->department->department_name,
-                    'budget_purchase_no' => $budget->budget_purchase_no,
-                    'to_department' => $toDept->department_name,
-                    'amount' => $budget->amount,
-                    'reason' => $budget->reason,
-                    'status' => $budget->status,
-                    'feedback' => $budget->feedback
-                ]])
-                ->log(ucfirst($validatedData['action']) . ' budget-request ' . $budget->budget_req_no . ' by ' . $user->name . ' at ' . now());
-
-            // Commit transaksi
-            DB::commit();
-            return response()->json(['message' => 'Budget-request successfully ' . $validatedData['action'] .'!'], 200);
-
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
             DB::rollback();

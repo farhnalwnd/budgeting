@@ -38,10 +38,7 @@
                                 <th scope="col" class="px-6 py-3 text-lg">#</th>
                                 <th scope="col" class="px-6 py-3 text-lg">No</th>
                                 <th scope="col" class="px-6 py-3 text-lg">From</th>
-                                <th scope="col" class="px-6 py-3 text-lg">To</th>
                                 <th scope="col" class="px-6 py-3 text-lg">Amount</th>
-                                <th scope="col" class="px-6 py-3 text-lg">Purchase No</th>
-                                <th scope="col" class="px-6 py-3 text-lg">Reason</th>
                                 <th scope="col" class="px-6 py-3 text-lg">Status</th>
                                 <th scope="col" class="px-6 py-3 text-lg">Action</th>
                             </tr>
@@ -90,10 +87,17 @@
                     },
                     { data: 'budget_req_no', name: 'no' },
                     { data: 'from_department.department_name', name: 'from_department' },
-                    { data: 'to_department.department_name', name: 'to_department' },
-                    { data: 'amount', name: 'amount' },
-                    { data: 'budget_purchase_no', name: 'purchase_no' },
-                    { data: 'reason', name: 'reason' },
+                    { data: 'amount', name: 'amount',
+                            render: function(data, type, row) {
+                                if (data == null) return '-';
+
+                                return new Intl.NumberFormat('id-ID', {
+                                style: 'currency',
+                                currency: 'IDR',
+                                minimumFractionDigits: 0
+                                }).format(data);
+                            }
+                    },
                     { data: 'status', name: 'status' },
                     { data: null, name: 'action', orderable: false, searchable: false,
                         render: function(data, type, row, meta) {
@@ -101,9 +105,7 @@
                             var deleteUrl = "{{ route('budget-request.destroy', ':id') }}".replace(':id', id); 
                             return `
                             <div class="d-flex action-btn">
-                                <a href="javascript:void(0)" class="text-primary edit" onClick="openEditModal(${meta.row})">
-                                    <i class="ti ti-eye fs-5"></i>
-                                </a>
+                                <button class="btn btn-info" onClick="openEditModal(${meta.row})">Detail</button>
                             </div>
                             `;  
                         }
@@ -129,90 +131,112 @@
             newEditModal = `
                 <div id="editContactModal${id}" tabindex="-1" aria-modal="true" role="dialog"
                     class="flex overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-                    <div class="relative p-4 w-full max-w-4xl max-h-full">
-                        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700" style="margin-top: 10%;">
-                            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-                                <h3 class="text-3xl font-semibold text-white">Update Budget</h3>
-                                <button type="button"
-                                    class="end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                                    data-modal-hide="editContactModal${id}" onClick="openEditModal(${id})">
-                                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                        viewbox="0 0 14 14">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"></path>
-                                    </svg>
-                                    <span class="sr-only">Close modal</span>
-                                </button>
+                    <div class="absolute bg-white text-black p-6 rounded-lg shadow-lg w-2/3 max-h-[800px] card">
+                        <!-- Header -->
+                        <div class="flex justify-start">
+                            <div class="flex items-center">
+                                <h1 class="text-6xl font-bold text-yellow-700 font-mono">Detail Budget-Request</h1>
                             </div>
-                            <div class="p-4 md:p-5">
-                                <form class="space-y-4" action="${updateUrl}" method="POST" id="updateBudgetForm">
-                                @csrf
-                                @method('PUT')
+                            
+                            <div class="w-72 h-32 ml-auto mb-5">
+                                <img src="{{ asset('assets/images/logo/logowhite.png')  }}" class="dark-logo" alt="Logo-Dark">
+                                <img src="{{ asset('assets/images/logo/logo.png') }}" class="light-logo" alt="Logo-light">
+                            </div>
+                        </div>
+                        <hr class="my-10 border-t-2 rounded-md border-slate-900 opacity-90"> 
+                        <form class="space-y-4" action="${updateUrl}" method="POST" id="updateBudgetForm">
+                            @csrf
+                            @method('PUT')
+                            <input type="hidden" name="action" value=""></input>
+
+                            <!-- Keterangan -->
+                            <div>
+                                <div class="flex items-center mt-2">
                                     <div class="form-group">
-                                        <label for="No Budget"
-                                            class="block mb-2 text-xl font-medium text-gray-900 dark:text-white">No Budget</label>
+                                        <h1 class="form-label font-bold text-lg">From Department</h1>
+                                        <input type="text" name="from_department" readonly value="${budget.from_department.department_name}"
+                                            class="w-full p-2 border focus:ring-0 text-center text-body bg-secondary-light flex-1"
+                                            placeholder="From Department" required>
+                                    </div>
+                                    <div class="ml-auto form-group">
+                                        <h1 class="form-label font-bold text-lg">Budget No</h1>
                                         <input type="text" name="no" readonly value="${budget.budget_req_no}"
-                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                                            placeholder="No Budget" required>
+                                            class="w-full p-2 border focus:ring-0 text-center text-body bg-secondary-light"
+                                            placeholder="Auto Fill" required>
                                     </div>
-                                    <div class="grid grid-cols-2 gap-x-4">
-                                        <div class="form-group">
-                                            <label for="from_department"
-                                                class="block mb-2 text-xl font-medium text-gray-900 dark:text-white">From Department</label>
-                                            <input type="text" name="from_department" readonly value="${budget.from_department.department_name}"
-                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                                                placeholder="From Department" required>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="to_department"
-                                                    class="form-label text-white text-xl">Department</label>
-                                            <div class="controls">
-                                                <input type="text" name="to_department" readonly value="${budget.to_department.department_name}"
-                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                                                placeholder="From Department" required>
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="amount"
-                                                class="block mb-2 text-xl font-medium text-gray-900 dark:text-white">Amount</label>
-                                            <input type="number" name="amount" value="${budget.amount}"
-                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                                                placeholder="Input Number" readonly>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="reason"
-                                                class="block mb-2 text-xl font-medium text-gray-900 dark:text-white">Reason</label>
-                                            <input type="text" name="reason" value="${budget.reason}"
-                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                                                placeholder="Input reason" readonly>
-                                        </div>
-                                    </div>
-                                    <div class="flex gap-x-4">
-                                        <input type="hidden" name="action" value=""></input>
-                                        <button type="button" value="approve" onClick="submitForm(this, ${id})"
-                                            class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                                </div>
+                            </div>
+
+                            <!-- Table -->
+                            <div class="container mt-10">
+                                <div x-data="{ scrolled: false }" @scroll="scrolled = $el.scrollTop > 0 || false"
+                                    class="overflow-y-auto max-h-[250px] mt-6">
+                                    <table class="table-auto w-full border-collapse" id="testTable">
+                                        <thead :class="scrolled ? 'bg-white shadow-md border-none' : ''" class="sticky top-0 z-10">
+                                            <tr>
+                                                <th class="text-center w-fit">
+                                                    <h2>To Department</h2>
+                                                </th>
+                                                <th class="text-center w-fit">
+                                                    <h2>Amount</h2>
+                                                </th>
+                                                <th class="text-center w-fit">
+                                                    <h2>Reason</h2>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="max-h-[50vh] overflow-y-auto">
+                                            <tr>
+                                                <td>
+                                                    <input type="text" name="to_department" value="${budget.to_department.department_name}" readonly
+                                                    class="w-full p-2 border focus:ring-0 text-center text-body bg-secondary-light" 
+                                                        placeholder="To Department" required>
+                                                </td>
+                                                <td>
+                                                    <input type="number" name="amount" value="${budget.amount}" readonly
+                                                    class="w-full p-2 border focus:ring-0 text-center text-body bg-secondary-light" 
+                                                        placeholder="Input Number" required>
+                                                </td>
+                                                <td>
+                                                    <input type="text" name="reason" id="reason" value="${budget.reason}" readonly
+                                                        class="w-full p-2 border focus:ring-0 text-center text-body bg-secondary-light" 
+                                                        placeholder="Input reason" required>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3" style="color: 
+                                                    ${budget.status.toLowerCase() == 'approved' || budget.status.toLowerCase() == 'approved with review' 
+                                                    ? 'green' 
+                                                    : budget.status.toLowerCase() == 'rejected' 
+                                                    ? 'red' 
+                                                    : 'black'}">
+                                                    ${budget.status.substring(0,1).toUpperCase()}${budget.status.substring(1).toLowerCase()}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3">
+                                                    ${budget.feedback ?? ''}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="flex items-center justify-between mx-4 mt-4 gap-2">
+                                    <div class="">
+                                        <button type="button" class="btn btn-success" value="approve" onClick="submitForm(this, ${id})">
                                             Approve
                                         </button>
-                                        <button type="button" value="approve with review" onClick="submitForm(this, ${id})"
-                                            class="w-full text-white bg-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center dark:bg-yellow-600 dark:hover:bg-yellow-700 dark:focus:ring-yellow-800">
-                                            Approve with review
-                                        </button>
-                                        <button type="button" value="reject" onClick="submitForm(this, ${id})"
-                                            class="w-full text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">
+                                        <button type="button" class="btn btn-danger" value="reject" onClick="submitForm(this, ${id})">
                                             Reject
                                         </button>
                                     </div>
-                                    <div class="form-group">
-                                        <label for="reviewTextArea" class="hidden block mb-2 text-xl font-medium text-danger text-center">Tolong isi review terlebih dahulu.</label>
-                                        <textarea class="form-control w-full" placeholder="Leave a review here" name="reviewTextArea"></textarea>
-                                    </div>
-                                </form>
+                                    <button type="button" class="btn btn-danger" data-modal-hide="editContactModal${id}" onClick="openEditModal(${id})">Exit</button>
+                                </div>
                             </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
             `;
-            
             modalDiv.innerHTML += newEditModal;
                 
         }
@@ -254,68 +278,79 @@
             var form = button.closest('form');
             var actionUrl = form.getAttribute('action');
             var actionDiv = form.querySelector('[name="action"]');
-            var review = form.querySelector('[name="reviewTextArea"]');
-            var label = form.querySelector('label[for="reviewTextArea"]');
             actionDiv.value = button.value;
 
-            if(button.value === 'approve with review' || button.value === 'reject')
+            if(button.value === 'reject')
             {
-                if(review.value.trim() === "")
-                {
-                    label.classList.remove('hidden');
-                }
-                else
-                {
-                    label.classList.add('hidden');
-                    Swal.fire({
-                        title: 'Are you sure?',
-                        text: "You won't be able to revert this!",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Yes, submit form!'
-                    }).then((result) => {
-                        if (result.isConfirmed) {                            
-                            // Tutup edit modal div
-                            openEditModal(divId);
-
-                            // Kirim form
-                            $.ajax({
-                                url: actionUrl,
-                                method: 'PUT',
-                                data: $(form).serialize(), // Ambil semua input form
-                                success: function(response) {
-                                    // Alert data berhasil
-                                    Swal.fire({
-                                        toast: true,
-                                        icon: 'success',
-                                        title: response.message,
-                                        position: 'top-end',
-                                        showConfirmButton: false,
-                                        timer: 3000
-                                    });
-                                    // Bersihkan edit div
-                                    clearEditDiv();
-
-                                    // Refresh data table
-                                    table.ajax.reload(null, false); // Reload data dari server
-                                },
-                                error: function(xhr) {
-                                    // Alert data gagal
-                                    Swal.fire({
-                                        toast: true,
-                                        icon: 'error',
-                                        title: xhr.responseJSON.message,
-                                        position: 'top-end',
-                                        showConfirmButton: false,
-                                        timer: 3000
-                                    });
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, reject form!'
+                }).then((result) => {
+                    if (result.isConfirmed) {   
+                        Swal.fire({
+                            title: 'Enter feedback for closing',
+                            input: 'textarea',
+                            inputPlaceholder: 'Enter feedback here...',
+                            inputValidator: (value) => {
+                                if (!value.trim()) {
+                                    return 'You need to write something!';
                                 }
-                            });
-                        }
-                    });
-                }
+                            },
+                            showCancelButton: true,
+                            confirmButtonText: 'Submit',
+                            cancelButtonText: 'Cancel',
+                            cancelButtonColor: '#d33',
+                            confirmButtonColor: '#3085d6',
+                        }).then((inputResult) => {
+                            if (inputResult.isConfirmed) {
+                                
+                                // Tutup edit modal div
+                                openEditModal(divId);
+
+                                // Kirim form
+                                const feedback = inputResult.value;
+                                $.ajax({
+                                    url: actionUrl,
+                                    method: 'PUT',
+                                    data: $(form).serialize() + '&reviewTextArea=' + encodeURIComponent(feedback), // Ambil semua input form
+                                    success: function(response) {
+                                        // Alert data berhasil
+                                        Swal.fire({
+                                            toast: true,
+                                            icon: 'success',
+                                            title: response.message,
+                                            position: 'top-end',
+                                            showConfirmButton: false,
+                                            timer: 3000
+                                        });
+                                        // Bersihkan edit div
+                                        clearEditDiv();
+
+                                        // Refresh data table
+                                        table.ajax.reload(null, false); // Reload data dari server
+                                    },
+                                    error: function(xhr) {
+                                        // Alert data gagal
+                                        Swal.fire({
+                                            toast: true,
+                                            icon: 'error',
+                                            title: xhr.responseJSON.message,
+                                            position: 'top-end',
+                                            showConfirmButton: false,
+                                            timer: 3000
+                                        });
+                                    }
+                                });
+                            }                        
+                        });
+
+                    }
+                });
             }
             else if(button.value === 'approve')
             {
@@ -326,7 +361,7 @@
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
                     cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, submit form!'
+                    confirmButtonText: 'Yes, approve form!'
                 }).then((result) => {
                     if (result.isConfirmed) {
                         // Tutup edit modal div
