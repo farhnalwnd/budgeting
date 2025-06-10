@@ -80,6 +80,12 @@ Route::middleware('auth')->group(function () {
         Route::resource('budget-request', BudgetRequestController::class);
         Route::resource('activity', ActivityLogController::class);
         Route::resource('approver', BudgetApproverController::class);
+        Route::resource('purchase-request', PurchaseController::class);
+        Route::get('purchaserequest', [PurchaseController::class, 'getData'])->name('purchase.data');
+        Route::get('getYear', [PurchaseController::class, 'getYear'])->name('get.year');
+        Route::get('getBalanceByYear', [PurchaseController::class, 'getBalanceByYear'])->name('get.balance.by.year');
+        Route::get('purchases/{purchase_no}/details', [PurchaseController::class, 'getDetails'])->name('purchase.details');
+        
         
         Route::get('budget-approval', [BudgetRequestController::class, 'BudgetRequestApprovalIndex'])->name('budget-request.approval');
         Route::get('getBudgetRequestApprovalList-approval', [BudgetRequestController::class, 'getBudgetRequestApprovalList'])->name('get.budget-request.approval.list');
@@ -105,10 +111,10 @@ Route::middleware('auth')->group(function () {
 });
 
 route::prefix('page')->group(function () {
-    Route::get('/budgetin/request/approve', [PurchaseController::class, 'approved'])->name('budgeting.request.approved');
-    Route::get('/budgetin/request/reject', [PurchaseController::class, 'rejected'])->name('budgeting.request.reject');
-    Route::get('/budgetin/request/endview', [PurchaseController::class, 'endview'])->name('budgeting.request.endview');
-    Route::post('/budgetin/request/reject-feedback', [PurchaseController::class, 'submitRejectFeedback'])->name('budgeting.request.reject.feedback');
+    Route::get('/budgeting/request/approve', [PurchaseController::class, 'approved'])->name('budgeting.request.approved');
+    Route::get('/budgeting/request/reject', [PurchaseController::class, 'rejected'])->name('budgeting.request.reject');
+    Route::get('/budgeting/request/endview', [PurchaseController::class, 'endview'])->name('budgeting.request.endview');
+    Route::post('/budgeting/request/reject-feedback', [PurchaseController::class, 'submitRejectFeedback'])->name('budgeting.request.reject.feedback');
 
 });
 

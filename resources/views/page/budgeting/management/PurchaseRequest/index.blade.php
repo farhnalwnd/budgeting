@@ -739,13 +739,13 @@
                         let statusClass = '';
                         switch (data.toLowerCase()) {
                             case 'pending':
-                                statusClass = 'bg-yellow-100 text-yellow-800 border border-yellow-400';
+                                statusClass = 'bg-yellow-100 font-semibold uppercase text-lg text-yellow-800 border border-yellow-400';
                                 break;
                             case 'rejected':
-                                statusClass = 'bg-blue-100 text-red-800 border border-red-400';
+                                statusClass = 'bg-blue-100 font-semibold uppercase text-lg text-red-800 border border-red-400';
                                 break;
                             default:
-                                statusClass = 'bg-green-100 text-green-800 border border-green-400';
+                                statusClass = 'bg-green-100 font-semibold uppercase text-lg text-green-800 border border-green-400';
                                 break;
                             }
                             return `<span class="px-3 py-1 rounded-full font-semibold text-sm ${statusClass}">${data}</span>`;
