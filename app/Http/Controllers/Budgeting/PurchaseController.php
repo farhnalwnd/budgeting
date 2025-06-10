@@ -73,6 +73,8 @@ class PurchaseController extends Controller
             $validatedData = $request->validate([
             'description' => 'required|array|min:1',
             'description.*' => 'required|string|max:100',
+            'UM' => 'required|array|min:1',
+            'UM.*' => 'required|string|max:5',
             'price' => 'required|array|min:1',
             'price.*' => 'required|string',
             'quantity' => 'required|array|min:1',
@@ -104,6 +106,7 @@ class PurchaseController extends Controller
             $purchases[] = [
                 'purchase_no'=> $master->purchase_no,
                 'item_name' => $desc,
+                'UM' => $validatedData['UM'][$index] ?? null,
                 'amount' => $price,
                 'quantity' => $quantity,
                 'total_amount' => $total,
@@ -219,8 +222,8 @@ class PurchaseController extends Controller
         $purchaseDetails = $data->detail;
         $admin = user::where('username', 'admin')->first();
         $users = user::where('department_id', $departmentId)->first();
-        SendApprovedPurchaseNotification::dispatch($users, $data, $purchaseDetails, false)->onConnection('sync');
-        SendApprovedPurchaseNotification::dispatch($admin, $data->fresh(), $purchaseDetails->fresh(), true)->onConnection('sync');
+        SendApprovedPurchaseNotification::dispatch($users, $data, $purchaseDetails, false);
+        SendApprovedPurchaseNotification::dispatch($admin, $data->fresh(), $purchaseDetails->fresh(), true);
 
 
         //*log activity on purchaseRequest
@@ -460,8 +463,8 @@ class PurchaseController extends Controller
                         $admin = user::where('username', 'admin')->first();
                         $user = user::where('department_id', $budgetRequest->from_department_id)->first();
                         // dd($user, $purchases , $budgetRequest, $deptName, $purchaseDetails);
-                        SendApprovedPurchase::dispatch($user, $purchases , $budgetRequest, $deptName, $purchaseDetails, false)->onConnection('sync');
-                        SendApprovedPurchase::dispatch($admin, $purchases , $budgetRequest, $deptName, $purchaseDetails, true)->onConnection('sync');
+                        SendApprovedPurchase::dispatch($user, $purchases , $budgetRequest, $deptName, $purchaseDetails, false);
+                        SendApprovedPurchase::dispatch($admin, $purchases , $budgetRequest, $deptName, $purchaseDetails, true);
                     }
                 }
             }
@@ -555,19 +558,19 @@ class PurchaseController extends Controller
                 ->performedOn($budgetRequest)
                 ->inLog('budget-request reject')
                 ->event('reject')
-                ->causedBy($data->nik->name)
+                ->causedBy($data->user)
                 ->withProperties([
-                    'no' => $budgetRequest->budget->req_no,
+                    'no' => $budgetRequest->budget_purchase_no,
                     'action' => 'reject',
                     'data' => [
                         'feedback' => $data->feedback,
                     ]
                 ])
-                ->log('budget-request reject ' .  $budgetRequest->budget->req_no . ' by ' . $data->nik->name . ' with feedback '. $data->feedback . ' at: ' . now());
+                ->log('budget-request reject ' .  $budgetRequest->budget_purchase_no . ' by ' . $data->user->name . ' with feedback '. $data->feedback . ' at: ' . now());
             DB::commit(); 
             return view('emails.finishProcces');
         } catch (\Exception $e) {
-            DB::rollBack(); 
+            DB::rollBack();
             return back()->with('error', 'Gagal menyimpan alasan: ' . $e->getMessage());
         }
     }

@@ -32,9 +32,9 @@
             </tr>
             <tr>
                 <td colspan="3">
-                    <p>Dear <strong>{{$user->name}}</strong>,</p>
-                    <p>System mencatat adanya penolakan peminjaman dana yang telah anda request sebelumnya dengan rincian sebagai berikut:
-                    </p>
+                    <p>Dear <strong>{{ $user->name }}</strong>,</p>
+                    <p>System mencatat adanya penolakan peminjaman dana yang telah anda request sebelumnya dengan
+                        rincian sebagai berikut:</p>
                 </td>
             </tr>
         </thead>
@@ -54,20 +54,21 @@
             </tr>
 
             @foreach ($purchaseDetails as $detail)
-            <tr class="tr-odd">
-                <td style="width:auto">{{$loop->iteration}}</td>
+            @php $rowClass = $loop->odd ? 'tr-odd' : ''; @endphp
+            <tr class="{{ $rowClass }}">
+                <td>{{ $loop->iteration }}</td>
                 <td>Item:</td>
                 <td>{{ $detail->item_name }}</td>
             </tr>
-            <tr class="tr-odd">
-                <td style="width:auto"></td>
+            <tr class="{{ $rowClass }}">
+                <td></td>
                 <td>Jumlah:</td>
-                <td>{{ $detail->quantity}}</td>
+                <td>{{ $detail->quantity }}</td>
             </tr>
-            <tr>
-                <td style="width:auto"></td>
+            <tr class="{{ $rowClass }}">
+                <td></td>
                 <td>Total:</td>
-                <td>{{ $detail->total_amount}}</td>
+                <td>{{ $detail->total_amount }}</td>
             </tr>
             @endforeach
 
@@ -76,21 +77,12 @@
                 <td>{{ $purchases->grand_total }}</td>
             </tr>
             <tr>
-                <th colspan="3">
-                    <a href=""
-                        style="text-decoration: none; color: green; font-size: 24px; font-weight: bold; margin-right: 20px;">
-                        Edit
-                    </a>
-                </th>
-            </tr>
-
-            <tr>
-                <td colspan="3">
-                    <p style="text-align: center;">Kindly approve it at your earliest convenience so we can proceed.</p>
-                    <p style="text-align: center;">Thank you for your attention.</p>
+                <td colspan="3" class="text-center">
+                    <p class="text-center">Kindly approve it at your earliest convenience so we can proceed.</p>
+                    <p class="text-center">Thank you for your attention.</p>
                     <br>
-                    <p style="text-align: center;">Best regards,</p>
-                    <p style="text-align: center;">PT Sinar Meadow International Indonesia</p>
+                    <p class="text-center">Best regards,</p>
+                    <p class="text-center">PT Sinar Meadow International Indonesia</p>
                 </td>
             </tr>
         </tbody>

@@ -119,6 +119,7 @@
                         <thead :class="scrolled ? 'bg-white shadow-md border-none' : ''" class="sticky top-0 z-10">
                             <tr>
                                 <th class="text-center w-fit">ITEM NAME</th>
+                                <th class="text-center w-48">UM</th>
                                 <th class="text-center w-48">HARGA (RP)</th>
                                 <th class="text-center w-28">JML</th>
                                 <th class="text-center w-48">TOTAL</th>
@@ -129,7 +130,9 @@
                             <tbody class="max-h-[50vh] overflow-y-auto">
                                 <tr>
                                     <td><input type="text" name="description[]"
-                                    
+                                        class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none" required>
+                                    </td>
+                                    <td><input type="text" name="UM[]"
                                         class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none" required>
                                     </td>
                                     <td>
@@ -250,6 +253,7 @@
             tableRows += `
                 <tr>
                     <td class="border-2 border-gray-400 p-3 text-center">${item.item_name}</td>
+                    <td class="border-2 border-gray-400 p-3 text-center">${item.um || '-'}</td>
                     <td class="border-2 border-gray-400 p-3 text-center">${toRupiah(item.amount)}</td>
                     <td class="border-2 border-gray-400 p-3 text-center">${item.quantity}</td>
                     <td class="border-2 border-gray-400 p-3 text-center">${toRupiah(item.total_amount)}</td>
@@ -294,11 +298,12 @@
                     <table class="table-auto w-full border-collapse">
                         <thead class="sticky top-0 z-10">
                             <tr>
-                                <th class="border-2 p-2 border-gray-800 text-center w-2/6">ITEM NAME</th>
-                                <th class="border-2 p-2 border-gray-800 text-center w-1/6">HARGA (RP)</th>
-                                <th class="border-2 p-2 border-gray-800 text-center w-1/6">JML</th>
-                                <th class="border-2 p-2 border-gray-800 text-center w-1/6">TOTAL</th>
-                                <th class="border-2 p-2 border-gray-800 text-center w-1/6">REMARK</th>
+                                <th class="border-2 p-2 border-gray-800 text-center w-4/12">ITEM NAME</th>
+                                <th class="border-2 p-2 border-gray-800 text-center w-1/12">UM</th>
+                                <th class="border-2 p-2 border-gray-800 text-center w-2/12">HARGA (RP)</th>
+                                <th class="border-2 p-2 border-gray-800 text-center w-1/12">JML</th>
+                                <th class="border-2 p-2 border-gray-800 text-center w-2/12">TOTAL</th>
+                                <th class="border-2 p-2 border-gray-800 text-center w-2/12">REMARK</th>
                             </tr>
                         </thead>
                         <tbody class="overflow-y-auto">
@@ -352,7 +357,7 @@
                 case 'pending':
                     return 'p-1 bg-yellow-100 text-yellow-800 border border-yellow-400';
                 case 'rejected':
-                    return 'p-1 bg-blue-100 text-red-800 border border-red-400';
+                    return 'p-1 bg-red-100 text-red-800 border border-red-400';
                     break;
                 default:
                     return 'p-1 bg-green-100 text-green-800 border border-green-400';
@@ -771,6 +776,9 @@
             const newRow = document.createElement('tr');
             newRow.innerHTML = `
                 <td><input type="text" name="description[]"
+                    class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none" required>
+                </td>
+                <td><input type="text" name="UM[]"
                     class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none" required>
                 </td>
                 <td>

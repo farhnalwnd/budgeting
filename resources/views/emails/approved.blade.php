@@ -17,7 +17,8 @@
             background-color: rgb(238, 238, 238);
         }
 
-        td, th {
+        td,
+        th {
             padding: 0.5rem;
             vertical-align: top;
         }
@@ -30,7 +31,9 @@
             border-collapse: collapse;
         }
 
-        h2, h5, p {
+        h2,
+        h5,
+        p {
             margin: 0.2em 0;
         }
 
@@ -79,22 +82,24 @@
                 <td>{{ $data->department_id }}</td>
             </tr>
 
-            @foreach ($purchaseDetails as $detail)
-                <tr class="tr-odd">
-                    <td>{{ $loop->iteration }}</td>
-                    <td>Item:</td>
-                    <td>{{ $detail->item_name }}</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>Jumlah:</td>
-                    <td>{{ $detail->quantity }}</td>
-                </tr>
-                <tr class="tr-odd">
-                    <td></td>
-                    <td>Total:</td>
-                    <td>Rp {{ number_format($detail->total_amount, 0, ',', '.') }}</td>
-                </tr>
+            @foreach ($purchaseDetails as $index => $detail)
+            @php $isOddGroup = $index % 2 === 0; @endphp
+
+            <tr class="{{ $isOddGroup ? 'tr-odd' : '' }}">
+                <td>{{ $loop->iteration }}</td>
+                <td>Item:</td>
+                <td>{{ $detail->item_name }}</td>
+            </tr>
+            <tr class="{{ $isOddGroup ? 'tr-odd' : '' }}">
+                <td></td>
+                <td>Jumlah:</td>
+                <td>{{ $detail->quantity }}</td>
+            </tr>
+            <tr class="{{ $isOddGroup ? 'tr-odd' : '' }}">
+                <td></td>
+                <td>Total:</td>
+                <td>Rp {{ number_format($detail->total_amount, 0, ',', '.') }}</td>
+            </tr>
             @endforeach
 
             <tr>
@@ -107,18 +112,18 @@
                 <td>Saldo Departemen:</td>
                 <td>
                     @php
-                        $balance = optional($data->department)->balanceForYear(now()->year);
+                    $balance = optional($data->department)->balanceForYear(now()->year);
                     @endphp
                     {{ $balance !== null ? 'Rp ' . number_format($balance, 0, ',', '.') : '-' }}
                 </td>
             </tr>
 
             @if ($isAdmin)
-                <tr>
-                    <td colspan="3" class="text-center">
-                        <a href="#" class="btn">Edit</a>
-                    </td>
-                </tr>
+            <tr>
+                <td colspan="3" class="text-center">
+                    <a href="{{ route('purchase-request.edit', $data->id) }}" class="btn">edit</a>
+                </td>
+            </tr>
             @endif
 
             <tr>

@@ -14,6 +14,7 @@ class PurchaseDetail extends Model
     protected $fillable = [
         'item_name',
         'quanitity',
+        'UM',
         'amount',
         'total_amount',
         'remark'

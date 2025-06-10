@@ -2,12 +2,15 @@
 <html lang="en">
 
 <head>
-    <title>Form detail</title>
+    <title>Form Detail</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
         .header-style {
             background-color: yellow;
-            padding: 5px;
-            padding-left: 15px;
+            padding: 5px 15px;
         }
 
         .tr-odd {
@@ -17,12 +20,42 @@
         td,
         th {
             padding: 0.3rem 0.5rem;
+            vertical-align: top;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        table {
+            border: 1px solid black;
+            width: 100%;
+            max-width: 1000px;
+            margin: auto;
+            border-collapse: collapse;
+        }
+
+        h2,
+        h5,
+        p {
+            margin: 0.3em 0;
+        }
+
+        a.btn {
+            text-decoration: none;
+            font-size: 24px;
+            font-weight: bold;
+            margin-right: 20px;
+        }
+
+        .edit-link {
+            color: green;
         }
     </style>
 </head>
 
 <body>
-    <table style="border: 1px solid black; width:100%; max-width:1000px; margin:auto;">
+    <table>
         <thead>
             <tr class="header-style">
                 <td colspan="3">
@@ -32,79 +65,81 @@
             </tr>
             <tr>
                 <td colspan="3">
+                    <p>Dear <strong>{{ $user->name }}</strong>,</p>
                     @if($isAdmin)
-                    <p>Dear <strong>{{$user->name}}</strong>,</p>
-                    <p>System mencatat adanya data budget approved baru yang masuk dengan rincian sebagai berikut:
-                    </p>
+                    <p>System mencatat adanya data budget approved baru yang masuk dengan rincian sebagai berikut:</p>
                     @else
-                    <p>Dear <strong>{{$user->name}}</strong>,</p>
-                    <p>permohonan anda kepada department{{ $deptName[0] }} telah disetujui dan status purchases sudah menjadi approved.
-                    </p>
-                    <p>berikut rincianya:</p>
+                    <p>Permohonan anda kepada department <strong>{{ $deptName[0] }}</strong> telah disetujui dan status
+                        purchases sudah menjadi <strong>approved</strong>.</p>
+                    <p>Berikut rinciannya:</p>
                     @endif
                 </td>
             </tr>
         </thead>
+
         <tbody>
             <tr>
-                <th colspan="3">
+                <th colspan="3" class="text-center">
                     @if($isAdmin)
-                    <h5 class="text-center">data purchases baru dengan status {{$purchases->status}}</h5>
+                    <h5>Data purchases baru dengan status <strong>{{ $purchases->status }}</strong></h5>
                     @else
-                    <h5 class="text-center">department {{ $deptName[0]}} menyetujui peminjaman dana oleh department {{$deptName[1]}}
-                        sehingga status purchases
-                        saat ini adalah {{$purchases->status}}</h5>
+                    <h5>Department <strong>{{ $deptName[0] }}</strong> menyetujui peminjaman dana oleh department
+                        <strong>{{ $deptName[1] }}</strong> sehingga status purchases saat ini adalah <strong>{{
+                            $purchases->status }}</strong></h5>
                     @endif
                 </th>
             </tr>
+
             <tr>
-                <td colspan="2">penganggar:</td>
+                <td colspan="2">Penganggar:</td>
                 <td>{{ $deptName[1] }}</td>
             </tr>
+
             @foreach ($purchaseDetails as $detail)
-            <tr class="tr-odd">
-                <td style="width:auto">{{$loop->iteration}}</td>
+            @php $rowClass = $loop->odd ? 'tr-odd' : ''; @endphp
+            <tr class="{{ $rowClass }}">
+                <td>{{ $loop->iteration }}</td>
                 <td>Item:</td>
-                <td>{{ $detail->item_name}}</td>
+                <td>{{ $detail->item_name }}</td>
             </tr>
-            <tr>
-                <td style="width:auto"></td>
+            <tr class="{{ $rowClass }}">
+                <td></td>
                 <td>Jumlah:</td>
-                <td>{{ $detail->quantity}}</td>
+                <td>{{ $detail->quantity }}</td>
             </tr>
-            <tr class="tr-odd">
-                <td style="width:auto"></td>
+            <tr class="{{ $rowClass }}">
+                <td></td>
                 <td>Total:</td>
-                <td>{{ $detail->total_amount}}</td>
+                <td>{{ $detail->total_amount }}</td>
             </tr>
             @endforeach
+
             <tr>
-                <td style="width:auto"></td>
-                <td>total purchase:</td>
-                <td>{{$purchases->grand_total}}</td>
+                <td></td>
+                <td>Total Purchase:</td>
+                <td>{{ $purchases->grand_total }}</td>
             </tr>
             <tr class="tr-odd">
-                <td style="width:auto"></td>
-                <td>saldo department:</td>
-                <td>{{$purchases->department->balance}}</td>
+                <td></td>
+                <td>Saldo Department:</td>
+                <td>{{ $purchases->department->balance }}</td>
             </tr>
+
             @if($isAdmin)
             <tr>
-                <th colspan="3">
-                    <a href=""
-                        style="text-decoration: none; color: green; font-size: 24px; font-weight: bold; margin-right: 20px;">
-                        Edit
-                    </a>
+                <th colspan="3" class="text-center">
+                    <a href="{{ route('purchase-request.edit', $purchases->id) }}" class="btn edit-link">Edit</a>
                 </th>
             </tr>
             @endif
+
             <tr>
-                <td colspan="3">
-                    <p style="text-align: center;">Kindly approve it at your earliest convenience so we can proceed.</p>
-                    <p style="text-align: center;">Thank you for your attention.</p>
+                <td colspan="3" class="text-center">
+                    <p class="text-center">Kindly approve it at your earliest convenience so we can proceed.</p>
+                    <p class="text-center">Thank you for your attention.</p>
                     <br>
-                    <p style="text-align: center;">Best regards,</p>
-                    <p style="text-align: center;">PT Sinar Meadow International Indonesia</p>
+                    <p class="text-center">Best regards,</p>
+                    <p class="text-center">PT Sinar Meadow International Indonesia</p>
                 </td>
             </tr>
         </tbody>
