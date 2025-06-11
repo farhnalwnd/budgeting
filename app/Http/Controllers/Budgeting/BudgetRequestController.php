@@ -157,7 +157,7 @@ class BudgetRequestController extends Controller
                 // Simulasi request jika budget approved
                 $purchaseController = new PurchaseController();
                 $result = null;
-                if($validatedData['action'] === 'approve'|| $validatedData['action'] === 'approve with review')
+                if($validatedData['action'] === 'approve')
                 {
                     $request = new Request([
                         'budget_req_no' => $approval->budget_req_no,
@@ -167,7 +167,7 @@ class BudgetRequestController extends Controller
                     ]);
                     $result = $purchaseController->approved($request);
                 }
-                else
+                else if($validatedData['action'] === 'reject')
                 {
                     $request = new Request([
                         'budget_req_no' => $approval->budget_req_no,
@@ -176,16 +176,24 @@ class BudgetRequestController extends Controller
                     ]);
                     $result = $purchaseController->submitRejectFeedback($request);
                 }
+                else
+                {
+                    throw new \Exception(session('Input bukan approve / reject.'));
+                }
 
                 if ($result instanceof \Illuminate\Http\RedirectResponse) {
                     if (session()->has('error')) {
                         throw new \Exception(session('error'));
                     }
+                    else
+                    {
+                        throw new \Exception("There is an error.");
+                    }
                 }
 
                 // Commit transaksi
                 DB::commit();
-                return response()->json(['message' => 'Budget-request successfully ' . $validatedData['action'] .'!'], 200);  
+                return response()->json(['result' => $result, 'message' => 'Budget-request successfully ' . $validatedData['action'] .'!'], 200);  
             } 
             else
             {

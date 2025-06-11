@@ -40,7 +40,6 @@
                                 <th scope="col" class="px-6 py-3 text-lg">From</th>
                                 <th scope="col" class="px-6 py-3 text-lg">Amount</th>
                                 <th scope="col" class="px-6 py-3 text-lg">Status</th>
-                                <th scope="col" class="px-6 py-3 text-lg">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -98,18 +97,7 @@
                                 }).format(data);
                             }
                     },
-                    { data: 'status', name: 'status' },
-                    { data: null, name: 'action', orderable: false, searchable: false,
-                        render: function(data, type, row, meta) {
-                            var id = row.id;
-                            var deleteUrl = "{{ route('budget-request.destroy', ':id') }}".replace(':id', id); 
-                            return `
-                            <div class="d-flex action-btn">
-                                <button class="btn btn-info" onClick="openEditModal(${meta.row})">Detail</button>
-                            </div>
-                            `;  
-                        }
-                    }
+                    { data: 'status', name: 'status' }
                 ]
             });
         });
@@ -241,6 +229,11 @@
                 
         }
         
+        $('#budgetTable tbody').on('click', 'tr', function () {
+            let rowIndex = table.row(this).index();
+            openEditModal(rowIndex);
+        });
+
         function getTotalAmount(currInput)
         {
             var parent = currInput.parentNode.parentNode.parentNode;
@@ -384,7 +377,7 @@
                                 });
                                 // Bersihkan edit div
                                 clearEditDiv();
-
+                                
                                 // Refresh data table
                                 table.ajax.reload(null, false); // Reload data dari server
                             },

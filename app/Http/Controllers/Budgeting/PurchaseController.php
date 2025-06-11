@@ -495,7 +495,6 @@ class PurchaseController extends Controller
                 ]);
         }
         } catch (\Exception $e) {
-            dd($e->getMessage());
             DB::rollback();
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
@@ -537,7 +536,6 @@ class PurchaseController extends Controller
                 $budgetRequest->status = 'rejected';
                 $budgetRequest->feedback = $data->feedback;
                 $budgetRequest->save();
-
                 $purchases = $budgetRequest->purchase;
                 if ($purchases) {
                     $purchases->update(['status' => 'rejected']);
@@ -546,8 +544,9 @@ class PurchaseController extends Controller
                     $toDept = $budgetRequest->toDepartment->department_name;
                     $fromDept = $budgetRequest->fromDepartment->department_name;
                     $deptName = [$toDept, $fromDept];
-                    $user = user::where('department_id', $budgetRequest->from_department_id)->first();
+                    $user = User::where('department_id', $budgetRequest->from_department_id)->first();
 
+                    throw new \Exception("Test: " . $budgetRequest->from_department_id);
                     //* Kirim notifikasi dalam transaction-safe context
                     SendRejectedPurchaseNotification::dispatch($user, $purchases, $budgetRequest, $deptName, $purchaseDetails);
                 }
