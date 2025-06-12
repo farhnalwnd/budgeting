@@ -68,11 +68,6 @@
         </thead>
 
         <tbody>
-
-            @php
-            dd($budgetRequest);
-            @endphp
-            
             <tr>
                 <th colspan="3" class="text-center">
                     <h5>Data purchase dengan status: <strong>{{ ucfirst($purchases->status) }}</strong></h5>
