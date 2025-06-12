@@ -27,6 +27,11 @@ return new class extends Migration
                 ->references('purchase_no')
                 ->on('purchases')
                 ->onDelete('cascade'); //no purchasing
+            $table->string('nik')->nullable();
+            $table->foreign('nik')
+                ->references('nik')
+                ->on('users')
+                ->onDelete('cascade'); //nik
             $table->decimal('amount',18,2); // jumlah diminta
             $table->text('reason'); // alasan permintaan
             $table->enum('status', ['pending','approved','rejected'])->default('pending');
