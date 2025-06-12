@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Budgeting;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\sendApprovalRequest;
 use App\Models\Budgeting\BudgetApproval;
 use App\Models\Budgeting\BudgetApprover;
 use App\Models\Budgeting\BudgetRequest;
+use App\Models\Budgeting\Purchase;
 use App\Models\Department;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -341,7 +343,51 @@ class BudgetRequestController extends Controller
         {
             return response()->json(null);
         }
+    }
 
+    //controller budget request
+    public function resendEmail(Request $request)
+    {
+        $request->validate([
+            'budget_purchase_no' => 'required|string'
+        ]);
+
+        $purchaseNo = $request->budget_purchase_no;
+
+        $purchase = Purchase::where('purchase_no', $purchaseNo)->first();
+        $requestBudget = BudgetRequest::where('budget_purchase_no', $purchaseNo)->first();
+        $toDepartmentName = $requestBudget->toDepartment->department_name;
+        $fromDepartmentName = $requestBudget->fromDepartment->department_name;
+
+        if (!$purchase && !$requestBudget) {
+            return response()->json(['success' => false, 'message' => 'Data purchase tidak ditemukan.'], 404);
+        }
+
+        try {
+            $approver = null;
+            $approver = BudgetApprover::where('department_id', $requestBudget->to_department_id)->first();
+            $budgetApproval = BudgetApproval::where('budget_req_no', $requestBudget->budget_req_no)->first();
+            if($budgetApproval){
+                $budgetApproval->token = Str::uuid();
+                $budgetApproval->save();
+            }
+            if ($approver && $approver->user) {
+                $approver = $approver->user;
+            }
+            if ($approver && $approver->email) {
+                $requestData = [
+                    'to_department_name' => $toDepartmentName,
+                    'from_department_name' => $fromDepartmentName,
+                    'budget_purchase_no' => $purchaseNo,
+                    'amount' => $requestBudget->amount,
+                    'reason' => $requestBudget->reason
+                ];
+                sendApprovalRequest::dispatch($approver, $requestData, $budgetApproval);
+            }
+            return response()->json(['success' => true, 'message' => 'Email berhasil dikirim ulang.']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Gagal mengirim email: ' . $e->getMessage()], 500);
+        }
     }
 
 

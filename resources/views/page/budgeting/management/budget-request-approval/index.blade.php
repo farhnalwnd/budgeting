@@ -55,6 +55,11 @@
     </section>
 
     <!-- Modal Edit User -->
+    <div id="resendModalDiv">
+        <div id="modalBg" class="fixed inset-0 bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-40 hidden"></div>
+    </div>
+
+    <!-- Modal Edit User -->
     <div id="editModalDiv">
         <div id="modalBackground" class="fixed inset-0 bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-40 hidden"></div>
     </div>
@@ -112,6 +117,178 @@
             });
         });
 
+        $('#budgetTable tbody').on('click', 'tr', function () {
+                if (!$(event.target).closest('a, button, i').length) {
+                    var data = table.row(this).data();
+                    if (data && data.budget_purchase_no) {
+                        openResendModal(data);
+                    }
+                }
+            });
+
+            function openResendModal(data) {
+                var modal = document.getElementById(`detail-${data}`);
+                var modalBackground = document.getElementById('modalBg');
+                modalBackground.classList.toggle('hidden');
+                if (modal) {
+                    console.log(modal);
+                    modal.classList.toggle('hidden');
+                    modal.classList.toggle('flex');
+                    return;
+                }
+
+                var modalDiv = document.getElementById('resendModalDiv');
+                console.log('tes ini datanya', data);
+
+                var newResendModal = `
+            <div id="detail-${data}" class="text-black fixed inset-0 z-50 bg-black bg-opacity-10 flex items-center justify-center">
+                <div class="bg-white p-6 rounded-lg w-2/3">
+                    <!-- Header -->
+                    <div class="flex justify-start">
+                        <div class="flex items-center">
+                            <h1 class="text-6xl font-bold text-yellow-700 font-mono">PURCHASE</h1>
+                        </div>
+                        <img src="/sinarlogo.png" alt="logo" class="w-72 h-32 ml-auto">
+                    </div>
+                    <hr class="my-10 border-t-2 rounded-md border-slate-900 opacity-90">
+
+                    <!-- Keterangan -->
+                    <div class="grid grid-cols-5 gap-2 text-left py-3">
+                        <div class="col-span-4">
+                            <h1 class="font-bold text-lg">From Department:</h1>
+                            <h2 class="font-semibold text-base">${data.from_department.department_name}</h2>
+                        </div>
+                        <div class="pl-7">
+                            <h1 class="font-bold text-lg">To Department:</h1>
+                            <span class="font-semibold text-base">${data.to_department.department_name}</span>
+                        </div>
+                        <div class="col-span-4">
+                            <h1 class="font-bold text-lg mb-1">DATE:</h1>
+                            <span class="font-semibold text-base">${formatTanggalShort(data.updated_at)}</span>
+                        </div>
+                        <div class="pl-7">
+                            <h1 class="font-bold text-lg mb-1">Status:</h1>
+                            <span
+                                class="font-semibold text-lg rounded-md uppercase border-2 ${getStatusColor(data.status)} border-opacity-50">${data.status}</span>
+                        </div>
+                    </div>
+
+                    <!-- * table -->
+                    <div class="container pt-10">
+                        <table class="table-auto w-full border-collapse">
+                            <thead class="sticky top-0 z-10">
+                                <tr>
+                                    <th class="border-2 p-2 border-gray-800 text-center w-4/12">BUDGET REQUEST NO</th>
+                                    <th class="border-2 p-2 border-gray-800 text-center w-1/12">BUDGET PURCHASE NO</th>
+                                    <th class="border-2 p-2 border-gray-800 text-center w-2/12">AMOUNT</th>
+                                    <th class="border-2 p-2 border-gray-800 text-center w-1/12">STATUS</th>
+                                    <th class="border-2 p-2 border-gray-800 text-center w-2/12">REASON</th>
+                                    <th class="border-2 p-2 border-gray-800 text-center w-2/12">FEEDBACK</th>
+                                </tr>
+                            </thead>
+                            <tbody class="overflow-y-auto">
+                                <tr>
+                                    <td class="border-2 border-gray-400 p-3 text-center">${data.budget_req_no}</td>
+                                    <td class="border-2 border-gray-400 p-3 text-center">${data.budget_purchase_no}</td>
+                                    <td class="border-2 border-gray-400 p-3 text-center">${toRupiah(data.amount)}</td>
+                                    <td class="border-2 border-gray-400 p-3 text-center">${data.status}</td>
+                                    <td class="border-2 border-gray-400 p-3 text-center">${data.reason}</td>
+                                    <td class="border-2 border-gray-400 p-3 text-center">${data.feedback || '-'}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!--* Tombol -->
+                    <div class="flex items-center justify-end mx-4 mt-4 gap-2">
+                        <div class="ml-auto">
+                            <form action="/purchase-request/edit" method="GET">
+                                <button type="button" class="btn btn-primary" onClick="resendEmail('${data.budget_purchase_no}')">Resend</button>
+                            </form>
+                        </div>
+                        <div class="">
+                            <button type="button" class="btn btn-danger"
+                                onclick="closeResendModal('${data}')">Exit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+                modalDiv.innerHTML += newResendModal;
+            }
+
+        async function resendEmail(purchaseNo) {
+            try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+                const response = await fetch('getResendEmail', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        budget_purchase_no: purchaseNo
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    Swal.fire('Sukses!', 'Email berhasil dikirim ulang.', 'success');
+                } else {
+                    throw new Error(data.message || 'Gagal mengirim ulang email.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire('Gagal!', error.message, 'error');
+            }
+        }
+
+        function closeResendModal(data) {
+            var modal = document.getElementById(`detail-${data}`);
+            var modalBackground = document.getElementById('modalBg');
+            modalBackground.classList.toggle('hidden');
+            if (modal) {
+                modal.classList.toggle('hidden');
+                modal.classList.toggle('flex');
+                modal.remove();
+                return;
+            }
+            var modalDiv = document.getElementById('resendModalDiv');
+            var newResendModal = ``;
+            modalDiv.innerHTML += newResendModal;
+        }
+
+    // css untuk status
+        function getStatusColor(status) {
+            switch (status.toLowerCase()) {
+                case 'pending':
+                    return 'p-1 bg-yellow-100 text-yellow-800 border border-yellow-400';
+                case 'rejected':
+                    return 'p-1 bg-red-100 text-red-800 border border-red-400';
+                    break;
+                default:
+                    return 'p-1 bg-green-100 text-green-800 border border-green-400';
+                    break;
+            }
+        }
+
+        function formatTanggalShort(dateStr) {
+            const options = { day: 'numeric', month: 'short', year: '2-digit' };
+            return new Date(dateStr).toLocaleDateString('en-GB', options);
+        }
+
+        function toRupiah(number) {
+                return new Intl.NumberFormat('id-ID', {
+                    style: 'currency',
+                    currency: 'IDR',
+                    minimumFractionDigits: 0
+                }).format(number);
+        }
+        
         // Function untuk buat/buka modal
         function openEditModal(id){
             var modal = document.getElementById(`editContactModal${id}`);
@@ -216,6 +393,7 @@
             modalDiv.innerHTML += newEditModal;
                 
         }
+
         
         function getTotalAmount(currInput)
         {

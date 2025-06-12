@@ -85,7 +85,7 @@ Route::middleware('auth')->group(function () {
         Route::get('getYear', [PurchaseController::class, 'getYear'])->name('get.year');
         Route::get('getBalanceByYear', [PurchaseController::class, 'getBalanceByYear'])->name('get.balance.by.year');
         Route::get('purchases/{purchase_no}/details', [PurchaseController::class, 'getDetails'])->name('purchase.details');
-        
+        Route::POST('getResendEmail', [BudgetRequestController::class, 'resendEmail'])->name('resendEmail');
         
         Route::get('budget-approval', [BudgetRequestController::class, 'BudgetRequestApprovalIndex'])->name('budget-request.approval');
         Route::get('getBudgetRequestApprovalList-approval', [BudgetRequestController::class, 'getBudgetRequestApprovalList'])->name('get.budget-request.approval.list');

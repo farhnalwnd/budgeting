@@ -11,6 +11,7 @@ class BudgetRequest extends Model
     use HasFactory;
     protected $fillable = [
         'budget_req_no',
+        'nik',
         'from_department_id',
         'to_department_id',
         'budget_purchase_no',
