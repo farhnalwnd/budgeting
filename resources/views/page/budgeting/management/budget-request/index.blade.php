@@ -123,7 +123,7 @@
                                     <tr>
                                         <td>
                                             <select name="to_department" id="to_department" required
-                                                class="form-select w-full text-lg text-body bg-secondary-light border" aria-invalid="false" style="padding: 5px;"
+                                                class="form-select w-full text-lg text-body bg-secondary-light border text-center" aria-invalid="false" style="padding: 5px;"
                                                 placeholder="To Department">
                                                 <option value="" selected disabled>Select Department</option>
                                             </select>
@@ -563,17 +563,17 @@
                                     <tbody class="max-h-[50vh] overflow-y-auto">
                                         <tr>
                                             <td>
-                                                <input type="text" name="to_department" value="${budget.to_department.department_name}" readonly
+                                                <input type="text" value="${budget.to_department.department_name}" readonly
                                                 class="w-full p-2 border focus:ring-0 text-center text-body bg-secondary-light" 
                                                     placeholder="To Department" required>
                                             </td>
                                             <td>
-                                                <input type="number" name="amount" value="${budget.amount}" readonly
+                                                <input type="text" value="${new Intl.NumberFormat('id-ID', {style: 'currency',currency: 'IDR',minimumFractionDigits: 0}).format(budget.amount)}" readonly
                                                 class="w-full p-2 border focus:ring-0 text-center text-body bg-secondary-light" 
                                                     placeholder="Input Number" required>
                                             </td>
                                             <td>
-                                                <input type="text" name="reason" id="reason" value="${budget.reason}" readonly
+                                                <input type="text" value="${budget.reason}" readonly
                                                     class="w-full p-2 border focus:ring-0 text-center text-body bg-secondary-light" 
                                                     placeholder="Input reason" required>
                                             </td>

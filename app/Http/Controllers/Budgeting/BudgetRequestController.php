@@ -76,12 +76,29 @@ class BudgetRequestController extends Controller
             ]);
 
             $approverNik = BudgetApprover::where('department_id',$validatedData['to_department'])->first();
-            BudgetApproval::create([
+            $budgetApproval = BudgetApproval::create([
                 'budget_req_no' => $validatedData['no'],
                 'nik' => $approverNik->nik,
                 'status' => 'pending',
                 'token' => Str::uuid()
             ]);
+
+            $approver= BudgetApprover::where('department_id', $validatedData['to_department'])->first(); 
+
+            if($approver && $approver->user){
+                $approver = $approver->user;
+            }
+
+            if($approver && $approver->email){
+                $requestData=[
+                    'to_department_name'=> $toDept->department_name,
+                    'from_department_name'=>$user->department->department_name,
+                    'budget_req_no'=>$budget->budget_req_no,
+                    'amount'=>$validatedData['amount'],
+                    'reason'=>$validatedData['reason']
+                ];
+                sendApprovalRequest::dispatch($approver, $requestData, $budgetApproval);
+            }
 
             activity()
                 ->performedOn($budget)

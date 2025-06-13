@@ -173,7 +173,7 @@ class PurchaseController extends Controller
                     $requestData=[
                         'to_department_name'=> $toDept->department_name,
                         'from_department_name'=>$department->department_name,
-                        'budget_purchase_no'=>$purchaseNumber,
+                        'budget_req_no'=>$budgetRequest->budget_req_no,
                         'amount'=>$validatedData['amount'],
                         'reason'=>$validatedData['reason']
                     ];
@@ -621,14 +621,19 @@ class PurchaseController extends Controller
     {
         $department = Department::findOrFail($departmentId);
         $departmentCode = str_replace(" ","", strtoupper(substr($department->department_name, 0, 3)));
-
-        $lastAllocation = BudgetRequest::where('budget_req_no', 'like', 'REQCAPEX/'.$departmentCode.'/%')
+        $year = now()->format('y');
+        // Cari alokasi terakhir yang dimulai dengan CAPEX/{kodeDepartemen}/{tahun}
+        $lastAllocation = BudgetRequest::where('budget_req_no', 'like', 'CAPEX/REQ/'.$departmentCode.'/'.$year.'/%')
                                         ->latest()
                                         ->first();
-
+                                        
+        // Ambil angka urutan terakhir dari nomor alokasi
         $lastNumber = $lastAllocation ? (int) substr($lastAllocation->budget_req_no, -4) : 0;
+
+        // Menambahkan 1 dan memastikan nomor urut 4 digit
         $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
 
-        return "REQCAPEX/{$departmentCode}/{$newNumber}";
+        // Menghasilkan nomor alokasi baru
+        return "CAPEX/REQ/{$departmentCode}/{$year}/{$newNumber}";
     }
 }

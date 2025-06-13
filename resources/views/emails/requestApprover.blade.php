@@ -91,8 +91,8 @@
                 <td width="60%">{{ $requestData['from_department_name'] }}</td>
             </tr>
             <tr>
-                <td>Purchase No:</td>
-                <td>{{ $requestData['budget_purchase_no'] }}</td>
+                <td>Budget Request No:</td>
+                <td>{{ $requestData['budget_req_no'] }}</td>
             </tr>
             <tr class="tr-odd">
                 <td>Jumlah:</td>

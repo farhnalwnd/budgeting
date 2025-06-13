@@ -304,25 +304,6 @@
             openEditModal(rowIndex);
         });
 
-        function getTotalAmount(currInput)
-        {
-            var parent = currInput.parentNode.parentNode.parentNode;
-            var quantityInput = parent.querySelector('.quantity');
-            var amountInput = parent.querySelector('.amount');
-            var totalInput = parent.querySelector('.total');
-            // var totalInput = parent.lastElementChild.lastElementChild.firstElementChild;
-            if(quantityInput.value <= 0)
-            {
-                quantityInput.value = 1;
-            }
-            if(amountInput.value <= 0)
-            {
-                amountInput.value = 1;
-            }
-            totalInput.value = parseFloat(quantityInput.value) * parseFloat(amountInput.value);
-
-        }
-
         // Function untuk menghapus edit div
         function clearEditDiv()
         {
