@@ -8,6 +8,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use App\Mail\requestApproval;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class sendApprovalRequest implements ShouldQueue
@@ -22,7 +23,6 @@ class sendApprovalRequest implements ShouldQueue
      */
     public function __construct($approver, $requestData, $budgetApproval)
     {
-
         $this->approver=$approver;
         $this->requestData=$requestData;
         $this->budgetApproval=$budgetApproval;
@@ -46,6 +46,10 @@ class sendApprovalRequest implements ShouldQueue
             'token'=>$this->budgetApproval->token,
         ]);
         // dd('email s', $this->requestData);
-        Mail::to($this->approver->email)->send(new requestApproval($this->requestData, $this->approver, $this->budgetApproval, $approveLink, $rejectLink));
+        if($this->approver->email){
+            Mail::to($this->approver->email)->send(new requestApproval($this->requestData, $this->approver, $this->budgetApproval, $approveLink, $rejectLink));
+        }else{
+            Log::error('Approver email is missing for NIK: ' . $this->approver->nik);
+        }
     }
 }

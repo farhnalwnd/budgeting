@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use RealRashid\SweetAlert\Facades\Alert;
 
@@ -75,13 +76,24 @@ class BudgetRequestController extends Controller
                 'reason' => $validatedData['reason']
             ]);
 
-            $approverNik = BudgetApprover::where('department_id',$validatedData['to_department'])->first();
-            BudgetApproval::create([
+            $budgetData =[
+                'budget_purchase_no' => '',
+                'budget_req_no' => $validatedData['no'],
+                'to_department_name' => $toDept->department_name,
+                'from_department_name' => $user->department->department_name,
+                'amount' => $validatedData['amount'],
+                'reason' => $validatedData['reason']
+            ];
+
+            $approver = BudgetApprover::where('department_id',$validatedData['to_department'])->first();
+            $approverNik = $approver->user;
+            $budgetApproval = BudgetApproval::create([
                 'budget_req_no' => $validatedData['no'],
                 'nik' => $approverNik->nik,
                 'status' => 'pending',
                 'token' => Str::uuid()
             ]);
+            sendApprovalRequest::dispatch($approverNik, $budgetData, $budgetApproval);
 
             activity()
                 ->performedOn($budget)

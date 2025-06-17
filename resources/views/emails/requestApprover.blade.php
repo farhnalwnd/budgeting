@@ -91,8 +91,13 @@
                 <td width="60%">{{ $requestData['from_department_name'] }}</td>
             </tr>
             <tr>
-                <td>Purchase No:</td>
+                @if (!empty($requestData['budget_purchase_no']))
+                <td>Purchase NO:</td>
                 <td>{{ $requestData['budget_purchase_no'] }}</td>
+                @else
+                <td>Budget Request NO:</td>
+                <td>{{ $requestData['budget_req_no'] }}</td>
+                @endif
             </tr>
             <tr class="tr-odd">
                 <td>Jumlah:</td>
