@@ -135,7 +135,6 @@
 
             <tr>
                 <td colspan="3" class="text-center">
-                    <p class="text-center">Kindly approve it at your earliest convenience so we can proceed.</p>
                     <p class="text-center">Thank you for your attention.</p>
                     <br>
                     <p class="text-center">Best regards,</p>
