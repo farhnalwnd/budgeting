@@ -71,6 +71,7 @@ class BudgetRequestController extends Controller
             $budget = BudgetRequest::create([
                 'budget_req_no' => $validatedData['no'],
                 'from_department_id' => $user->department->id,
+                'nik' => $user->nik,
                 'to_department_id' => $validatedData['to_department'],
                 'amount' => $validatedData['amount'],
                 'reason' => $validatedData['reason']

@@ -10,7 +10,7 @@ if (!function_exists('generateDocumentNumber')) {
     {
         $now = Carbon::now();
         $year = $now->format('Y');
-        $prefix = 'FAN';
+        $prefix = 'FA';
 
         $lastDocument = Purchase::where('purchase_no', 'like', "$prefix/$year/%")
             ->orderBy('id', 'desc')
