@@ -444,20 +444,20 @@ class PurchaseController extends Controller
                 $fromDept->transferForYear($toDept, $now,  $amount);
                 $actualBalance = $toDept->balanceForYear($now);
 
-                if($actualBalance < $purchases->grand_total){
+                if($purchases && $actualBalance < $purchases->grand_total){
                     $purchases->update(['status' => 'rejected']);
-                        $budgetRequest->status = 'approved';
-                        $budgetRequest->feedback = 'saldo anda tetap kurang karna telah digunakan untuk yang lain, buat purchase baru!!';
-                        $budgetRequest->save();
+                    $budgetRequest->status = 'approved';
+                    $budgetRequest->feedback = 'saldo anda tetap kurang karna telah digunakan untuk yang lain, buat purchase baru!!';
+                    $budgetRequest->save();
+                    
+                    $toDept->transferForYear($fromDept, $now, $amount);
+                    sendLessBalance::dispatch($user, $purchases, $budgetRequest);
+                }else{
+                    // $toDept->withdraw($toDept->balanceInt);
+                    $toDept->withdrawFromYear($now, $actualBalance);
 
-                        $toDept->transferForYear($fromDept, $now, $amount);
-                        sendLessBalance::dispatch($user, $purchases, $budgetRequest);
-                    }else{
-                // $toDept->withdraw($toDept->balanceInt);
-                $toDept->withdrawFromYear($now, $actualBalance);
-
-                $budgetRequest->status = 'approved';
-                $budgetRequest->save();
+                    $budgetRequest->status = 'approved';
+                    $budgetRequest->save();
 
                     if($purchases){
                         $purchases->update(['status'=> 'approved']);
@@ -470,6 +470,8 @@ class PurchaseController extends Controller
                         SendApprovedPurchase::dispatch($user, $purchases , $budgetRequest, $deptName, $purchaseDetails, false);
                         SendApprovedPurchase::dispatch($admin, $purchases , $budgetRequest, $deptName, $purchaseDetails, true);
                     }
+                    SendApprovedPurchase::dispatch($user, $purchases , $budgetRequest, $deptName, $purchaseDetails, false);
+                    SendApprovedPurchase::dispatch($admin, $purchases , $budgetRequest, $deptName, $purchaseDetails, true);
                 }
             }
                 $approver = User::where('nik', $requestApprove->nik)->first();

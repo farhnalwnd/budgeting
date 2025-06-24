@@ -138,7 +138,6 @@
                 }
 
                 var modalDiv = document.getElementById('resendModalDiv');
-                console.log('tes ini datanya', data);
 
                 var newResendModal = `
             <div id="detail-${data}" class="text-black fixed inset-0 z-50 bg-black bg-opacity-10 flex items-center justify-center">
@@ -202,9 +201,11 @@
                     <!--* Tombol -->
                     <div class="flex items-center justify-end mx-4 mt-4 gap-2">
                         <div class="ml-auto">
+                            @if(auth()->user() && auth()->user()->hasRole('super-admin'))
                             <form action="/purchase-request/edit" method="GET">
                                 <button type="button" class="btn btn-primary" onClick="resendEmail('${data.budget_purchase_no}')">Resend</button>
                             </form>
+                            @endif
                         </div>
                         <div class="">
                             <button type="button" class="btn btn-danger"
