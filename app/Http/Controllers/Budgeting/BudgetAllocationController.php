@@ -41,11 +41,17 @@ class BudgetAllocationController extends Controller
         DB::beginTransaction();
 
         try{
+            
             $validatedData = $request->validate([
                 'no' => 'required|string|max:255',
                 'department' => 'required|exists:departments,id',
                 'description' => 'nullable|string|max:255',
             ]);
+
+            $no = $validatedData['no'];
+            if (!preg_match('/\d{4}$/', $no) || substr($no, -4) !== '0001') {
+                throw new \Exception('Budget allocation untuk department tersebut sudah ada.');
+            }
 
             $user = Auth::user();
             $budget = BudgetAllocation::create([
@@ -244,6 +250,10 @@ class BudgetAllocationController extends Controller
 
         // Menambahkan 1 dan memastikan nomor urut 4 digit
         $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
+
+        if ($newNumber !== '0001') {
+            return null;
+        }
 
         // Menghasilkan nomor alokasi baru
         return "CAPEX/{$departmentCode}/{$year}/{$newNumber}";

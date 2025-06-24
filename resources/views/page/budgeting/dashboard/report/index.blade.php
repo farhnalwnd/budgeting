@@ -68,6 +68,8 @@
 
     @push('scripts')
     <script>
+        var categories = null;
+        var departments = null;
         const userDept =  @json(auth()->user()->department->department_name ?? '');
         document.addEventListener('DOMContentLoaded', function() {
             @hasanyrole('super-admin|admin')
@@ -93,6 +95,19 @@
                 }
             });
             @endhasanyrole
+
+            // get category data
+            $.ajax({
+                url: '{{ route('get.category.data') }}',
+                method: 'GET',
+                success: function(response) {
+                    categories = response;
+                },
+                error: function() {
+                    // Jika gagal, tampilkan pesan error
+                    console.log('Error ketika mengambil data department.');
+                }
+            });
 
             $.ajax({
                 url: '{{ route('get.report.year') }}',
@@ -132,9 +147,37 @@
                     }
                 },
                 {
-                    extend: 'excel',
+                    extend: 'excelHtml5',
                     title: function () {
                         return getExportTitle();
+                    },
+                    customize: function (xlsx) {
+                        var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                        // Loop semua baris
+                        $('row', sheet).each(function () {
+                            // Ambil cell pertama (kolom A) pada baris ini
+                            var cell = $(this).find('c[r^="A"]');
+                            
+                            var value = cell.find('t').text();
+                            if (departments && departments.some(dept => dept.department_name === value)) 
+                            {
+                                $(this).find('c').attr('s', '5');
+                            }
+                            if (categories && categories.some(cat => cat.name === value)) 
+                            {
+                                cell.attr('s', '4');
+                            }
+                            else if (value && value.startsWith('Subtotal')) // cari value subtotal
+                            { 
+                                // Set style bold 
+                                cell.attr('s', '2');
+                            }
+                            else if (value && value.startsWith('GRAND TOTAL')) // cari value grand total
+                            { 
+                                // Set style bold 
+                                cell.attr('s', '7');
+                            }
+                        });
                     }
                 },
                 {

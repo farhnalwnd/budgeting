@@ -82,23 +82,26 @@ class BudgetListController extends Controller
                 throw new \Exception("Failed to calculate budget. " . $result);
             }
 
-            activity()
-                ->performedOn($budget)
-                ->inLog('budget-list')
-                ->event('Create')
-                ->causedBy($user)
-                ->withProperties(['no' => $budget->budget_allocation_no, 'action' => 'create'])
-                // 'data' => [
-                //     'budget_allocation_no' => $budget->budget_allocation_no,
-                //     'name' => $budget->budget_allocation_no,
-                //     'category_id' => $budget->category_id,
-                //     'quantity' => $budget->quantity,
-                //     'um' => $budget->um,
-                //     'default_amount' => $budget->default_amount,
-                //     'total_amount' => $budget->total_amount
-                // ]
-                ->log('Create budget-list ' . $budget->budget_allocation_no . ' by ' . $user->name . ' at ' . now());
-
+            foreach($validatedData['name'] as $index => $name)
+            {
+                $amount =  max(0,Purchase::parseRupiah($validatedData['amount'][$index]));
+                activity()
+                    ->performedOn($budget)
+                    ->inLog('budget-list')
+                    ->event('Create')
+                    ->causedBy($user)
+                    ->withProperties(['no' => $budget->budget_allocation_no, 'action' => 'create',
+                    'data' => [
+                        'budget_allocation_no' => $budget->budget_allocation_no,
+                        'name' => $validatedData['name'][$index],
+                        'category_id' => $validatedData['category'],
+                        'quantity' => $validatedData['quantity'][$index],
+                        'um' => $validatedData['um'][$index],
+                        'default_amount' => $amount,
+                        'total_amount' => $amount * $validatedData['quantity'][$index]
+                    ]])
+                    ->log('Create budget-list ' . $validatedData['name'][$index] . ' by ' . $user->name . ' at ' . now());
+            }
             // Commit transaksi
             DB::commit();
             return response()->json(['message' => 'Budget-list successfully created!'], 200);
@@ -180,7 +183,7 @@ class BudgetListController extends Controller
                 ->withProperties(['no' => $budget->budget_allocation_no, 'action' => 'update', 
                 'oldData' => [
                     'budget_allocation_no' => $budgetOld->budget_allocation_no,
-                    'name' => $budgetOld->budget_allocation_no,
+                    'name' => $budgetOld->name,
                     'category_id' => $budgetOld->category_id,
                     'quantity' => $budgetOld->quantity,
                     'um' => $budgetOld->um,
@@ -189,14 +192,14 @@ class BudgetListController extends Controller
                 ],
                 'newData' => [
                     'budget_allocation_no' => $budget->budget_allocation_no,
-                    'name' => $budget->budget_allocation_no,
+                    'name' => $budget->name,
                     'category_id' => $budget->category_id,
                     'quantity' => $budget->quantity,
                     'um' => $budget->um,
                     'default_amount' => $budget->default_amount,
                     'total_amount' => $budget->total_amount
                 ]])
-                ->log('Update budget-list ' . $budget->budget_allocation_no . ' by ' . $user->name . ' at ' . now());
+                ->log('Update budget-list ' . $budgetOld->name . ' by ' . $user->name . ' at ' . now());
 
             // Commit transaksi
             DB::commit();
@@ -238,14 +241,14 @@ class BudgetListController extends Controller
                 ->withProperties(['no' => $budget->budget_allocation_no, 'action' => 'delete',
                 'data' => [
                     'budget_allocation_no' => $budget->budget_allocation_no,
-                    'name' => $budget->budget_allocation_no,
+                    'name' => $budget->name,
                     'category_id' => $budget->category_id,
                     'quantity' => $budget->quantity,
                     'um' => $budget->um,
                     'default_amount' => $budget->default_amount,
                     'total_amount' => $budget->total_amount
                 ]])
-                ->log('Delete budget-list ' . $budget->budget_allocation_no . ' by ' . $user->name . ' at ' . now());
+                ->log('Delete budget-list ' . $budget->name . ' by ' . $user->name . ' at ' . now());
 
             // Commit transaksi
             DB::commit();

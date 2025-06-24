@@ -247,7 +247,8 @@
                 success: function(response) {
                     allocations = response;
                     var select = document.getElementById('no');
-                    allocations.forEach(allocation => {
+
+                    allocations.slice().reverse().forEach(allocation => {
                         var option = document.createElement('option');
                         option.value = allocation.budget_allocation_no;
                         option.textContent = allocation.budget_allocation_no;
@@ -408,10 +409,10 @@
                         success: function(response) {
                             // Alert data berhasil
                             Swal.fire({
-                                toast: true,
+                                toast: false,
                                 icon: 'success',
                                 title: response.message,
-                                position: 'top-end',
+                                position: 'center',
                                 showConfirmButton: false,
                                 timer: 3000
                             });
@@ -427,10 +428,10 @@
                         error: function(xhr) {
                             // Alert data gagal
                             Swal.fire({
-                                toast: true,
+                                toast: false,
                                 icon: 'error',
                                 title: xhr.responseJSON.message,
-                                position: 'top-end',
+                                position: 'center',
                                 showConfirmButton: false,
                                 timer: 3000
                             });
@@ -465,10 +466,10 @@
                         success: function(response) {
                             // Alert data berhasil
                             Swal.fire({
-                                toast: true,
+                                toast: false,
                                 icon: 'success',
                                 title: response.message,
-                                position: 'top-end',
+                                position: 'center',
                                 showConfirmButton: false,
                                 timer: 3000
                             });
@@ -481,10 +482,10 @@
                         error: function(xhr) {
                             // Alert data gagal
                             Swal.fire({
-                                toast: true,
+                                toast: false,
                                 icon: 'error',
                                 title: xhr.responseJSON.message,
-                                position: 'top-end',
+                                position: 'center',
                                 showConfirmButton: false,
                                 timer: 3000
                             });
@@ -517,10 +518,10 @@
                         success: function(response) {
                             // Alert data berhasil
                             Swal.fire({
-                                toast: true,
+                                toast: false,
                                 icon: 'success',
                                 title: response.message,
-                                position: 'top-end',
+                                position: 'center',
                                 showConfirmButton: false,
                                 timer: 3000
                             });
@@ -533,10 +534,10 @@
                         error: function(xhr) {
                             // Alert data gagal
                             Swal.fire({
-                                toast: true,
+                                toast: false,
                                 icon: 'error',
                                 title: xhr.responseJSON.message,
-                                position: 'top-end',
+                                position: 'center',
                                 showConfirmButton: false,
                                 timer: 3000
                             });

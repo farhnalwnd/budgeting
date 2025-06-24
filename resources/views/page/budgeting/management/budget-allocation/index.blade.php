@@ -163,26 +163,7 @@
                     console.log('Error ketika mengambil data department.');
                 }
             });
-            // get department list
-            $.ajax({
-                url: '{{ route('get.department.data') }}',
-                method: 'GET',
-                success: function(response) {
-                    departments = response;
 
-                    var departmentSelect = document.getElementById('department');
-                    departments.forEach(department => {
-                        var option = document.createElement('option');
-                        option.value = department.id;
-                        option.textContent = department.department_name;
-                        departmentSelect.appendChild(option);
-                    });
-                },
-                error: function() {
-                    // Jika gagal, tampilkan pesan error
-                    console.log('Error ketika mengambil data department.');
-                }
-            });
 
             function initTable()
             {            
@@ -261,7 +242,41 @@
                     ]
                 });
             }
+
+            $('#budgetTable').on('init.dt', function() {
+                getDepartment(); // Panggil fungsi untuk mendapatkan data department
+            });
+             
         });
+
+
+
+        // get department data
+        function getDepartment()
+        {
+            $.ajax({
+                url: '{{ route('get.department.data') }}',
+                method: 'GET',
+                success: function(response) {
+                    departments = response;
+                    var departmentSelect = document.getElementById('department');
+                    departmentSelect.innerHTML = '<option value="" selected disabled>Select Department</option>'; // Bersihkan option sebelumnya
+
+                    departments.forEach(department => {
+                        if (budgets && budgets.some(b => b.department && b.department.department_name === department.department_name)) return;
+                        var option = document.createElement('option');
+                        option.value = department.id;
+                        option.textContent = department.department_name;
+                        departmentSelect.appendChild(option);
+                    });
+                },
+                error: function() {
+                    // Jika gagal, tampilkan pesan error
+                    console.log('Error ketika mengambil data department.');
+                }
+            });
+        }
+
 
         // Function untuk menghapus edit div
         function clearEditDiv()
@@ -311,10 +326,10 @@
                         success: function(response) {
                             // Alert data berhasil
                             Swal.fire({
-                                toast: true,
+                                toast: false,
                                 icon: 'success',
                                 title: response.message,
-                                position: 'top-end',
+                                position: 'center',
                                 showConfirmButton: false,
                                 timer: 3000
                             });
@@ -330,10 +345,10 @@
                         error: function(xhr) {
                             // Alert data gagal
                             Swal.fire({
-                                toast: true,
+                                toast: false,
                                 icon: 'error',
                                 title: xhr.responseJSON.message,
-                                position: 'top-end',
+                                position: 'center',
                                 showConfirmButton: false,
                                 timer: 3000
                             });
@@ -368,10 +383,10 @@
                         success: function(response) {
                             // Alert data berhasil
                             Swal.fire({
-                                toast: true,
+                                toast: false,
                                 icon: 'success',
                                 title: response.message,
-                                position: 'top-end',
+                                position: 'center',
                                 showConfirmButton: false,
                                 timer: 3000
                             });
@@ -384,10 +399,10 @@
                         error: function(xhr) {
                             // Alert data gagal
                             Swal.fire({
-                                toast: true,
+                                toast: false,
                                 icon: 'error',
                                 title: xhr.responseJSON.message,
-                                position: 'top-end',
+                                position: 'center',
                                 showConfirmButton: false,
                                 timer: 3000
                             });
@@ -420,10 +435,10 @@
                         success: function(response) {
                             // Alert data berhasil
                             Swal.fire({
-                                toast: true,
+                                toast: false,
                                 icon: 'success',
                                 title: response.message,
-                                position: 'top-end',
+                                position: 'center',
                                 showConfirmButton: false,
                                 timer: 3000
                             });
@@ -436,10 +451,10 @@
                         error: function(xhr) {
                             // Alert data gagal
                             Swal.fire({
-                                toast: true,
+                                toast: false,
                                 icon: 'error',
                                 title: xhr.responseJSON.message,
-                                position: 'top-end',
+                                position: 'center',
                                 showConfirmButton: false,
                                 timer: 3000
                             });
