@@ -1,12 +1,12 @@
 <x-app-layout>
     @section('title')
-        List Budget-Request Approval
+    List Budget-Request Approval
     @endsection
-    
+
     @push('css')
-        <style>
-            
-        </style>
+    <style>
+
+    </style>
     @endpush
 
     <div class="content-header">
@@ -32,7 +32,8 @@
             </div>
             <div class="card-body">
                 <div class="relative overflow-x-auto sm:rounded-lg">
-                    <table id="budgetTable" class="table table-striped w-full text-left rtl:text-right table-bordered" style="width: 100%;">
+                    <table id="budgetTable" class="table table-striped w-full text-left rtl:text-right table-bordered"
+                        style="width: 100%;">
                         <thead class="uppercase border-b">
                             <tr>
                                 <th scope="col" class="px-6 py-3 text-lg">#</th>
@@ -57,14 +58,15 @@
 
     <!-- Modal Edit User -->
     <div id="editModalDiv">
-        <div id="modalBackground" class="fixed inset-0 bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-40 hidden"></div>
+        <div id="modalBackground" class="fixed inset-0 bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-40 hidden">
+        </div>
     </div>
 
     @push('scripts')
     <script>
         var budgets = null;
         var table = null;
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
 
 
             // Init datatable
@@ -76,137 +78,37 @@
                 ajax: {
                     url: '{{ route('get.budget-request.approval.list') }}',
                     type: 'GET',
-                    dataSrc: function(response) {
+                    dataSrc: function (response) {
                         budgets = response;
                         return response;
                     }
                 },
                 columns: [
-                    { 
+                    {
                         data: null,
-                        render: function(data, type, row, meta) {
+                        render: function (data, type, row, meta) {
                             // Menambahkan nomor urut
                             return meta.row + 1; // meta.row berisi index baris
                         }
                     },
                     { data: 'budget_req_no', name: 'no' },
                     { data: 'from_department.department_name', name: 'from_department' },
-                    { data: 'amount', name: 'amount',
-                            render: function(data, type, row) {
-                                if (data == null) return '-';
+                    {
+                        data: 'amount', name: 'amount',
+                        render: function (data, type, row) {
+                            if (data == null) return '-';
 
-                                return new Intl.NumberFormat('id-ID', {
+                            return new Intl.NumberFormat('id-ID', {
                                 style: 'currency',
                                 currency: 'IDR',
                                 minimumFractionDigits: 0
-                                }).format(data);
-                            }
+                            }).format(data);
+                        }
                     },
                     { data: 'status', name: 'status' }
                 ]
             });
         });
-
-        $('#budgetTable tbody').on('click', 'tr', function () {
-                if (!$(event.target).closest('a, button, i').length) {
-                    var data = table.row(this).data();
-                    if (data && data.budget_purchase_no) {
-                        openResendModal(data);
-                    }
-                }
-            });
-
-            function openResendModal(data) {
-                var modal = document.getElementById(`detail-${data}`);
-                var modalBackground = document.getElementById('modalBg');
-                modalBackground.classList.toggle('hidden');
-                if (modal) {
-                    console.log(modal);
-                    modal.classList.toggle('hidden');
-                    modal.classList.toggle('flex');
-                    return;
-                }
-
-                var modalDiv = document.getElementById('resendModalDiv');
-
-                var newResendModal = `
-            <div id="detail-${data}" class="text-black fixed inset-0 z-50 bg-black bg-opacity-10 flex items-center justify-center">
-                <div class="bg-white p-6 rounded-lg w-2/3">
-                    <!-- Header -->
-                    <div class="flex justify-start">
-                        <div class="flex items-center">
-                            <h1 class="text-6xl font-bold text-yellow-700 font-mono">PURCHASE</h1>
-                        </div>
-                        <img src="/sinarlogo.png" alt="logo" class="w-72 h-32 ml-auto">
-                    </div>
-                    <hr class="my-10 border-t-2 rounded-md border-slate-900 opacity-90">
-
-                    <!-- Keterangan -->
-                    <div class="grid grid-cols-5 gap-2 text-left py-3">
-                        <div class="col-span-4">
-                            <h1 class="font-bold text-lg">From Department:</h1>
-                            <h2 class="font-semibold text-base">${data.from_department.department_name}</h2>
-                        </div>
-                        <div class="pl-7">
-                            <h1 class="font-bold text-lg">To Department:</h1>
-                            <span class="font-semibold text-base">${data.to_department.department_name}</span>
-                        </div>
-                        <div class="col-span-4">
-                            <h1 class="font-bold text-lg mb-1">DATE:</h1>
-                            <span class="font-semibold text-base">${formatTanggalShort(data.updated_at)}</span>
-                        </div>
-                        <div class="pl-7">
-                            <h1 class="font-bold text-lg mb-1">Status:</h1>
-                            <span
-                                class="font-semibold text-lg rounded-md uppercase border-2 ${getStatusColor(data.status)} border-opacity-50">${data.status}</span>
-                        </div>
-                    </div>
-
-                    <!-- * table -->
-                    <div class="container pt-10">
-                        <table class="table-auto w-full border-collapse">
-                            <thead class="sticky top-0 z-10">
-                                <tr>
-                                    <th class="border-2 p-2 border-gray-800 text-center w-4/12">BUDGET REQUEST NO</th>
-                                    <th class="border-2 p-2 border-gray-800 text-center w-1/12">BUDGET PURCHASE NO</th>
-                                    <th class="border-2 p-2 border-gray-800 text-center w-2/12">AMOUNT</th>
-                                    <th class="border-2 p-2 border-gray-800 text-center w-1/12">STATUS</th>
-                                    <th class="border-2 p-2 border-gray-800 text-center w-2/12">REASON</th>
-                                    <th class="border-2 p-2 border-gray-800 text-center w-2/12">FEEDBACK</th>
-                                </tr>
-                            </thead>
-                            <tbody class="overflow-y-auto">
-                                <tr>
-                                    <td class="border-2 border-gray-400 p-3 text-center">${data.budget_req_no}</td>
-                                    <td class="border-2 border-gray-400 p-3 text-center">${data.budget_purchase_no}</td>
-                                    <td class="border-2 border-gray-400 p-3 text-center">${toRupiah(data.amount)}</td>
-                                    <td class="border-2 border-gray-400 p-3 text-center">${data.status}</td>
-                                    <td class="border-2 border-gray-400 p-3 text-center">${data.reason}</td>
-                                    <td class="border-2 border-gray-400 p-3 text-center">${data.feedback || '-'}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!--* Tombol -->
-                    <div class="flex items-center justify-end mx-4 mt-4 gap-2">
-                        <div class="ml-auto">
-                            @if(auth()->user() && auth()->user()->hasRole('super-admin'))
-                            <form action="/purchase-request/edit" method="GET">
-                                <button type="button" class="btn btn-primary" onClick="resendEmail('${data.budget_purchase_no}')">Resend</button>
-                            </form>
-                            @endif
-                        </div>
-                        <div class="">
-                            <button type="button" class="btn btn-danger"
-                                onclick="closeResendModal('${data}')">Exit</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-                modalDiv.innerHTML += newResendModal;
-            }
 
         async function resendEmail(purchaseNo) {
             try {
@@ -253,7 +155,7 @@
             modalDiv.innerHTML += newResendModal;
         }
 
-    // css untuk status
+        // css untuk status
         function getStatusColor(status) {
             switch (status.toLowerCase()) {
                 case 'pending':
@@ -266,13 +168,13 @@
                     break;
             }
         }
-        
+
         // Function untuk buat/buka modal
-        function openEditModal(id){
+        function openEditModal(id) {
             var modal = document.getElementById(`editContactModal${id}`);
             var modalBackground = document.getElementById('modalBackground');
             modalBackground.classList.toggle('hidden');
-            if (modal){
+            if (modal) {
                 modal.classList.toggle('hidden');
                 modal.classList.toggle('flex');
                 return;
@@ -280,7 +182,7 @@
             var modalDiv = document.getElementById('editModalDiv');
             var newEditModal = '';
             var budget = budgets[id];
-            var updateUrl = "{{ route('budget-request.update', ':id') }}".replace(':id', budget.id); 
+            var updateUrl = "{{ route('budget-request.update', ':id') }}".replace(':id', budget.id);
             newEditModal = `
                 <div id="editContactModal${id}" tabindex="-1" aria-modal="true" role="dialog"
                     class="flex overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
@@ -358,12 +260,12 @@
                                             </tr>
                                             <tr>
                                                 <td colspan="3" style="color: 
-                                                    ${budget.status.toLowerCase() == 'approved' || budget.status.toLowerCase() == 'approved with review' 
-                                                    ? 'green' 
-                                                    : budget.status.toLowerCase() == 'rejected' 
-                                                    ? 'red' 
-                                                    : 'black'}">
-                                                    ${budget.status.substring(0,1).toUpperCase()}${budget.status.substring(1).toLowerCase()}
+                                                    ${budget.status.toLowerCase() == 'approved' || budget.status.toLowerCase() == 'approved with review'
+                    ? 'green'
+                    : budget.status.toLowerCase() == 'rejected'
+                        ? 'red'
+                        : 'black'}">
+                                                    ${budget.status.substring(0, 1).toUpperCase()}${budget.status.substring(1).toLowerCase()}
                                                 </td>
                                             </tr>
                                             <tr>
@@ -396,18 +298,17 @@
                 </div>
             `;
             modalDiv.innerHTML += newEditModal;
-                
+
         }
 
-        
+
         $('#budgetTable tbody').on('click', 'tr', function () {
             let rowIndex = table.row(this).index();
             openEditModal(rowIndex);
         });
 
         // Function untuk menghapus edit div
-        function clearEditDiv()
-        {
+        function clearEditDiv() {
             const container = document.getElementById('editModalDiv');
             const background = document.getElementById('modalBackground');
             // Simpan elemen background
@@ -419,14 +320,13 @@
         }
 
         // Function check and submit form
-        function submitForm(button, divId){
+        function submitForm(button, divId) {
             var form = button.closest('form');
             var actionUrl = form.getAttribute('action');
             var actionDiv = form.querySelector('[name="action"]');
             actionDiv.value = button.value;
 
-            if(button.value === 'reject')
-            {
+            if (button.value === 'reject') {
                 Swal.fire({
                     title: 'Are you sure?',
                     text: "You won't be able to revert this!",
@@ -436,7 +336,7 @@
                     cancelButtonColor: '#d33',
                     confirmButtonText: 'Yes, reject form!'
                 }).then((result) => {
-                    if (result.isConfirmed) {   
+                    if (result.isConfirmed) {
                         Swal.fire({
                             title: 'Enter feedback for closing',
                             input: 'textarea',
@@ -453,7 +353,7 @@
                             confirmButtonColor: '#3085d6',
                         }).then((inputResult) => {
                             if (inputResult.isConfirmed) {
-                                
+
                                 // Tutup edit modal div
                                 openEditModal(divId);
 
@@ -463,7 +363,7 @@
                                     url: actionUrl,
                                     method: 'PUT',
                                     data: $(form).serialize() + '&reviewTextArea=' + encodeURIComponent(feedback), // Ambil semua input form
-                                    success: function(response) {
+                                    success: function (response) {
                                         // Alert data berhasil
                                         Swal.fire({
                                             toast: true,
@@ -479,7 +379,7 @@
                                         // Refresh data table
                                         table.ajax.reload(null, false); // Reload data dari server
                                     },
-                                    error: function(xhr) {
+                                    error: function (xhr) {
                                         // Alert data gagal
                                         Swal.fire({
                                             toast: true,
@@ -491,14 +391,13 @@
                                         });
                                     }
                                 });
-                            }                        
+                            }
                         });
 
                     }
                 });
             }
-            else if(button.value === 'approve')
-            {
+            else if (button.value === 'approve') {
                 Swal.fire({
                     title: 'Are you sure?',
                     text: "You won't be able to revert this!",
@@ -517,7 +416,7 @@
                             url: actionUrl,
                             method: 'PUT',
                             data: $(form).serialize(), // Ambil semua input form
-                            success: function(response) {
+                            success: function (response) {
                                 // Alert data berhasil
                                 Swal.fire({
                                     toast: true,
@@ -529,11 +428,11 @@
                                 });
                                 // Bersihkan edit div
                                 clearEditDiv();
-                                
+
                                 // Refresh data table
                                 table.ajax.reload(null, false); // Reload data dari server
                             },
-                            error: function(xhr) {
+                            error: function (xhr) {
                                 // Alert data gagal
                                 Swal.fire({
                                     toast: true,
@@ -547,7 +446,7 @@
                         });
                     }
                 });
-                
+
             }
         }
 

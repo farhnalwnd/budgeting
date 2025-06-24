@@ -461,7 +461,6 @@ class PurchaseController extends Controller
 
                     if($purchases){
                         $purchases->update(['status'=> 'approved']);
-
                         $purchaseDetails = $purchases->detail;
                         $toDeptName = $toDept->department_name;
                         $fromDeptName = $fromDept->department_name;
@@ -470,8 +469,8 @@ class PurchaseController extends Controller
                         SendApprovedPurchase::dispatch($user, $purchases , $budgetRequest, $deptName, $purchaseDetails, false);
                         SendApprovedPurchase::dispatch($admin, $purchases , $budgetRequest, $deptName, $purchaseDetails, true);
                     }
-                    SendApprovedPurchase::dispatch($user, $purchases , $budgetRequest, $deptName, $purchaseDetails, false);
-                    SendApprovedPurchase::dispatch($admin, $purchases , $budgetRequest, $deptName, $purchaseDetails, true);
+                    // SendApprovedPurchase::dispatch($user, $purchases , $budgetRequest, $deptName, $purchaseDetails, false);
+                    // SendApprovedPurchase::dispatch($admin, $purchases , $budgetRequest, $deptName, $purchaseDetails, true);
                 }
             }
                 $approver = User::where('nik', $requestApprove->nik)->first();

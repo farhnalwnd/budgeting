@@ -77,15 +77,6 @@ class BudgetRequestController extends Controller
                 'reason' => $validatedData['reason']
             ]);
 
-            $budgetData =[
-                'budget_purchase_no' => '',
-                'budget_req_no' => $validatedData['no'],
-                'to_department_name' => $toDept->department_name,
-                'from_department_name' => $user->department->department_name,
-                'amount' => $validatedData['amount'],
-                'reason' => $validatedData['reason']
-            ];
-
             $approver = BudgetApprover::where('department_id',$validatedData['to_department'])->first();
             $approverNik = $approver->user;
             $budgetApproval = BudgetApproval::create([
@@ -94,24 +85,21 @@ class BudgetRequestController extends Controller
                 'status' => 'pending',
                 'token' => Str::uuid()
             ]);
-
-            $approver= BudgetApprover::where('department_id', $validatedData['to_department'])->first(); 
-
             if($approver && $approver->user){
                 $approver = $approver->user;
             }
 
             if($approver && $approver->email){
                 $requestData=[
-                    'to_department_name'=> $toDept->department_name,
-                    'from_department_name'=>$user->department->department_name,
-                    'budget_req_no'=>$budget->budget_req_no,
-                    'amount'=>$validatedData['amount'],
-                    'reason'=>$validatedData['reason']
+                    'budget_purchase_no' => '',
+                    'budget_req_no' => $validatedData['no'],
+                    'to_department_name' => $toDept->department_name,
+                    'from_department_name' => $user->department->department_name,
+                    'amount' => $validatedData['amount'],
+                    'reason' => $validatedData['reason']
                 ];
                 sendApprovalRequest::dispatch($approver, $requestData, $budgetApproval);
             }
-            sendApprovalRequest::dispatch($approverNik, $budgetData, $budgetApproval);
 
             activity()
                 ->performedOn($budget)
