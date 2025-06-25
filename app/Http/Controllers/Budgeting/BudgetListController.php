@@ -289,7 +289,7 @@ class BudgetListController extends Controller
             $departmentBudget = $budget->total_amount ?? 0;
 
             $finalAmount = $totalAmount - $departmentBudget;
-            $year = now()->addYear()->format('Y');
+            $year = '20' . substr(explode('/', $no)[2], -2);
             if($finalAmount > 0){
                 $department->depositToYear($year, abs($finalAmount));
             }
