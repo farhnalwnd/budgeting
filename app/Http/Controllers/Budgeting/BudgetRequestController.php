@@ -409,6 +409,15 @@ class BudgetRequestController extends Controller
 
     public function getBudgetRequestApprovalList(){
         $user = Auth::user();
+        /** @var User $user */
+        // Cek apakah user memiliki peran super-admin atau admin
+        if($user->hasRole(['super-admin', 'admin']))
+        {
+            $budgets = BudgetRequest::with('fromDepartment', 'toDepartment')
+                ->where('status', 'pending')
+                ->get();
+                return response()->json($budgets);
+        }
         $approvals = BudgetApprover::where('nik', $user->nik)->get();
         if($approvals->isNotEmpty())
         {
