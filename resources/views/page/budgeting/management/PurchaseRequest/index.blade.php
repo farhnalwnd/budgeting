@@ -337,7 +337,7 @@
     
                 <!--* Tombol -->
                 <div class="flex items-center justify-end mx-4 mt-4 gap-2">
-                    @hasanyrole('super-admin|admin')
+                    @hasanyrole('super-admin|budgeting-admin')
                     <div class="ml-auto">
                         <form action="${editUrlBase}/${purchase.id}/edit" method="GET">
                             <button type="submit" class="btn btn-primary">Edit</button>
