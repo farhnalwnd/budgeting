@@ -15,7 +15,7 @@
         </div>
         <!-- Teks -->
         <div>
-            <h1 class="text-center text-xl font-semibold font-sans mb-14">UUPPPSSSSSSSIIEEE</h1>
+            <h1 class="text-center text-4xl font-bold font-sans mb-2">401</h1>
             <p class="font-light text-lg">sepertinya kamu sudah melakukan aksi ini sebelumnya & berhasil disimpan......</p>
         </div>
     </div>

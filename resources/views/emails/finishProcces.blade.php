@@ -16,12 +16,17 @@
         <div class="md:w-1/2">
             <div class=" w-full md:w-full md:h-full  overflow-hidden ">
                 <div class="flex items-center justify-between p-4">
-                    <h2 class="text-3xl font-bold text-blue-900 justify-items-end">terimakash, data telah berhasil
+                    <h2 class="text-3xl font-bold text-blue-900 justify-items-end">terimakasih, data telah berhasil
                         disimpan...</h2>
                 </div>
             </div>
         </div>
     </div>
 </body>
+<script>
+    setTimeout(function () {
+            window.close();
+        }, 3000);
+</script>
 
 </html>

@@ -53,12 +53,12 @@
 
     <!-- Modal Edit User -->
     <div id="resendModalDiv">
-        <div id="modalBg" class="fixed inset-0 bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-40 hidden"></div>
+        <div id="modalBg" class="fixed inset-0 bg-gray-900/50 dark:bg-gray-900/80 z-40 hidden"></div>
     </div>
 
     <!-- Modal Edit User -->
     <div id="editModalDiv">
-        <div id="modalBackground" class="fixed inset-0 bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-40 hidden">
+        <div id="modalBackground" class="fixed inset-0 bg-gray-900/50 dark:bg-gray-900/80 z-40 hidden">
         </div>
     </div>
 
@@ -76,7 +76,7 @@
                     'copy', 'csv', 'excel', 'pdf', 'print'
                 ],
                 ajax: {
-                    url: '{{ route('get.budget-request.approval.list') }}',
+                    url: "{{ route('get.budget-request.approval.list') }}",
                     type: 'GET',
                     dataSrc: function (response) {
                         budgets = response;
@@ -114,7 +114,7 @@
             try {
                 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-                const response = await fetch('getResendEmail', {
+                const response = await fetch( "{{ route('resendEmail')}}", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

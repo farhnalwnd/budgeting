@@ -81,48 +81,30 @@
             <tr>
                 <th colspan="3" class="text-center">
                     @if($isAdmin)
-                    <h5>Data purchases baru dengan status <strong>{{ $purchases->status }}</strong></h5>
+                    <h5>Data purchases baru dengan status <strong>{{ $purchases->status ?? '-' }}</strong></h5>
                     @else
-                    <h5>Department <strong>{{ $deptName[0] }}</strong> menyetujui peminjaman dana oleh department
+                    <h5>Department <strong>{{ $deptName[0] }}</strong> menyetujui permintaan dana oleh department
                         <strong>{{ $deptName[1] }}</strong> sehingga status purchases saat ini adalah <strong>{{
-                            $purchases->status }}</strong></h5>
+                            $purchases->status ?? '-' }}</strong></h5>
                     @endif
                 </th>
             </tr>
 
-            <tr>
-                <td colspan="2">Penganggar:</td>
+            <tr class="tr-odd">
+                <td colspan="2">Peminta:</td>
                 <td>{{ $deptName[1] }}</td>
             </tr>
-
-            @foreach ($purchaseDetails as $detail)
-            @php $rowClass = $loop->odd ? 'tr-odd' : ''; @endphp
-            <tr class="{{ $rowClass }}">
-                <td>{{ $loop->iteration }}</td>
-                <td>Item:</td>
-                <td>{{ $detail->item_name }}</td>
-            </tr>
-            <tr class="{{ $rowClass }}">
-                <td></td>
-                <td>Jumlah:</td>
-                <td>{{ $detail->quantity }}</td>
-            </tr>
-            <tr class="{{ $rowClass }}">
-                <td></td>
-                <td>Total:</td>
-                <td>{{ $detail->total_amount }}</td>
-            </tr>
-            @endforeach
-
             <tr>
-                <td></td>
-                <td>Total Purchase:</td>
-                <td>{{ $purchases->grand_total }}</td>
+                <td colspan="2">Pemberi:</td>
+                <td>{{ $deptName[0] }}</td>
             </tr>
             <tr class="tr-odd">
-                <td></td>
-                <td>Saldo Department:</td>
-                <td>{{ $purchases->department->balance }}</td>
+                <td colspan="2">budget Request No:</td>
+                <td>{{ $budgetRequest->budget_req_no }}</td>
+            </tr>
+            <tr>
+                <td colspan="2">jumlah pinjaman:</td>
+                <td>{{ $budgetRequest->amount }}</td>
             </tr>
 
             @if($isAdmin)
@@ -144,5 +126,10 @@
         </tbody>
     </table>
 </body>
+<script>
+    setTimeout(function () {
+            window.close();
+        }, 3000);
+</script>
 
 </html>

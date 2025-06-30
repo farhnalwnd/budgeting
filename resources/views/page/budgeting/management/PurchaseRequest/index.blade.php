@@ -31,8 +31,8 @@
     <section x-data="{open : false}" @modal-close.window="open = false" class="content">
         <div class="mb-4 flex px-4">
             <div id="deptBalance"
-                class="w-fit h-max shadow-md rounded-md shadow-neutral-500 bg-gradient-to-t from-cyan-500 to-blue-500  text-lg p-3 hover:scale-105 group">
-                <h1 class="group-hover:cursor-pointer">Rp. {{number_format($department->balanceForYear(now()->year) , 0, ',' , '.')}}</h1>
+                class="w-fit h-max shadow-md rounded-md shadow-neutral-500 bg-gradient-to-t from-blue-500 to-blue-700  text-lg p-3 hover:scale-105 group">
+                <h1 class="group-hover:cursor-pointer text-white">Rp. {{number_format($department->balanceForYear(now()->year) , 0, ',' , '.')}}</h1>
             </div>
             <div @click="open = ! open" class="ml-auto">
                 <button type="button"
@@ -58,11 +58,12 @@
                     <thead>
                         <tr>
                             <th class="w-fit">#</th>
-                            <th class="text-center w-2/12">PO Number</th>
+                            <th class="text-center w-2/12">Approval Number</th>
                             <th class="text-center w-3/12">Department</th>
                             <th class="text-center w-2/12">Grand Total</th>
                             <th class="text-center w-2/12">Actual Amount</th>
                             <th class="text-center w-2/12">Status</th>
+                            <th class="text-center w-2/12">Created</th>
                             <th class="text-center w-fit">Details</th>
                         </tr>
                     </thead>
@@ -133,7 +134,7 @@
                                         class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none" required>
                                     </td>
                                     <td><input type="text" name="UM[]"
-                                        class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none" required>
+                                        class="w-full p-2 border-none focus:bg-transparent focus:ring-0 focus:border-none UM" required>
                                     </td>
                                     <td>
                                         <input type="text" name="price[]"
@@ -231,6 +232,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.5/dist/sweetalert2.all.min.js"></script>
 <script>
     var purchases = null;
+    const editUrlBase = "{{ url('management/purchase-request') }}";
     let walletBalance = {{ $department->balanceForYear(now()->year) }};
 
     // view detail dan edit button
@@ -320,7 +322,7 @@
                         <div>
                             <div class="flex justify-between">
                                 <p class="uppercase font-semibold text-lg px-5 text-right">grand total :</p>
-                                <span class="text-right">Rp. ${toRupiah(purchase.grand_total)}</span>
+                                <span class="text-right">${toRupiah(purchase.grand_total || '0')}</span>
                             </div>
                             <div class="flex justify-between">
                                 <p class="uppercase font-semibold text-lg px-5 text-right">actual amount :</p>
@@ -335,11 +337,13 @@
     
                 <!--* Tombol -->
                 <div class="flex items-center justify-end mx-4 mt-4 gap-2">
+                    @hasanyrole('super-admin|admin')
                     <div class="ml-auto">
-                        <form action="/purchase-request/${purchase.id}/edit" method="GET">
+                        <form action="${editUrlBase}/${purchase.id}/edit" method="GET">
                             <button type="submit" class="btn btn-primary">Edit</button>
                         </form>
                     </div>
+                    @endhasanyrole
                     <div class="">
                         <button type="button" class="btn btn-danger" onclick="openModal('${purchaseNo}')">Exit</button>
                     </div>
@@ -472,6 +476,7 @@
 
     function clearRow(row) {
         row.querySelector('input[name="description[]"]').value = '';
+        row.querySelector('.UM').value = '';
         row.querySelector('.price-input').value = toRupiah(0);
         row.querySelector('.quantity-input').value = '';
         row.querySelector('textarea[name="remark[]"]').value = '';
@@ -640,7 +645,7 @@
                     walletBalance = response.new_balance;
 
                     document.getElementById('wallet-balance').innerText = toRupiah(walletBalance);
-                    document.getElementById('wallet-after').innerText = toRupiah(walletBalance);
+                    document.getElementById('wallet-after').innerText = toRupiah(remainingBalance);
 
                     if (balanceElement) {
                         balanceElement.innerText = toRupiah(walletBalance);
@@ -664,6 +669,19 @@
             success: function (years) {
                 const yearSelect = document.getElementById('filterYear');
                 yearSelect.innerHTML = '';
+
+                if (!years || years.length === 0) {
+                    let option = document.createElement('option');
+                    option.value = '';
+                    option.textContent = 'purchase belum ada';
+                    option.disabled = true;
+                    option.selected = true;
+                    yearSelect.appendChild(option);
+                    document.getElementById('wallet-balance').innerText = toRupiah(walletBalance);
+                    document.getElementById('wallet-after').innerText = toRupiah(walletBalance);
+                    initTable(null);
+                    return;
+                }
 
                 const currentYear = new Date().getFullYear();
                 let selectedYear = years.includes(currentYear) ? currentYear : years[0];
@@ -750,15 +768,23 @@
                             }
                             return `<span class="px-3 py-1 rounded-full font-semibold text-sm ${statusClass}">${data}</span>`;
                         }
+                    },{data: 'created_at', name: 'created_at', className: 'center', render: function (data, type, row) {
+                            if (!data) return '-';
+                            const date = new Date(data);
+                            const day = String(date.getDate()).padStart(2, '0');
+                            const month = String(date.getMonth() + 1).padStart(2, '0');
+                            const year = date.getFullYear();
+                            return `${day}-${month}-${year}`;}
                     },
                     {
                         data: null,
                         name: 'aksi',
+                        className: 'center',
                         orderable: false,
                         searchable: false,
                         render: function (data, type, row) {
                             return `
-                            <button class="btn btn-info" onclick="openModal('${row.purchase_no}')">Detail</button>
+                                <button class="btn btn-sm btn-info" onclick="openModal('${row.purchase_no}')" title="Detail"><i class="fas fa-info-circle"></i></button>
                             `;
                         }
                     }

@@ -86,7 +86,7 @@ Route::middleware('auth')->group(function () {
         Route::get('getBalanceByYear', [PurchaseController::class, 'getBalanceByYear'])->name('get.balance.by.year');
         Route::get('purchases/{purchase_no}/details', [PurchaseController::class, 'getDetails'])->name('purchase.details');
         Route::POST('getResendEmail', [BudgetRequestController::class, 'resendEmail'])->name('resendEmail');
-        
+
         Route::get('budget-approval', [BudgetRequestController::class, 'BudgetRequestApprovalIndex'])->name('budget-request.approval');
         Route::get('getBudgetRequestApprovalList-approval', [BudgetRequestController::class, 'getBudgetRequestApprovalList'])->name('get.budget-request.approval.list');
 
@@ -146,11 +146,6 @@ Route::group(['middleware' => ['role:super-admin|admin']], function () {
     Route::post('levels', [LevelController::class, 'store'])->name('level.store');
     Route::delete('levels/{level:level_slug}/delete', [LevelController::class, 'destroy'])->name('level.destroy');
 
-    Route::resource('purchase-request', PurchaseController::class);
-    Route::get('purchaserequest', [PurchaseController::class, 'getData'])->name('purchase.data');
-    Route::get('getYear', [PurchaseController::class, 'getYear'])->name('get.year');
-    Route::get('getBalanceByYear', [PurchaseController::class, 'getBalanceByYear'])->name('get.balance.by.year');
-    Route::get('/purchases/{purchase_no}/details', [PurchaseController::class, 'getDetails'])->name('purchase.details');
 });
 
 
