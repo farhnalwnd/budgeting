@@ -36,7 +36,6 @@ class SendApprovedPurchaseNotification implements ShouldQueue
      */
     public function handle(): void
     {
-        return;
         try {
             Log::info('Attempting to send email', [
                 'to' => $this->user->email,

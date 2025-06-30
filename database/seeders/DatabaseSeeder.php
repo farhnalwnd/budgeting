@@ -85,8 +85,9 @@ class DatabaseSeeder extends Seeder
         Permission::create(['name' => 'view data dashboard']);
         Permission::create(['name' => 'view inventory dashboard']);
 
-        
-
+        Permission::create(['name' => 'create purchase']);
+        Permission::create(['name' => 'update purchase']);
+        Permission::create(['name' => 'view purchase']);
 
          //create departements
 
@@ -131,6 +132,7 @@ class DatabaseSeeder extends Seeder
 
         // Create Roles
         $superAdminRole = Role::create(['name' => 'super-admin']); //as super-admin
+        $budgetingAdminRole = Role::create(['name' => 'budgeting-admin']); //as budgeting-admin
         $adminRole = Role::create(['name' => 'admin']);
         $staffRole = Role::create(['name' => 'staff']);
         $userRole = Role::create(['name' => 'user']);
@@ -139,15 +141,20 @@ class DatabaseSeeder extends Seeder
         $allPermissionNames = Permission::pluck('name')->toArray();
 
         $superAdminRole->givePermissionTo($allPermissionNames);
+        $budgetingAdminRole->givePermissionTo($allPermissionNames);
 
         // Let's give few permissions to admin role.
         $adminRole->givePermissionTo(['create role', 'view role', 'update role']);
         $adminRole->givePermissionTo(['create permission', 'view permission']);
         $adminRole->givePermissionTo(['create user', 'view user', 'update user']);
         $adminRole->givePermissionTo(['create product', 'view product', 'update product']);
+        $adminRole->givePermissionTo(['create purchase','update purchase','view purchase']);
 
         $staffRole->givePermissionTo(['view dashboard Finance']);
+        $staffRole->givePermissionTo(['create purchase', 'view purchase']);
         $userRole->givePermissionTo(['view dashboard Sales & Marketing']);
+        $userRole->givePermissionTo(['create purchase', 'view purchase']);
+        
         $userRole->givePermissionTo(['view browse requisition']);
 
         $superAdminRole->givePermissionTo(['view requisition', 'get data master', 'view browse requisition', 'create maintenance requisition', 'update maintenance requisition', 'delete maintenance requisition', 'print maintenance requisition']);
