@@ -366,10 +366,10 @@
                                     success: function (response) {
                                         // Alert data berhasil
                                         Swal.fire({
-                                            toast: true,
+                                            toast: false,
                                             icon: 'success',
                                             title: response.message,
-                                            position: 'top-end',
+                                            position: 'center',
                                             showConfirmButton: false,
                                             timer: 3000
                                         });
@@ -382,10 +382,10 @@
                                     error: function (xhr) {
                                         // Alert data gagal
                                         Swal.fire({
-                                            toast: true,
+                                            toast: false,
                                             icon: 'error',
                                             title: xhr.responseJSON.message,
-                                            position: 'top-end',
+                                            position: 'center',
                                             showConfirmButton: false,
                                             timer: 3000
                                         });
@@ -419,10 +419,10 @@
                             success: function (response) {
                                 // Alert data berhasil
                                 Swal.fire({
-                                    toast: true,
+                                    toast: false,
                                     icon: 'success',
                                     title: response.message,
-                                    position: 'top-end',
+                                    position: 'center',
                                     showConfirmButton: false,
                                     timer: 3000
                                 });
@@ -435,10 +435,10 @@
                             error: function (xhr) {
                                 // Alert data gagal
                                 Swal.fire({
-                                    toast: true,
+                                    toast: false,
                                     icon: 'error',
                                     title: xhr.responseJSON.message,
-                                    position: 'top-end',
+                                    position: 'center',
                                     showConfirmButton: false,
                                     timer: 3000
                                 });

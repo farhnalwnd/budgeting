@@ -50,7 +50,7 @@
                         <thead class="uppercase border-b">
                             <tr>
                                 {{-- <th scope="col" class="px-6 py-3 text-lg">#</th> --}}
-                                <th scope="col" class="px-6 py-3 text-lg">Purchase No</th>
+                                <th scope="col" class="px-6 py-3 text-lg">Approval No</th>
                                 <th scope="col" class="px-6 py-3 text-lg">Description</th>
                                 <th scope="col" class="px-6 py-3 text-lg">Total</th>
                                 <th scope="col" class="px-6 py-3 text-lg">No. PO</th>
@@ -68,9 +68,10 @@
 
     @push('scripts')
     <script>
+        var categories = null;
+        var departments = null;
         const userDept =  @json(auth()->user()->department->department_name ?? '');
         document.addEventListener('DOMContentLoaded', function() {
-            @hasanyrole('super-admin|admin')
             // Ambil data department hanya untuk admin
             // get department list
             $.ajax({
@@ -79,20 +80,34 @@
                 success: function(response) {
                     departments = response;
 
-                    var departmentSelect = document.getElementById('departmentFilter');
-                    departments.forEach(department => {
-                        var option = document.createElement('option');
-                        option.value = department.department_name;
-                        option.textContent = department.department_name;
-                        departmentSelect.appendChild(option);
-                    });
+                    @hasanyrole('super-admin')
+                        var departmentSelect = document.getElementById('departmentFilter');
+                        departments.forEach(department => {
+                            var option = document.createElement('option');
+                            option.value = department.department_name;
+                            option.textContent = department.department_name;
+                            departmentSelect.appendChild(option);
+                        });
+                    @endhasanyrole
                 },
                 error: function() {
                     // Jika gagal, tampilkan pesan error
                     console.log('Error ketika mengambil data department.');
                 }
             });
-            @endhasanyrole
+
+            // get category data
+            $.ajax({
+                url: '{{ route('get.category.data') }}',
+                method: 'GET',
+                success: function(response) {
+                    categories = response;
+                },
+                error: function() {
+                    // Jika gagal, tampilkan pesan error
+                    console.log('Error ketika mengambil data department.');
+                }
+            });
 
             $.ajax({
                 url: '{{ route('get.report.year') }}',
@@ -132,9 +147,37 @@
                     }
                 },
                 {
-                    extend: 'excel',
+                    extend: 'excelHtml5',
                     title: function () {
                         return getExportTitle();
+                    },
+                    customize: function (xlsx) {
+                        var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                        // Loop semua baris
+                        $('row', sheet).each(function () {
+                            // Ambil cell pertama (kolom A) pada baris ini
+                            var cell = $(this).find('c[r^="A"]');
+                            
+                            var value = cell.find('t').text();
+                            if (departments && departments.some(dept => dept.department_name === value)) 
+                            {
+                                $(this).find('c').attr('s', '5');
+                            }
+                            if (categories && categories.some(cat => cat.name === value)) 
+                            {
+                                cell.attr('s', '4');
+                            }
+                            else if (value && (value.startsWith('Subtotal') || value.startsWith('Remaining') || value.startsWith('Initial'))) // cari value subtotal, remaining, atau initial
+                            { 
+                                // Set style bold 
+                                $(this).find('c').attr('s', '2');
+                            }
+                            else if (value && value.startsWith('GRAND TOTAL')) // cari value grand total
+                            { 
+                                // Set style bold 
+                                cell.attr('s', '7');
+                            }
+                        });
                     }
                 },
                 {
@@ -155,7 +198,7 @@
                             <style>
                                 tr.subtotal-row {
                                     font-weight: bold !important;
-                                    background-color: #f0f0f0 !important;
+                                    background-color: white !important;
                                     -webkit-print-color-adjust: exact;
                                     print-color-adjust: exact;
                                 }
@@ -189,17 +232,18 @@
                         // Tambahkan styling jika perlu
                         firstRow.addClass('sub-title');
 
+
                         // Ambil baris setelah baris yang berisi "Subtotal"
                         $rows.each(function(index) {
                             const text = $(this).find('td:first').text().toLowerCase();
-                            if (text.includes('subtotal') || text.includes('grand total')) {
+                            const nextRow = $rows.eq(index + 1);
+                            const nextCell = nextRow.find('td:first');
+                            
+                            if (text.startsWith('subtotal') || text.startsWith('remaining') || text.startsWith('initial') || text === ('grand total')) {
                                 // Hanya ambil baris berikutnya
                                 $(this).addClass('subtotal-row');
 
-                                const nextRow = $rows.eq(index + 1);
-                                const nextCell = nextRow.find('td:first');
-
-                                if(!nextCell.text().toLowerCase().includes('grand total'))
+                                if(text.startsWith('remaining') && !nextCell.text().toLowerCase().includes('grand total'))
                                 {
                                     var colCount = nextRow.find('td').length;
                                     // Hapus semua <td> lain selain yang pertama
@@ -244,17 +288,17 @@
                     data: 'total_amount',
                     render: function (data, type, row) {
                         if (row.is_subtotal) {
-                            if(!row.purchase_no.startsWith('Subtotal') && row.purchase_no !== 'GRAND TOTAL')
+                            if(row.purchase_no.startsWith('Subtotal') || row.purchase_no.startsWith('Initial') || row.purchase_no.startsWith('Remaining'))
                             {
-                                return '';
+                                return `<strong>${data}</strong>`;
                             }
-                            return `<strong>${Number(data).toLocaleString()}</strong>`;
+                            return '';
                         }
                         if (row.is_subcategory)
                         {
                             return '';
                         }
-                        return Number(data).toLocaleString();
+                        return data;
                     }
                 },
                 {
@@ -267,17 +311,17 @@
                     data: 'actual_amount',
                     render: function (data, type, row) {
                         if (row.is_subtotal) {
-                            if(!row.purchase_no.startsWith('Subtotal') && row.purchase_no !== 'GRAND TOTAL')
+                            if(row.purchase_no.startsWith('Subtotal') || row.purchase_no.startsWith('Initial') || row.purchase_no.startsWith('Remaining'))
                             {
-                                return '';
+                                return `<strong>${data}</strong>`;
                             }
-                            return `<strong>${Number(data).toLocaleString()}</strong>`;
+                            return '';
                         }
                         if (row.is_subcategory)
                         {
                             return '';
                         }
-                        return Number(data).toLocaleString();
+                        return data;
                     }
                 },
                 {
@@ -288,7 +332,19 @@
                 }
             ],
             rowCallback: function (row, data) {
-                if (data.is_subtotal && !data.purchase_no.startsWith('Subtotal')) {
+                if (data.is_subtotal) {
+                    if (
+                        !data.purchase_no.startsWith('Subtotal') &&
+                        !data.purchase_no.startsWith('Initial') &&
+                        !data.purchase_no.startsWith('Remaining')
+                    ) {
+                        $(row).css({
+                            'font-weight': 'bold',
+                            'background-color': '#f0f0f0'
+                        });
+                    }
+                }else if(data.is_grandtotal)
+                {
                     $(row).css({
                         'font-weight': 'bold',
                         'background-color': '#f0f0f0'
@@ -305,9 +361,9 @@
 
             @hasanyrole('super-admin|admin')
             const dept = $('#departmentFilter').val();
-            return `Laporan Pembelian ${dept} - Tahun ${year} `;
+            return `Laporan Pemakaian Budget Capex ${dept} - Tahun ${year} `;
             @endhasanyrole
-            return `Laporan Pembelian ${userDept} - Tahun ${year} `;
+            return `Laporan Pemakaian Budget Capex ${userDept} - Tahun ${year} `;
         }
 
         $('#departmentFilter').on('change', function() {
