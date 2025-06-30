@@ -91,7 +91,7 @@ class ReportController extends Controller
             ? $request->year 
             : Carbon::now()->year;
             /** @var User $user */
-            if($user->hasRole(['super-admin', 'admin'])) // Jika user adalah admin
+            if($user->hasRole(['super-admin', 'budgeting-admin'])) // Jika user adalah admin
             {
                 // Mengambil purchase pada tahun yang dipilih
                 $query = Purchase::with('department', 'category', 'detail', 'budgetRequest.toDepartment', 'budgetRequest.fromDepartment');

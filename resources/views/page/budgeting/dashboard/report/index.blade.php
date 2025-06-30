@@ -31,7 +31,7 @@
                 <h1 class="card-title text-2xl font-medium">Report Approved Purchases</h1>
                 
                 <div>
-                    @hasanyrole('super-admin|admin')
+                    @hasanyrole('super-admin|budgeting-admin')
                     {{-- Select department hanya untuk admin --}}
                     <select id="departmentFilter" class="form-control">
                         <option value="">All Department</option>
@@ -80,7 +80,7 @@
                 success: function(response) {
                     departments = response;
 
-                    @hasanyrole('super-admin')
+                    @hasanyrole('super-admin|budgeting-admin')
                         var departmentSelect = document.getElementById('departmentFilter');
                         departments.forEach(department => {
                             var option = document.createElement('option');
@@ -359,7 +359,7 @@
         function getExportTitle() {
             const year = $('#yearFilter').val();
 
-            @hasanyrole('super-admin|admin')
+            @hasanyrole('super-admin|budgeting-admin')
             const dept = $('#departmentFilter').val();
             return `Laporan Pemakaian Budget Capex ${dept} - Tahun ${year} `;
             @endhasanyrole

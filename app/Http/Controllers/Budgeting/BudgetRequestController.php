@@ -367,7 +367,7 @@ class BudgetRequestController extends Controller
         $user = Auth::user();
         $query = BudgetRequest::with('fromDepartment', 'toDepartment');
         /** @var User $user */
-        if(!$user->hasRole(['super-admin', 'admin']))
+        if(!$user->hasRole(['super-admin', 'budgeting-admin']))
         {
             $query->where('from_department_id', $user->department->id);
         }
@@ -411,7 +411,7 @@ class BudgetRequestController extends Controller
         $user = Auth::user();
         /** @var User $user */
         // Cek apakah user memiliki peran super-admin atau admin
-        if($user->hasRole(['super-admin', 'admin']))
+        if($user->hasRole(['super-admin', 'budgeting-admin']))
         {
             $budgets = BudgetRequest::with('fromDepartment', 'toDepartment')
                 ->where('status', 'pending')
