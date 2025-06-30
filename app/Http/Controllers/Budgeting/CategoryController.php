@@ -60,7 +60,7 @@ class CategoryController extends Controller
                 ->performedOn($category)
                 ->inLog('category')
                 ->event('Create')
-                ->causedBy($user)
+                ->causedBy($user->department)
                 ->withProperties(['no' => $category->id, 'action' => 'create', 'category' => $category->name])
                 ->log('Create category ' . $category->name . ' by ' . $user->name . ' at ' . now());
 
@@ -117,7 +117,7 @@ class CategoryController extends Controller
                 ->performedOn($category)
                 ->inLog('category')
                 ->event('Update')
-                ->causedBy($user)
+                ->causedBy($user->department)
                 ->withProperties(['no' => $category->id, 'action' => 'create', 'category' => $category->name])
                 ->log('Update category ' . $categoryOldName . ' to ' . $category->name . ' by ' . $user->name . ' at ' . now());
 
@@ -156,7 +156,7 @@ class CategoryController extends Controller
                 ->performedOn($category)
                 ->inLog('category')
                 ->event('Delete')
-                ->causedBy($user)
+                ->causedBy($user->department)
                 ->withProperties(['no' => $category->id, 'action' => 'delete',
                 'data' => [
                     'no' => $category->id,

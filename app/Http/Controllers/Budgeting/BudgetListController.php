@@ -97,7 +97,7 @@ class BudgetListController extends Controller
                     ->performedOn($budget)
                     ->inLog('budget-list')
                     ->event('Create')
-                    ->causedBy($user)
+                    ->causedBy($user->department)
                     ->withProperties(['no' => $budget->budget_allocation_no, 'action' => 'create',
                     'data' => [
                         'budget_allocation_no' => $budget->budget_allocation_no,
@@ -187,7 +187,7 @@ class BudgetListController extends Controller
                 ->performedOn($budget)
                 ->inLog('budget-list')
                 ->event('Update')
-                ->causedBy($user)
+                ->causedBy($user->department)
                 ->withProperties(['no' => $budget->budget_allocation_no, 'action' => 'update', 
                 'oldData' => [
                     'budget_allocation_no' => $budgetOld->budget_allocation_no,
@@ -245,7 +245,7 @@ class BudgetListController extends Controller
                 ->performedOn($budget)
                 ->inLog('budget-list')
                 ->event('Delete')
-                ->causedBy($user)
+                ->causedBy($user->department)
                 ->withProperties(['no' => $budget->budget_allocation_no, 'action' => 'delete',
                 'data' => [
                     'budget_allocation_no' => $budget->budget_allocation_no,
