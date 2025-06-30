@@ -11,13 +11,20 @@ use RealRashid\SweetAlert\Facades\Alert;
 
 class BudgetApproverController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view budgetapprover', ['only' => ['index']]);
+        $this->middleware('permission:create budgetapprover', ['only' => ['create', 'store']]);
+        $this->middleware('permission:update budgetapprover', ['only' => ['update', 'edit']]);
+        $this->middleware('permission:delete budgetapprover', ['only' => ['destroy']]);
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
         confirmDelete();
-        return view('roleuser.approver.index');
+        return view('page.budgeting.management.approver.index');
     }
 
     /**

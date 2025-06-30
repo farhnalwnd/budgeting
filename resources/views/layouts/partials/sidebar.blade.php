@@ -20,27 +20,39 @@
         <li><a href="#" style="font-size: 18px;" class="{{ request()->is('management/*') ? 'current' : '' }}"><i
                     data-feather="database" style="width: 18px; height: 18px;"></i>Data Management</a>
             <ul>
+                @can('view budgetlist')
                 <li><a href="{{ route('budget-list.index') }}"
                     class="{{ request()->is('management/budget-list') ? 'current' : '' }}"><i class="icon-Commit"><span
                             class="path1"></span><span class="path2"></span></i>Budget List </a></li>
+                @endcan
                 <li><a href="{{ route('purchase-request.index') }}"
                     class="{{ request()->is('management/PurchaseRequest') ? 'current' : '' }}"><i class="icon-Commit"><span
                             class="path1"></span><span class="path2"></span></i>Purchase Request</a></li>
-                <li><a href="{{ route('budget-allocation.index') }}"
+                @can('view budgetallocation')
+                            <li><a href="{{ route('budget-allocation.index') }}"
                         class="{{ request()->is('management/budget-allocation') ? 'current' : '' }}"><i class="icon-Commit"><span
                                 class="path1"></span><span class="path2"></span></i>Budget Allocation</a></li>
+                @endcan
                 <li><a href="{{ route('budget-request.index') }}"
                     class="{{ request()->is('management/budget-request') ? 'current' : '' }}"><i class="icon-Commit"><span
                             class="path1"></span><span class="path2"></span></i>Budget Request</a></li>
                 <li><a href="{{ route('budget-request.approval') }}"
                     class="{{ request()->is('management/budget-approval') ? 'current' : '' }}"><i class="icon-Commit"><span
                             class="path1"></span><span class="path2"></span></i>Budget Request Approval</a></li>
+                @can('view budgetcategory')
                 <li><a href="{{ route('category.index') }}"
                         class="{{ request()->is('management/category') ? 'current' : '' }}"><i class="icon-Commit"><span
                                 class="path1"></span><span class="path2"></span></i>Category </a></li>
+                @endcan
+                @can('view budgetactivitylog')
                 <li><a href="{{ route('activity.index') }}"
                         class="{{ request()->is('management/activity') ? 'current' : '' }}"><i class="icon-Commit"><span
                                 class="path1"></span><span class="path2"></span></i>Activity Log</a></li>
+                @endcan
+                @can('view budgetapprover')
+                <li><a href="{{ route('approver.index') }}" class="{{ request()->is('management/approver*') ? 'current' : '' }}">
+                    <i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Approver</a></li>
+                @endcan
             </ul>
         </li>
             <li
@@ -76,9 +88,6 @@
                         <li><a href="{{ route('permissions.index') }}"
                                 class="{{ request()->is('permissions*') ? 'current' : '' }}"><i class="icon-Commit"><span
                                         class="path1"></span><span class="path2"></span></i>Permission</a></li>
-                        <li><a href="{{ route('approver.index') }}" class="{{ request()->is('approver.index*') ? 'current' : '' }}"><i
-                                    class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Approver</a></li>
-                        
                 </ul>
             </li>
     </ul>

@@ -8,6 +8,10 @@ use Spatie\Activitylog\Models\Activity;
 
 class ActivityLogController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view budgetactivitylog', ['only' => ['index', 'getLogsData']]);
+    }
     /**
      * Display a listing of the resource.
      */

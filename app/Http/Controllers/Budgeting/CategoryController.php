@@ -11,6 +11,14 @@ use RealRashid\SweetAlert\Facades\Alert;
 
 class CategoryController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view budgetcategory', ['only' => ['index']]);
+        $this->middleware('permission:create budgetcategory', ['only' => ['create', 'store']]);
+        $this->middleware('permission:update budgetcategory', ['only' => ['update', 'edit']]);
+        $this->middleware('permission:delete budgetcategory', ['only' => ['destroy']]);
+    }
+
     /**
      * Display a listing of the resource.
      */

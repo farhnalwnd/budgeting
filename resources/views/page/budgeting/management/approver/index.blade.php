@@ -26,6 +26,7 @@
     </div>
 
     <section class="content">
+        @can('create budgetapprover')
         <!-- Add Approver Button -->
         <div class="mb-4 flex justify-end">
             <button type="button"
@@ -34,7 +35,8 @@
                 Add Approver
             </button>
         </div>
-
+        @endcan
+        
         <div class="card">
             <div class="card-header">
                 <h1 class="card-title text-2xl font-medium">List Approver</h1>
@@ -58,7 +60,7 @@
         </div>
     </section>
     
-
+    @can('create budgetapprover')
     {{-- {-- Create Approver-List Modal --} --}}
     <div id="createApproverModal" tabindex="-1" aria-hidden="true"
         class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
@@ -125,7 +127,9 @@
             </div>
         </div>
     </div>
+    @endcan
 
+    
     <!-- Modal Edit User -->
     <div id="editModalDiv">
         <div id="modalBackground" class="fixed inset-0 bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-40 hidden"></div>
@@ -145,6 +149,7 @@
                 success: function(response) {
                     departments = response;
 
+                    @can('create budgetapprover')
                     var departmentSelect = document.getElementById('department');
                     departments.forEach(department => {
                         var option = document.createElement('option');
@@ -152,6 +157,7 @@
                         option.textContent = department.department_name;
                         departmentSelect.appendChild(option);
                     });
+                    @endcan
                 },
                 error: function() {
                     // Jika gagal, tampilkan pesan error
@@ -166,6 +172,7 @@
                 success: function(response) {
                     users = response;
 
+                    @can('create budgetapprover')
                     var nikSelect = document.getElementById('nik');
                     users.forEach(user => {
                         var option = document.createElement('option');
@@ -173,6 +180,7 @@
                         option.textContent = `${user.nik} - ${user.name}`;
                         nikSelect.appendChild(option);
                     });
+                    @endcan
                 },
                 error: function() {
                     // Jika gagal, tampilkan pesan error
@@ -212,9 +220,12 @@
                             var deleteUrl = "{{ route('approver.destroy', ':id') }}".replace(':id', id); 
                             return `
                             <div class="d-flex action-btn">
+                                @can('update budgetapprover')
                                 <a href="javascript:void(0)" class="text-primary edit" onClick="openEditModal(${meta.row})">
                                     <i class="ti ti-eye fs-5"></i>
                                 </a>
+                                @endcan
+                                @can('delete budgetapprover')
                                 <form id="delete-form-${id}" action="${deleteUrl}" method="POST" style="display: inline;">
                                     @csrf
                                     @method('DELETE')
@@ -223,6 +234,7 @@
                                         <i class="ti ti-trash fs-5"></i>
                                     </a>
                                 </form>
+                                @endcan
                             </div>
                             `;  
                         }
@@ -231,6 +243,7 @@
             });
         });
        
+        @can('delete budgetapprover')
         // Function untuk konfirmasi delete approver
         function confirmApproverDelete(button){
             var approverId = button.getAttribute('data-approver-id');
@@ -248,7 +261,9 @@
                 }
             });
         }
+        @endcan
 
+        @can('update budgetapprover')
         // Function untuk buat/buka modal
         function openEditModal(id){
             var modal = document.getElementById(`editApproverModal${id}`);
@@ -340,6 +355,7 @@
             modalDiv.innerHTML += newEditModal;
                 
         }
+        @endcan
     </script>
     @endpush
 

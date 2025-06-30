@@ -15,6 +15,14 @@ use RealRashid\SweetAlert\Facades\Alert;
 
 class BudgetListController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view budgetlist', ['only' => ['index']]);
+        $this->middleware('permission:create budgetlist', ['only' => ['create', 'store', 'calculateBudget']]);
+        $this->middleware('permission:update budgetlist', ['only' => ['update', 'edit', 'calculateBudget']]);
+        $this->middleware('permission:delete budgetlist', ['only' => ['destroy', 'calculateBudget']]);
+    }
+
     /**
      * Display a listing of the resource.
      */

@@ -15,9 +15,15 @@ use Illuminate\Support\Str;
 
 class BudgetAllocationController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public function __construct()
+    {
+        $this->middleware('permission:view budgetallocation', ['only' => ['index']]);
+        $this->middleware('permission:create budgetallocation', ['only' => ['create', 'store']]);
+        $this->middleware('permission:update budgetallocation', ['only' => ['update', 'edit']]);
+        $this->middleware('permission:delete budgetallocation', ['only' => ['destroy']]);
+    }
+    
+
     public function index()
     {
         confirmDelete();

@@ -85,6 +85,28 @@ class DatabaseSeeder extends Seeder
         Permission::create(['name' => 'view data dashboard']);
         Permission::create(['name' => 'view inventory dashboard']);
 
+        Permission::create(['name' => 'view budgetallocation']);
+        Permission::create(['name' => 'create budgetallocation']);
+        Permission::create(['name' => 'update budgetallocation']);
+        Permission::create(['name' => 'delete budgetallocation']);
+
+        Permission::create(['name' => 'view budgetlist']);
+        Permission::create(['name' => 'create budgetlist']);
+        Permission::create(['name' => 'update budgetlist']);
+        Permission::create(['name' => 'delete budgetlist']);
+
+        Permission::create(['name' => 'view budgetcategory']);
+        Permission::create(['name' => 'create budgetcategory']);
+        Permission::create(['name' => 'update budgetcategory']);
+        Permission::create(['name' => 'delete budgetcategory']);
+
+        Permission::create(['name' => 'view budgetapprover']);
+        Permission::create(['name' => 'create budgetapprover']);
+        Permission::create(['name' => 'update budgetapprover']);
+        Permission::create(['name' => 'delete budgetapprover']);
+        
+        Permission::create(['name' => 'view budgetactivitylog']);
+
         Permission::create(['name' => 'create purchase']);
         Permission::create(['name' => 'update purchase']);
         Permission::create(['name' => 'view purchase']);
