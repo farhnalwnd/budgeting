@@ -105,7 +105,7 @@ class BudgetRequestController extends Controller
                 ->performedOn($budget)
                 ->inLog('budget-request')
                 ->event('Create')
-                ->causedBy($user)
+                ->causedBy($user->department)
                 ->withProperties(['no' => $budget->budget_req_no, 'action' => 'create',
                 'data' => [
                     'budget_req_no' => $budget->budget_req_no,
@@ -277,7 +277,7 @@ class BudgetRequestController extends Controller
                     ->performedOn($budget)
                     ->inLog('budget-request')
                     ->event(ucfirst($validatedData['action']))
-                    ->causedBy($user)
+                    ->causedBy($user->department)
                     ->withProperties(['no' => $budget->budget_req_no, 'action' => $validatedData['action'],
                     'data' => [
                         'budget_req_no' => $budget->budget_req_no,
@@ -330,7 +330,7 @@ class BudgetRequestController extends Controller
                 ->performedOn($budget)
                 ->inLog('budget-request')
                 ->event('Delete')
-                ->causedBy($user)
+                ->causedBy($user->department)
                 ->withProperties(['no' => $budget->budget_req_no, 'action' => 'delete',
                 'data' => [
                     'budget_req_no' => $budget->budget_req_no,

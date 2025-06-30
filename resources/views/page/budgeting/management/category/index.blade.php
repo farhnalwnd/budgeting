@@ -28,6 +28,7 @@
     </div>
 
     <section x-data="{open : false}" class="content">
+        @can('create budgetcategory')
         <!-- Add Category Button -->
         <div class="mb-4 flex justify-end">
             <button type="button" @click="open = ! open"
@@ -35,6 +36,7 @@
                 Add Category
             </button>
         </div>
+        @endcan
 
         <div class="card">
             <div class="card-header">
@@ -57,6 +59,7 @@
             </div>
         </div>
         
+        @can('create budgetcategory')
         <!-- Modal -->
         <div x-show="open" x-on:keydown.escape.window="open = false" x-transition.duration.400ms
             class="fixed inset-0 z-[900] flex items-center justify-center bg-black bg-opacity-50">
@@ -107,6 +110,7 @@
                 </form>
             </div>
         </div>
+        @endcan
     </section>
 
 
@@ -150,9 +154,12 @@
                             var deleteUrl = "{{ route('category.destroy', ':id') }}".replace(':id', id); 
                             return `
                             <div class="d-flex action-btn">
+                                @can('update budgetcategory')
                                 <a href="javascript:void(0)" class="text-primary edit" onClick="openEditModal(${meta.row})">
                                     <i class="ti ti-eye fs-5"></i>
                                 </a>
+                                @endcan
+                                @can('delete budgetcategory')
                                 <form id="delete-form-${id}" action="${deleteUrl}" method="POST" style="display: inline;">
                                     @csrf
                                     @method('DELETE')
@@ -161,6 +168,7 @@
                                         <i class="ti ti-trash fs-5"></i>
                                     </a>
                                 </form>
+                                @endcan
                             </div>
                             `;  
                         }
@@ -169,19 +177,7 @@
             });
         });
 
-        // Function untuk menghapus edit div
-        function clearEditDiv()
-        {
-            const container = document.getElementById('editModalDiv');
-            const background = document.getElementById('modalBackground');
-            // Simpan elemen background
-            const preserved = background.cloneNode(true);
-            // Kosongkan container
-            container.innerHTML = '';
-            // Masukkan kembali elemen yang disimpan
-            container.appendChild(preserved);
-        }
-
+        @can('create budgetcategory')
         // Function untuk konfirmasi create category
         function confirmCategoryCreate(button){
             var form = button.closest('form');
@@ -224,8 +220,10 @@
                                 showConfirmButton: false,
                                 timer: 3000
                             });
+                            @can('update budgetcategory')
                             // Bersihkan edit div
                             clearEditDiv();
+                            @endcan
 
                             // Refresh data table
                             table.ajax.reload(null, false); // Reload data dari server
@@ -247,6 +245,21 @@
                     });
                 }
             });
+        }
+        @endcan
+
+        @can('update budgetcategory')
+        // Function untuk menghapus edit div
+        function clearEditDiv()
+        {
+            const container = document.getElementById('editModalDiv');
+            const background = document.getElementById('modalBackground');
+            // Simpan elemen background
+            const preserved = background.cloneNode(true);
+            // Kosongkan container
+            container.innerHTML = '';
+            // Masukkan kembali elemen yang disimpan
+            container.appendChild(preserved);
         }
 
         // Function untuk konfirmasi edit category
@@ -309,7 +322,9 @@
                 }
             });
         }
+        @endcan
 
+        @can('delete budgetcategory')
         // Function untuk konfirmasi delete category
         function confirmCategoryDelete(button){
             var categoryId = button.getAttribute('data-category-id');
@@ -340,8 +355,10 @@
                                 showConfirmButton: false,
                                 timer: 3000
                             });
+                            @can('update budgetcategory')
                             // Bersihkan edit div
                             clearEditDiv();
+                            @endcan
 
                             // Refresh data table
                             table.ajax.reload(null, false); // Reload data dari server
@@ -361,7 +378,9 @@
                 }
             });
         }
+        @endcan
 
+        @can('update budgetcategory')
         // Function untuk buat/buka modal
         function openEditModal(id){
             var modal = document.getElementById(`editContactModal${id}`);
@@ -432,6 +451,7 @@
             modalDiv.innerHTML += newEditModal;
                 
         }
+        @endcan
     </script>
     
     @endpush

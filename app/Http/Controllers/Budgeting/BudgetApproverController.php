@@ -11,13 +11,20 @@ use RealRashid\SweetAlert\Facades\Alert;
 
 class BudgetApproverController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view budgetapprover', ['only' => ['index']]);
+        $this->middleware('permission:create budgetapprover', ['only' => ['create', 'store']]);
+        $this->middleware('permission:update budgetapprover', ['only' => ['update', 'edit']]);
+        $this->middleware('permission:delete budgetapprover', ['only' => ['destroy']]);
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
         confirmDelete();
-        return view('roleuser.approver.index');
+        return view('page.budgeting.management.approver.index');
     }
 
     /**
@@ -52,7 +59,7 @@ class BudgetApproverController extends Controller
                 ->performedOn($approver)
                 ->inLog('budget-approver')
                 ->event('Create')
-                ->causedBy($user)
+                ->causedBy($user->department)
                 ->withProperties(['no' => $approver->id, 'action' => 'create',
                 'data' => [
                     'department_id' => $approver->department_id,
@@ -115,7 +122,7 @@ class BudgetApproverController extends Controller
                 ->performedOn($approver)
                 ->inLog('budget-approver')
                 ->event('Update')
-                ->causedBy($user)
+                ->causedBy($user->department)
                 ->withProperties(['no' => $approver->id, 'action' => 'update',
                 'oldData' => [
                     'department_id' => $approverOld->department_id,
@@ -158,7 +165,7 @@ class BudgetApproverController extends Controller
                 ->performedOn($approver)
                 ->inLog('budget-approver')
                 ->event('Delete')
-                ->causedBy($user)
+                ->causedBy($user->department)
                 ->withProperties(['no' => $approver->id, 'action' => 'delete',
                 'data' => [
                     'department_id' => $approver->department_id,

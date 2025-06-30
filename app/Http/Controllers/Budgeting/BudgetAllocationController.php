@@ -15,9 +15,15 @@ use Illuminate\Support\Str;
 
 class BudgetAllocationController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public function __construct()
+    {
+        $this->middleware('permission:view budgetallocation', ['only' => ['index']]);
+        $this->middleware('permission:create budgetallocation', ['only' => ['create', 'store']]);
+        $this->middleware('permission:update budgetallocation', ['only' => ['update', 'edit']]);
+        $this->middleware('permission:delete budgetallocation', ['only' => ['destroy']]);
+    }
+    
+
     public function index()
     {
         confirmDelete();
@@ -76,7 +82,7 @@ class BudgetAllocationController extends Controller
                 ->performedOn($budget)
                 ->inLog('budget-allocation')
                 ->event('Create')
-                ->causedBy($user)
+                ->causedBy($user->department)
                 ->withProperties(['no' => $budget->budget_allocation_no, 'action' => 'create',
                 'data' => [
                     'budget_allocation_no' => $budget->budget_allocation_no,
@@ -140,7 +146,7 @@ class BudgetAllocationController extends Controller
                 ->performedOn($budget)
                 ->inLog('budget-allocation')
                 ->event('Update')
-                ->causedBy($user)
+                ->causedBy($user->department)
                 ->withProperties(['no' => $budget->budget_allocation_no, 'action' => 'update',
                 'oldData' => [
                     'budget_allocation_no' => $budgetOld->budget_allocation_no,
@@ -185,7 +191,7 @@ class BudgetAllocationController extends Controller
                 ->performedOn($budget)
                 ->inLog('budget-allocation')
                 ->event('Delete')
-                ->causedBy($user)
+                ->causedBy($user->department)
                 ->withProperties(['no' => $budget->budget_allocation_no, 'action' => 'delete',
                 'data' => [
                     'budget_allocation_no' => $budget->budget_allocation_no,

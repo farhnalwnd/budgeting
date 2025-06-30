@@ -15,6 +15,14 @@ use RealRashid\SweetAlert\Facades\Alert;
 
 class BudgetListController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view budgetlist', ['only' => ['index']]);
+        $this->middleware('permission:create budgetlist', ['only' => ['create', 'store', 'calculateBudget']]);
+        $this->middleware('permission:update budgetlist', ['only' => ['update', 'edit', 'calculateBudget']]);
+        $this->middleware('permission:delete budgetlist', ['only' => ['destroy', 'calculateBudget']]);
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -89,7 +97,7 @@ class BudgetListController extends Controller
                     ->performedOn($budget)
                     ->inLog('budget-list')
                     ->event('Create')
-                    ->causedBy($user)
+                    ->causedBy($user->department)
                     ->withProperties(['no' => $budget->budget_allocation_no, 'action' => 'create',
                     'data' => [
                         'budget_allocation_no' => $budget->budget_allocation_no,
@@ -179,7 +187,7 @@ class BudgetListController extends Controller
                 ->performedOn($budget)
                 ->inLog('budget-list')
                 ->event('Update')
-                ->causedBy($user)
+                ->causedBy($user->department)
                 ->withProperties(['no' => $budget->budget_allocation_no, 'action' => 'update', 
                 'oldData' => [
                     'budget_allocation_no' => $budgetOld->budget_allocation_no,
@@ -237,7 +245,7 @@ class BudgetListController extends Controller
                 ->performedOn($budget)
                 ->inLog('budget-list')
                 ->event('Delete')
-                ->causedBy($user)
+                ->causedBy($user->department)
                 ->withProperties(['no' => $budget->budget_allocation_no, 'action' => 'delete',
                 'data' => [
                     'budget_allocation_no' => $budget->budget_allocation_no,

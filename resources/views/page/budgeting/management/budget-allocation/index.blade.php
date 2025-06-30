@@ -27,12 +27,14 @@
 
     <section x-data="{open : false}" class="content">
         <!-- Add Budget Allocation Button -->
+        @can('create budgetallocation')
         <div class="mb-4 flex justify-end">
             <button type="button" @click="open = ! open"
                 class="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80 font-medium rounded-lg text-base px-3 py-3 text-center me-2 mb-2 float-right">
                 Add Budget Allocation
             </button>
         </div>
+        @endcan
 
         <div class="card">
             <div class="card-header">
@@ -63,6 +65,7 @@
             </div>
         </div>
         
+        @can('create budgetallocation')
         <!-- Modal -->
         <div x-show="open" x-on:keydown.escape.window="open = false" x-transition.duration.400ms
             class="fixed inset-0 z-[900] flex items-center justify-center bg-black bg-opacity-50">
@@ -130,6 +133,7 @@
                 </form>
             </div>
         </div>
+        @endcan
     </section>
 
     <!-- Modal Edit User -->
@@ -224,9 +228,12 @@
                                 var deleteUrl = "{{ route('budget-allocation.destroy', ':id') }}".replace(':id', id.replaceAll("/", "-")); 
                                 return `
                                 <div class="d-flex action-btn">
+                                    @can('update budgetallocation')
                                     <a href="javascript:void(0)" class="text-primary edit" onClick="openEditModal(${meta.row})">
                                         <i class="ti ti-eye fs-5"></i>
                                     </a>
+                                    @endcan
+                                    @can('delete budgetallocation')
                                     <form id="delete-form-${id}" action="${deleteUrl}" method="POST" style="display: inline;">
                                         @csrf
                                         @method('DELETE')
@@ -235,6 +242,7 @@
                                             <i class="ti ti-trash fs-5"></i>
                                         </a>
                                     </form>
+                                    @endcan
                                 </div>
                                 `;  
                             }
@@ -254,6 +262,7 @@
         // get department data
         function getDepartment()
         {
+            @can('create budgetallocation')
             $.ajax({
                 url: '{{ route('get.department.data') }}',
                 method: 'GET',
@@ -275,6 +284,7 @@
                     console.log('Error ketika mengambil data department.');
                 }
             });
+            @endcan
         }
 
 

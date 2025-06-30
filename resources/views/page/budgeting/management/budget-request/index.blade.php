@@ -239,6 +239,7 @@
                     buttons: [
                         'copy', 'csv', 'excel', 'pdf', 'print'
                     ],
+                    order: [[0, 'desc']],
                     ajax: {
                         url: '{{ route('get.budget.request.list') }}',
                         type: 'GET',

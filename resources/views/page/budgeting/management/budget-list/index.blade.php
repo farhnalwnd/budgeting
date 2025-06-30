@@ -29,6 +29,7 @@
     </div>
 
     <section x-data="{open : false}" class="content">
+        @can('create budgetlist')
         <!-- Add Budget List Button -->
         <div class="mb-4 flex justify-end">
             <button type="button" @click="open = ! open" 
@@ -37,6 +38,7 @@
                 Add Budget-List
             </button>
         </div>
+        @endcan
 
         <div class="card">
             <div class="card-header">
@@ -68,6 +70,7 @@
             </div>
         </div>
         
+        @can('create budgetlist')
         <!-- Modal -->
         <div x-show="open" x-on:keydown.escape.window="open = false" x-transition.duration.400ms
             class="fixed inset-0 z-[900] flex items-center justify-center bg-black bg-opacity-50">
@@ -203,6 +206,7 @@
                 </form>
             </div>
         </div>
+        @endcan
     </section>
 
 
@@ -240,12 +244,16 @@
                 }
             });
 
+
+            
+            @canany(['create budgetlist', 'update budgetlist'])
             // get all budget-allocation list
             $.ajax({
                 url: '{{ route('get.budget-allocation.all') }}',
                 method: 'GET',
                 success: function(response) {
                     allocations = response;
+                    @can('create budgetlist')
                     var select = document.getElementById('no');
 
                     allocations.slice().reverse().forEach(allocation => {
@@ -254,19 +262,23 @@
                         option.textContent = allocation.budget_allocation_no;
                         select.appendChild(option);
                     });
+                    @endcan
                 },
                 error: function() {
                     // Jika gagal, tampilkan pesan error
                     console.log('Error ketika mengambil data budget allocation.');
                 }
             });
+            @endcanany
 
+            @canany(['create budgetlist', 'update budgetlist'])
             // get category list
             $.ajax({
                 url: '{{ route('get.category.data') }}',
                 method: 'GET',
                 success: function(response) {
                     categories = response;
+                    @can('create budgetlist')
                     var select = document.getElementById('category');
                     categories.forEach(category => {
                         var option = document.createElement('option');
@@ -274,13 +286,14 @@
                         option.textContent = category.name;
                         select.appendChild(option);
                     });
+                    @endcan
                 },
                 error: function() {
                     // Jika gagal, tampilkan pesan error
                     console.log('Error ketika mengambil data category.');
                 }
             });
-
+            @endcanany
             function initTable()
             {
                 // Init datatable
@@ -341,9 +354,12 @@
                                 var deleteUrl = "{{ route('budget-list.destroy', ':id') }}".replace(':id', id); 
                                 return `
                                 <div class="d-flex action-btn">
+                                    @can('update budgetlist')
                                     <a href="javascript:void(0)" class="text-primary edit" onClick="openEditModal(${meta.row})">
                                         <i class="ti ti-eye fs-5"></i>
                                     </a>
+                                    @endcan
+                                    @can('delete budgetlist')
                                     <form id="delete-form-${id}" action="${deleteUrl}" method="POST" style="display: inline;">
                                         @csrf
                                         @method('DELETE')
@@ -352,6 +368,7 @@
                                             <i class="ti ti-trash fs-5"></i>
                                         </a>
                                     </form>
+                                    @endcan
                                 </div>
                                 `;  
                             }
@@ -778,9 +795,11 @@
                                 const total = price * quantity;
 
                                 totalInput.value = toRupiah(total);
+                                @can('create budgetlist')
                                 updateGrandTotal();
+                                @endcan
                             }
-
+        @can('create budgetlist')
         function updateGrandTotal() {
             const totalInputs = document.querySelectorAll('.total-input');
             let grandTotal = 0;
@@ -792,6 +811,7 @@
 
             document.getElementById('grand-total').innerText = toRupiah(grandTotal);
         }
+        @endcan
 
         function formatPriceInput(input) {
                     input.addEventListener('keydown', function (e) {
@@ -893,8 +913,9 @@
         });
 
             // Inisialisasi nilai awal saldo
+            @can('create budgetlist')
             updateGrandTotal();
-
+            @endcan
         
         
         $('#yearFilter').on('change', function() {
