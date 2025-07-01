@@ -45,45 +45,61 @@
                 </th>
             </tr>
             <tr>
-                <td colspan="2">penganggar:</td>
+                <td colspan="2" class="tr-odd">penganggar:</td>
                 <td>{{ $deptName[1] }}</td>
             </tr>
-            <tr>
-                <td colspan="2">Purchase No:</td>
-                <td>{{ $purchases->purchase_no }}</td>
-            </tr>
-
-            @foreach ($purchaseDetails as $detail)
-            @php $rowClass = $loop->odd ? 'tr-odd' : ''; @endphp
-            <tr class="{{ $rowClass }}">
-                <td>{{ $loop->iteration }}</td>
-                <td>Item:</td>
-                <td>{{ $detail->item_name }}</td>
-            </tr>
-            <tr class="{{ $rowClass }}">
-                <td></td>
-                <td>Jumlah:</td>
-                <td>{{ $detail->quantity }}</td>
-            </tr>
-            <tr class="{{ $rowClass }}">
-                <td></td>
-                <td>Total:</td>
-                <td>{{ $detail->total_amount }}</td>
-            </tr>
-            @endforeach
-
-            <tr>
-                <td colspan="2">grand total:</td>
-                <td>{{ $purchases->grand_total }}</td>
-            </tr>
-            <tr>
-                <td colspan="3" class="text-center">
-                    <p class="text-center">Thank you for your attention.</p>
-                    <br>
-                    <p class="text-center">Best regards,</p>
-                    <p class="text-center">PT Sinar Meadow International Indonesia</p>
-                </td>
-            </tr>
+                @if($purchases)
+                    <tr>
+                        <td colspan="2">Purchase No:</td>
+                        <td>{{ $purchases->purchase_no }}</td>
+                    </tr>
+                @foreach ($purchaseDetails as $detail)
+                    @php $rowClass = $loop->odd ? 'tr-odd' : ''; @endphp
+                        <tr class="{{ $rowClass }}">
+                            <td>{{ $loop->iteration }}</td>
+                            <td>Item:</td>
+                            <td>{{ $detail->item_name }}</td>
+                        </tr>
+                        <tr class="{{ $rowClass }}">
+                            <td></td>
+                            <td>Jumlah:</td>
+                            <td>{{ $detail->quantity }}</td>
+                        </tr>
+                        <tr class="{{ $rowClass }}">
+                            <td></td>
+                            <td>Total:</td>
+                            <td>{{ $detail->total_amount }}</td>
+                        </tr>
+                @endforeach
+                    <tr>
+                        <td colspan="2">grand total:</td>
+                        <td>{{ $purchases->grand_total }}</td>
+                    </tr>
+                @else
+                    <tr>
+                        <td></td>
+                        <td>No Budget Request:</td>
+                        <td>{{ $budgetRequest->budget_req_no }}</td>
+                    </tr>
+                    <tr class="tr-odd">
+                        <td></td>
+                        <td>nominal:</td>
+                        <td>{{ $budgetRequest->amount }}</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>feedback:</td>
+                        <td>{{ $budgetRequest->feedback }}</td>
+                    </tr>
+                @endif
+                <tr>
+                    <td colspan="3">
+                        <p style="text-align: center;">Thank you for your attention.</p>
+                        <br>
+                        <p style="text-align: center;">Best regards,</p>
+                        <p style="text-align: center;">PT Sinar Meadow International Indonesia</p>
+                    </td>
+                </tr>
         </tbody>
     </table>
 </body>

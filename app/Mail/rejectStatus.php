@@ -8,6 +8,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class rejectStatus extends Mailable
 {
@@ -32,6 +33,7 @@ class rejectStatus extends Mailable
 
     public function build()
 {
+    Log::info($this->budgetRequest->budget_req_no);
     return $this->subject("peminjaman dana direject oleh")
     ->markdown('emails.userRejected')
     ->with([
@@ -42,25 +44,6 @@ class rejectStatus extends Mailable
         'purchaseDetails'=>$this->purchaseDetails
     ]);
 }
-    /**
-     * Get the message envelope.
-     */
-    public function envelope(): Envelope
-    {
-        return new Envelope(
-            subject: 'peminjaman dana direject oleh '. $this->deptName[0],
-        );
-    }
-
-    /**
-     * Get the message content definition.
-     */
-    public function content(): Content
-    {
-        return new Content(
-            view: 'view.name',
-        );
-    }
 
     /**
      * Get the attachments for the message.

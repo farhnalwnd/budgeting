@@ -107,7 +107,7 @@
                 <td>{{ $budgetRequest->amount }}</td>
             </tr>
 
-            @if($isAdmin)
+            @if($isAdmin && !empty($purchaseDetails))
             <tr>
                 <th colspan="3" class="text-center">
                     <a href="{{ route('purchase-request.edit', $purchases->id) }}" class="btn edit-link">Edit</a>

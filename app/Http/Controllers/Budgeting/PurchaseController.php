@@ -232,7 +232,7 @@ class PurchaseController extends Controller
         $purchaseDetails = $data->detail;
         // ! ganti admin menjadi nik
         $admins = User::role('budgeting-admin')->get();
-        $userAdmin = user::where('department_id', $departmentId)->role('admin')->first();
+        $userAdmin = user::where('department_id', $departmentId)->first();
         SendApprovedPurchaseNotification::dispatch($userAdmin, $data, $purchaseDetails, false);
         foreach ($admins as $admin) {
             SendApprovedPurchaseNotification::dispatch($admin, $data->fresh(), $purchaseDetails->fresh(), true);
@@ -510,7 +510,7 @@ class PurchaseController extends Controller
                         ]
                     ])
 
-                    ->log('budget-request approval with number:  ' .  $budgetRequest->budget_req_no . ' by ' . $approver->name . ' at: ' . now());
+                    ->log('budget-request approval with number:  ' .  $budgetRequest->budget_req_no . ' by ' . $approver->name .' with nomminal: '. $amount . ' at: ' . now());
             DB::commit();
             return view('emails.finishProcces');
         }else{
@@ -576,6 +576,14 @@ class PurchaseController extends Controller
 
                     //* Kirim notifikasi dalam transaction-safe context
                     SendRejectedPurchaseNotification::dispatch($user, $purchases, $budgetRequest, $deptName, $purchaseDetails);
+                }else{
+                    $toDept = $budgetRequest->toDepartment->department_name;
+                    $fromDept = $budgetRequest->fromDepartment->department_name;
+                    $deptName = [$toDept, $fromDept];
+                    $user = user::where('nik', $budgetRequest->nik)->first();
+
+                    //* Kirim notifikasi dalam transaction-safe context
+                    SendRejectedPurchaseNotification::dispatch($user, null, $budgetRequest, $deptName, null);
                 }
             }
             $approverDept = User::with('department')->where('nik', $request->nik)->first();

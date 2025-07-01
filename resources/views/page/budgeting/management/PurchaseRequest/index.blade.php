@@ -31,7 +31,7 @@
     <section x-data="{open : false}" @modal-close.window="open = false" class="content">
         <div class="mb-4 flex px-4">
             <div id="deptBalance"
-                class="w-fit h-max shadow-md rounded-md shadow-neutral-500 bg-gradient-to-t from-blue-500 to-blue-700  text-lg p-3 hover:scale-105 group">
+                class="w-fit h-max shadow-md rounded-md shadow-neutral-500 bg-gradient-to-t from-blue-500 to-blue-700  text-xl p-3 hover:scale-105 group">
                 <h1 class="group-hover:cursor-pointer text-white">Rp. {{number_format($department->balanceForYear(now()->year) , 0, ',' , '.')}}</h1>
             </div>
             <div @click="open = ! open" class="ml-auto">

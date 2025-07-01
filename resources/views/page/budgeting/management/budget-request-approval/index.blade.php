@@ -123,7 +123,7 @@
                         'X-Requested-With': 'XMLHttpRequest'
                     },
                     body: JSON.stringify({
-                        budget_purchase_no: purchaseNo
+                        budget_req_no: purchaseNo
                     })
                 });
 
@@ -287,7 +287,7 @@
                                     </div>
                                     <div class="ml-auto">
                                         <form action="/purchase-request/edit" method="GET">
-                                            <button type="button" class="btn btn-primary" onClick="resendEmail('${budget.budget_purchase_no}')">Resend</button>
+                                            <button type="button" class="btn btn-primary" onClick="resendEmail('${budget.budget_req_no}')">Resend</button>
                                         </form>
                                         <button type="button" class="btn btn-danger" data-modal-hide="editContactModal${id}" onClick="openEditModal(${id})">Exit</button>
                                     </div>

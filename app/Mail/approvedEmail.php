@@ -44,7 +44,6 @@ class approvedEmail extends Mailable
             'purchaseDetails'=> $this->purchaseDetails,
             'isAdmin'=> $this->isAdmin
             ]);
-
     }
 
     /**

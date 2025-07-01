@@ -171,8 +171,7 @@ class BudgetRequestController extends Controller
 
             // check purchase
             $purchase = Purchase::where('purchase_no', $budget->budget_purchase_no)->first();
-            if($purchase)
-            {
+
                 // Simulasi request jika budget approved
                 $purchaseController = new PurchaseController();
                 $result = null;
@@ -213,88 +212,7 @@ class BudgetRequestController extends Controller
                 // Commit transaksi
                 DB::commit();
                 return response()->json(['result' => $result, 'message' => 'Budget-request successfully ' . $validatedData['action'] .'!'], 200);  
-            } 
-            else
-            {
 
-                if($approval->status != 'pending')
-                {
-                    DB::rollback();
-                    throw new \Exception("Approval status is not pending.");
-                }
-
-                $fromDept = Department::findOrFail($budget->from_department_id);
-                $toDept = Department::findOrFail($budget->to_department_id);
-
-                // Get year from budget no
-                $parts = explode('/', $budget->budget_req_no);
-                $yearSuffix = $parts[3];
-                $year = '20' . $yearSuffix;
-
-                if(!$toDept->hasWallet($year))
-                {
-                    DB::rollback();
-                    throw new \Exception("Your department has insufficient budget this year.");
-                }
-                if($toDept->balanceForYear($year) < $validatedData['amount']){
-                    DB::rollback();
-                    throw new \Exception("Your department has insufficient budget this year.");
-                }
-
-
-                $user = Auth::user();
-                $status = null;
-                $review = null;
-                if($validatedData['action'] === 'approve' || $validatedData['action'] === 'approve with review')
-                {
-                    $status = 'Approved';
-                    if($validatedData['action'] === 'approve with review')
-                    {
-                        $review = $validatedData['reviewTextArea'];
-                    }
-                    $toDept->getWallet($year)->transfer($fromDept->getWallet($year), $budget->amount);
-                }
-                else
-                {   
-                    $status = 'Rejected';
-                    $review = $validatedData['reviewTextArea'];
-                }
-
-                $budget->update([
-                    'status' => $status,
-                    'feedback' => $review
-                ]);
-
-                $approval->update([
-                    'status' => $status,
-                    'feedback' => $review,
-                    'token' => null
-                ]);
-
-                
-
-                activity()
-                    ->performedOn($budget)
-                    ->inLog('budget-request')
-                    ->event(ucfirst($validatedData['action']))
-                    ->causedBy($user->department)
-                    ->withProperties(['no' => $budget->budget_req_no, 'action' => $validatedData['action'],
-                    'data' => [
-                        'budget_req_no' => $budget->budget_req_no,
-                        'from_department' => $user->department->department_name,
-                        'budget_purchase_no' => $budget->budget_purchase_no,
-                        'to_department' => $toDept->department_name,
-                        'amount' => $budget->amount,
-                        'reason' => $budget->reason,
-                        'status' => $budget->status,
-                        'feedback' => $budget->feedback
-                    ]])
-                    ->log(ucfirst($validatedData['action']) . ' budget-request ' . $budget->budget_req_no . ' by ' . $user->name . ' at ' . now());
-
-                // Commit transaksi
-                DB::commit();
-                return response()->json(['message' => 'Budget-request successfully ' . $validatedData['action'] .'!'], 200);
-            }
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
             DB::rollback();
@@ -438,44 +356,54 @@ class BudgetRequestController extends Controller
     public function resendEmail(Request $request)
     {
         $request->validate([
-            'budget_purchase_no' => 'required|string'
+            'budget_req_no' => 'required|string'
         ]);
+        $requestNo = $request->budget_req_no;
 
-        $purchaseNo = $request->budget_purchase_no;
+        $requestBudget = BudgetRequest::with(['purchase', 'toDepartment', 'fromDepartment'])->where('budget_req_no', $requestNo)->first();
 
-        $purchase = Purchase::where('purchase_no', $purchaseNo)->first();
-        $requestBudget = BudgetRequest::where('budget_purchase_no', $purchaseNo)->first();
-        $toDepartmentName = $requestBudget->toDepartment->department_name;
-        $fromDepartmentName = $requestBudget->fromDepartment->department_name;
-
-        if (!$purchase && !$requestBudget) {
-            return response()->json(['success' => false, 'message' => 'Data purchase tidak ditemukan.'], 404);
+        if (!$requestBudget) {
+            return response()->json(['success' => false, 'message' => 'Data Budget Request tidak ditemukan.'], 404);
         }
 
         try {
-            $approver = null;
             $approver = BudgetApprover::where('department_id', $requestBudget->to_department_id)->first();
             $budgetApproval = BudgetApproval::where('budget_req_no', $requestBudget->budget_req_no)->first();
-            if($budgetApproval){
-                $budgetApproval->token = Str::uuid();
-                $budgetApproval->save();
+
+            if (!$approver || !$budgetApproval) {
+                return response()->json(['success' => false, 'message' => 'Data approver atau data approval untuk request ini tidak ditemukan.'], 404);
             }
-            if ($approver && $approver->user) {
-                $approver = $approver->user;
+
+            $budgetApproval->token = Str::uuid();
+            $budgetApproval->save();
+
+            $requestData = [
+                'to_department_name' => $requestBudget->toDepartment->department_name,
+                'from_department_name' => $requestBudget->fromDepartment->department_name,
+                'amount' => $requestBudget->amount,
+                'reason' => $requestBudget->reason,
+                'budget_req_no' => $request->budget_req_no,
+                'budget_purchase_no' => null,
+            ];
+
+            $purchase = $requestBudget->purchase;
+            if ($purchase) {
+                $requestData['budget_purchase_no'] = $purchase->purchase_no;
             }
-            if ($approver && $approver->email) {
-                $requestData = [
-                    'to_department_name' => $toDepartmentName,
-                    'from_department_name' => $fromDepartmentName,
-                    'budget_purchase_no' => $purchaseNo,
-                    'amount' => $requestBudget->amount,
-                    'reason' => $requestBudget->reason
-                ];
-                sendApprovalRequest::dispatch($approver, $requestData, $budgetApproval);
+
+            $approverUser = $approver->user;
+
+            if ($approverUser && $approverUser->email) {
+                sendApprovalRequest::dispatch($approverUser, $requestData, $budgetApproval);
+            } else {
+                return response()->json(['success' => false, 'message' => 'User approver tidak valid atau tidak memiliki email.'], 404);
             }
+
             return response()->json(['success' => true, 'message' => 'Email berhasil dikirim ulang.']);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Gagal mengirim email: ' . $e->getMessage()], 500);
+            // Log error untuk debugging
+            Log::error('Gagal kirim ulang email: ' . $e->getMessage() . ' di baris ' . $e->getLine());
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan sistem saat mengirim email.'], 500);
         }
     }
 
