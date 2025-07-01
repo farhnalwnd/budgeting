@@ -232,8 +232,8 @@ class PurchaseController extends Controller
         $purchaseDetails = $data->detail;
         // ! ganti admin menjadi nik
         $admins = User::role('budgeting-admin')->get();
-        $users = user::where('department_id', $departmentId)->first();
-        SendApprovedPurchaseNotification::dispatch($users, $data, $purchaseDetails, false);
+        $userAdmin = user::where('department_id', $departmentId)->role('admin')->first();
+        SendApprovedPurchaseNotification::dispatch($userAdmin, $data, $purchaseDetails, false);
         foreach ($admins as $admin) {
             SendApprovedPurchaseNotification::dispatch($admin, $data->fresh(), $purchaseDetails->fresh(), true);
         }
@@ -313,7 +313,7 @@ class PurchaseController extends Controller
             $newActualAmount = $validated['actual_amount'];
     
             //* actual amount pernah diinput
-            if ($oldAmount !== null && $oldAmount !== 0) {
+            if ($oldAmount !== null && $oldAmount > 0) {
                 if ($oldAmount > $grandTotal) {
                     // $fromDept->deposit($oldAmount - $grandTotal);
                     $fromDept->depositToYear(now()->year, $oldAmount - $grandTotal);
@@ -329,8 +329,10 @@ class PurchaseController extends Controller
                 'actual_amount' => $newActualAmount
             ]);
             
-            if($newActualAmount !== null && $newActualAmount !== 0)
+            if($newActualAmount !== null && $newActualAmount > 0)
             {
+
+                
                 // * ketika actual amount baru  besar dari grand total
                 if ($newActualAmount > $grandTotal) {
                     $diff = $newActualAmount - $grandTotal;
