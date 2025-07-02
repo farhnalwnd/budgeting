@@ -199,13 +199,28 @@ class DatabaseSeeder extends Seeder
 
         $superAdminUser->assignRole($superAdminRole);
 
+        $budgetingAdminUser = User::firstOrCreate([
+                    'email' => 'budgetingadmin@gmail.com',
+                ], [
+                    'name' => 'budgeting Admin',
+                    'username' => 'budgeting',
+                    'nik' => 'AG2222',
+                    'email' => 'budgetingadmin@gmail.com',
+                    'password' => Hash::make ('password'),
+                    'email_verified_at' => now(),
+                    'position_id' => 1,
+                    'department_id' => 2,
+                ]);
+
+        $budgetingAdminUser->assignRole($budgetingAdminRole);
+
 
         $adminUser = User::firstOrCreate([
                             'email' => 'admin@gmail.com'
                         ], [
                             'name' => 'Admin',
                             'username' => 'admin',
-                            'nik' => 'AG2222',
+                            'nik' => 'AG3333',
                             'email' => 'admin@gmail.com',
                             'password' => Hash::make ('password'),
                             'email_verified_at' => now(),
@@ -216,20 +231,35 @@ class DatabaseSeeder extends Seeder
         $adminUser->assignRole($adminRole);
 
 
-        $staffUser = User::firstOrCreate([
-                            'email' => 'staff@gmail.com',
+        $staffEng = User::firstOrCreate([
+                            'email' => 'engstaff@gmail.com',
                         ], [
-                            'name' => 'Staff',
-                            'username' => 'staff',
-                            'nik' => 'AG3333',
-                            'email' => 'staff@gmail.com',
+                            'name' => 'Engineering Staff',
+                            'username' => 'eng',
+                            'nik' => 'AG4444',
+                            'email' => 'engineeringstaff@gmail.com',
                             'password' => Hash::make('password'),
                             'email_verified_at' => now(),
                             'position_id' => 3,
                             'department_id' => 1,
                         ]);
 
-        $staffUser->assignRole($staffRole);
+        $staffEng->assignRole($staffRole);
+
+        $stafffin = User::firstOrCreate([
+                            'email' => 'finstaff@gmail.com',
+                        ], [
+                            'name' => 'Finance Staff',
+                            'username' => 'fin',
+                            'nik' => 'AG5555',
+                            'email' => 'financestaff@gmail.com',
+                            'password' => Hash::make('password'),
+                            'email_verified_at' => now(),
+                            'position_id' => 3,
+                            'department_id' => 2,
+                        ]);
+
+        $stafffin->assignRole($staffRole);
 
 
         CategoryMaster::Create(['name' => 'Plant & Machineries']);
