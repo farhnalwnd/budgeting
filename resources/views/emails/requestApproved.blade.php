@@ -83,8 +83,8 @@
                     @if($isAdmin)
                     <h5>Data purchases baru dengan status <strong>{{ $purchases->status ?? '-' }}</strong></h5>
                     @else
-                    <h5>Department <strong>{{ $deptName[0] }}</strong> menyetujui permintaan dana oleh department
-                        <strong>{{ $deptName[1] }}</strong> sehingga status purchases saat ini adalah <strong>{{
+                    <h5>Department <strong>{{ $deptName[1] }}</strong> menyetujui permintaan dana oleh department
+                        <strong>{{ $deptName[0] }}</strong> sehingga status purchases saat ini adalah <strong>{{
                             $purchases->status ?? '-' }}</strong></h5>
                     @endif
                 </th>
@@ -92,11 +92,11 @@
 
             <tr class="tr-odd">
                 <td colspan="2">Peminta:</td>
-                <td>{{ $deptName[1] }}</td>
+                <td>{{ $deptName[0] }}</td>
             </tr>
             <tr>
                 <td colspan="2">Pemberi:</td>
-                <td>{{ $deptName[0] }}</td>
+                <td>{{ $deptName[1] }}</td>
             </tr>
             <tr class="tr-odd">
                 <td colspan="2">budget Request No:</td>

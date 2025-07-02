@@ -44,8 +44,8 @@
                     <h5 class="text-center">data yang ditolak oleh department {{ $deptName[0] }}</h5>
                 </th>
             </tr>
-            <tr>
-                <td colspan="2" class="tr-odd">penganggar:</td>
+            <tr class="tr-odd">
+                <td colspan="2">penganggar:</td>
                 <td>{{ $deptName[1] }}</td>
             </tr>
                 @if($purchases)
@@ -77,17 +77,14 @@
                     </tr>
                 @else
                     <tr>
-                        <td></td>
                         <td>No Budget Request:</td>
                         <td>{{ $budgetRequest->budget_req_no }}</td>
                     </tr>
                     <tr class="tr-odd">
-                        <td></td>
                         <td>nominal:</td>
                         <td>{{ $budgetRequest->amount }}</td>
                     </tr>
                     <tr>
-                        <td></td>
                         <td>feedback:</td>
                         <td>{{ $budgetRequest->feedback }}</td>
                     </tr>

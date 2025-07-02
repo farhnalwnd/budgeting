@@ -79,7 +79,7 @@
             </tr>
             <tr>
                 <td colspan="2">No Purchase:</td>
-                <td>{{ $data->department_id }}</td>
+                <td>{{ $data->purchase_no }}</td>
             </tr>
 
             @foreach ($purchaseDetails as $index => $detail)

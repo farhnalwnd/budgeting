@@ -230,8 +230,8 @@ class PurchaseController extends Controller
             //* email ke user
         $data = purchase::with(['detail', 'department'])->where('purchase_no', $purchaseNumber)->firstOrFail();
         $purchaseDetails = $data->detail;
-        // ! ganti admin menjadi nik
         $admins = User::role('budgeting-admin')->get();
+        //! email dikirim ke orang random dari dpt tersebut.
         $userAdmin = user::where('department_id', $departmentId)->first();
         SendApprovedPurchaseNotification::dispatch($userAdmin, $data, $purchaseDetails, false);
         foreach ($admins as $admin) {
