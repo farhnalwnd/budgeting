@@ -225,15 +225,14 @@ class PurchaseController extends Controller
 
         // $department->withdraw($grandTotal);
         $department->withdrawFromYear(now()->year, $grandTotal);
-            // dd($department);
 
             //* email ke user
         $data = purchase::with(['detail', 'department'])->where('purchase_no', $purchaseNumber)->firstOrFail();
         $purchaseDetails = $data->detail;
         $admins = User::role('budgeting-admin')->get();
         //! email dikirim ke orang random dari dpt tersebut.
-        $userAdmin = user::where('department_id', $departmentId)->first();
-        SendApprovedPurchaseNotification::dispatch($userAdmin, $data, $purchaseDetails, false);
+        $purchaser = user::where('department_id', $departmentId)->role('admin')->first();
+        SendApprovedPurchaseNotification::dispatch($purchaser, $data, $purchaseDetails, false);
         foreach ($admins as $admin) {
             SendApprovedPurchaseNotification::dispatch($admin, $data->fresh(), $purchaseDetails->fresh(), true);
         }

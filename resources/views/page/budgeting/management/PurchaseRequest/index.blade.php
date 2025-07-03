@@ -721,7 +721,7 @@
             table = $('#usersTable').DataTable({
                 dom: 'Bfrtip',
                 autoWidth: false,
-                buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+                buttons: ['excel', 'pdf'],
                 ajax: {
                     url: "{{ route('purchase.data') }}",
                     type: 'GET',
