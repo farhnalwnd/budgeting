@@ -9,6 +9,7 @@ use App\Http\Controllers\Budgeting\BudgetAllocationController;
 use App\Http\Controllers\Budgeting\BudgetApproverController;
 use App\Http\Controllers\Budgeting\PurchaseController;
 use App\Http\Controllers\Budgeting\BudgetListController;
+use App\Http\Controllers\Budgeting\PanelDashboardController;
 use App\Http\Controllers\Budgeting\BudgetRequestController;
 use App\Http\Controllers\Budgeting\CategoryController;
 use App\Http\Controllers\Budgeting\ReportController;
@@ -46,6 +47,13 @@ Route::middleware('auth')->group(function () {
     /* Dashboard */
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard-finance', [DashboardController::class, 'index-finance'])->name('dashboard-finance');
+    Route::get('dashboard/panel-dashboard', [PanelDashboardController::class, 'index'])->name('panel-dashboard');
+    Route::get('/dashboard/getChartYear', [PanelDashboardController::class, 'getchartYear'])->name('get.chart.year');
+    Route::get('/dashboard/getChartDepartment', [PanelDashboardController::class, 'getchartDepartment'])->name('get.chart.department');
+    Route::get('/dashboard/getChartRequest', [PanelDashboardController::class, 'getRequest'])->name('get.chart.request');
+    Route::get('/dashboard/getChartPurchase', [PanelDashboardController::class, 'getpurchase'])->name('get.chart.purchase');
+    Route::get('/dashboard/getPieChart', [PanelDashboardController::class, 'getPieChart'])->name('get.pie.chart');
+    Route::get('/dashboard/getBarChart', [PanelDashboardController::class, 'getBarChart'])->name('get.bar.chart');
     Route::resource('/dashboard/report', ReportController::class);
     Route::get('/dashboard/getReportData', [ReportController::class, 'getReportData'])->name('get.report.data');
     Route::get('/dashboard/getReportYear', [ReportController::class, 'getReportYear'])->name('get.report.year');

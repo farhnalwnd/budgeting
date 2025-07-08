@@ -303,6 +303,10 @@
 
 
         $('#budgetTable tbody').on('click', 'tr', function () {
+            //cek apakah ada data ditable
+            if (table.data().count() === 0) {
+                return; 
+            }
             let rowIndex = table.row(this).index();
             openEditModal(rowIndex);
         });

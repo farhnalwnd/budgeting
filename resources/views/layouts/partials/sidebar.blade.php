@@ -10,8 +10,11 @@
     <ul id="main-menu" class="sm sm-blue">
         <li class="{{ request()->is('dashboard') ? 'current' : '' }}"><a href="{{ route('dashboard') }}"
                 style="font-size: 18px;"><i data-feather="home" style="width: 18px; height: 18px;"><span
-                        class="path1"></span><span class="path2"></span></i>Dashboard</a>
+                    class="path1"></span><span class="path2"></span></i>Dashboard</a>
             <ul>
+                <li><a href="{{ route('panel-dashboard') }}"
+                    class="{{ request()->is('dashboard/panel-dashboard') ? 'current' : '' }}"><i class="icon-Commit"><span
+                            class="path1"></span><span class="path2"></span></i>Chart Dashboard</a></li>
                 <li><a href="{{ route('report.index') }}"
                     class="{{ request()->is('dashboard/report') ? 'current' : '' }}"><i class="icon-Commit"><span
                             class="path1"></span><span class="path2"></span></i>Report </a></li>

@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use App\Models\Budgeting\Purchase;
 use App\Traits\HasYearlyWallets;
+use Bavix\Wallet\Models\Wallet as ModelsWallet;
 use Bavix\Wallet\Traits\HasWallets;
 
 class Department extends Model implements Wallet
@@ -54,6 +55,11 @@ class Department extends Model implements Wallet
     public function budgetApprovers()
     {
         return $this->hasMany(BudgetApprover::class, 'department_id');
+    }
+
+    public function wallet()
+    {
+        return $this->hasOne(ModelsWallet::class, 'id', 'holder_id');
     }
 
 
