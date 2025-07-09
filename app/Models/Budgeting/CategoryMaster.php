@@ -18,6 +18,6 @@ class CategoryMaster extends Model
     }
 
     public function category(){
-        return $this->hasMany(Purchase::class, 'category_id');
+        return $this->hasMany(Purchase::class, 'category_id', 'id');
     }
 }

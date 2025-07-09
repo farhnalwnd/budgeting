@@ -54,6 +54,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard/getChartPurchase', [PanelDashboardController::class, 'getpurchase'])->name('get.chart.purchase');
     Route::get('/dashboard/getPieChart', [PanelDashboardController::class, 'getPieChart'])->name('get.pie.chart');
     Route::get('/dashboard/getBarChart', [PanelDashboardController::class, 'getBarChart'])->name('get.bar.chart');
+    Route::get('/dashboard/purchaseTracking', [PanelDashboardController::class, 'purchaseTracking'])->name('get.line.chart');
+    Route::get('/dashboard/balanceTracking', [PanelDashboardController::class, 'balanceTracking'])->name('getbalanceTracking');
     Route::resource('/dashboard/report', ReportController::class);
     Route::get('/dashboard/getReportData', [ReportController::class, 'getReportData'])->name('get.report.data');
     Route::get('/dashboard/getReportYear', [ReportController::class, 'getReportYear'])->name('get.report.year');
