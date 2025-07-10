@@ -12,9 +12,11 @@
                 style="font-size: 18px;"><i data-feather="home" style="width: 18px; height: 18px;"><span
                     class="path1"></span><span class="path2"></span></i>Dashboard</a>
             <ul>
+                @can('view dashboard statistic')
                 <li><a href="{{ route('panel-dashboard') }}"
                     class="{{ request()->is('dashboard/panel-dashboard') ? 'current' : '' }}"><i class="icon-Commit"><span
                             class="path1"></span><span class="path2"></span></i>Chart Dashboard</a></li>
+                @endcan
                 <li><a href="{{ route('report.index') }}"
                     class="{{ request()->is('dashboard/report') ? 'current' : '' }}"><i class="icon-Commit"><span
                             class="path1"></span><span class="path2"></span></i>Report </a></li>

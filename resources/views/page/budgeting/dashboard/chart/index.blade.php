@@ -104,7 +104,7 @@
             </div>
         </div> 
 
-        <div class="mb-8 bg-white rounded-2xl w-full h-screen flex justify-center items-center p-3">
+        <div class="mb-8 bg-white rounded-2xl shadow-md w-full h-screen flex justify-center items-center p-3">
             <canvas id="purchaseChart"></canvas>
         </div>
 

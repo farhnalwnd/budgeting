@@ -16,6 +16,12 @@ use Illuminate\Support\Facades\Schema;
 
 class PanelDashboardController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('permission:view dashboard statistic', ['only' => ['index']]);
+    }
+
     public function index()
     {
         return view(".page.budgeting.dashboard.chart.index");

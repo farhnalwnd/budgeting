@@ -110,6 +110,7 @@ class DatabaseSeeder extends Seeder
         Permission::create(['name' => 'create purchase']);
         Permission::create(['name' => 'update purchase']);
         Permission::create(['name' => 'view purchase']);
+        Permission::create(['name' => 'view dashboard statistic']);
 
          //create departements
 
